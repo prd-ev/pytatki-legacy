@@ -1,0 +1,2 @@
+# pytatki
+Notatki we flasku
