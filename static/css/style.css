@@ -1,0 +1,46 @@
+@charset "utf-8";
+
+
+/*-------------------------
+	Simple reset
+--------------------------*/
+
+.primary {
+  background-color: #757575;
+  color: #ffffff;
+}
+.primary-light {
+  background-color: #a4a4a4;
+  color: #ffffff;
+}
+.primary-dark {
+  background-color: #494949;
+  color: #ffffff;
+}
+.secondary {
+  background-color: #1976d2;
+  color: #ffffff;
+}
+.secondary-light {
+  background-color: #63a4ff;
+  color: #ffffff;
+}
+.secondary-dark {
+  background-color: #004ba0;
+  color: #ffffff;
+}
+
+/*-------------------------
+	Demo page
+-------------------------*/
+
+.normal {
+	background-color: #23232e;
+}
+.form {
+    background-color: #ffffff;
+}
+
+
+
+

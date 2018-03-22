@@ -16,8 +16,9 @@ class User(DB.Model, UserMixin):
     id = Column(Integer, autoincrement=True, primary_key=True)
     active = Column(Boolean, default=True)
     username = Column(String(20), unique=True)
-    email = Column(String(200), unique=True)
+    email = Column(String(200))
     password = Column(String(200), default='')
+    admin = Column(Boolean, default=False)
 
     def is_active(self):
         """
