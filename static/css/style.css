@@ -29,7 +29,11 @@
   background-color: #004ba0;
   color: #ffffff;
 }
-
+html, body{
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
 /*-------------------------
 	Demo page
 -------------------------*/
@@ -38,7 +42,25 @@
 	background-color: #23232e;
 }
 .form {
-    background-color: #ffffff;
+    background-color: #dddddd;
+}
+.login-row{
+    margin-top: 15%;
+    margin-bottom: 15%;
+}
+.register-row{
+    margin-top: 10%;
+    margin-bottom: 10%;
+}
+@media (max-width: 768px){
+    .login-row{
+        margin-top:0px;
+        margin-bottom:0px;
+    }
+    .register-row{
+        margin-top:0px;
+        margin-bottom:0px;
+    }
 }
 
 

@@ -3,11 +3,11 @@
 {% set page_id = 'login' %}
 
 {% block content %}
-  <div class="row mt-5 mb-5">
-    <div class="col-sm-2"></div>
-
-    <div class="col-lg-8 bg-white">
-      <h3>Rejestracja</h3>
+  <div class="row login-row">
+    <div class="col-lg-7">
+    </div>
+    <div class="col-lg-4 bg-white rounded m-2" style="padding:15px;">
+      <h3>Logowanie</h3>
 		<form method=post action="/login/">
             <div class="form-group">
                 <input class="form-control" id="username" name="username" type="text" value="{{form['username']}}" autofocus placeholder="Login lub hasło">
@@ -27,6 +27,5 @@
 		{% endif %}
 	</div>
 
-    <div class="col-sm-2"></div>
   </div>
 {% endblock %}

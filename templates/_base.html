@@ -9,10 +9,11 @@
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="{% if page_id != 'register' %}normal{%else%}form{%endif%}">
+<body class="{% if page_id == 'register' or page_id == 'login' %}form{%else%}normal{%endif%}">
     <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
         <a class="navbar-brand" href="/">Pliki</a>
-        {% if page_id != 'register' %}
+        {% if page_id == 'register' or page_id == 'login' %}
+        {% else %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
         aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -26,9 +27,13 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Wyloguj się</a>
                 </li>
+                {% if admin %}
+                <hr>
                 <li class="nav-item {% if page_id == 'admin' %} active{% endif %}">
                     <a class="btn btn-warning btn-block" href="/admin">Funkcje administratora</a>
                 </li>
+                <hr>
+                {% endif %}
                 {% else %}
                 <li class="nav-item{% if page_id == 'register' %} active{% endif %}">
                     <a role="presentation" class="nav-link" data-toggle="modal" data-target="#register" href="#">Zarejestruj się</a>
@@ -70,7 +75,7 @@
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked">
-                        <label class="form-check-label" for="accept_tos">Akceptuję <a href="/about/tos" target="blank">Warunki użytkowania</a> i <a href="/about/privacy-policy" target="blank">Politykę prywatności</a> (zaktualizowana 17 stycznia 2018r.)</label>
+                        <label class="form-check-label" for="accept_tos">Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia 2018r.)</label>
                     </div><br>
                     <input class="btn btn-primary" type=submit value="Zarejestruj się">
                 </form>

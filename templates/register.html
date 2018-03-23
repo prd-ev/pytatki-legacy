@@ -3,10 +3,11 @@
 {% set page_id = 'register' %}
 
 {% block content %}
-  <div class="row mt-5 mb-5">
-    <div class="col-sm-2"></div>
+  <div class="row register-row">
+    <div class="col-lg-6">
 
-    <div class="col-lg-8 bg-white">
+    </div>
+    <div class="col-lg-5 bg-white m-2 rounded" style="padding:15px;">
       <h3>Rejestracja</h3>
 		<form method=post action="/register/">
             <div class="form-group">
@@ -30,18 +31,23 @@
             </div>
             <div class="form-group">
                 <input class="form-control" id="confirm" name="confirm" type="password" value="" placeholder="Powtórz hasło">
+                {% if wrong_password %}
+                <small class="form-text text-danger">
+                    Błędne hasło
+                </small>
+                {% endif %}
             </div>
             <div class="form-check">
                 <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked" {{form['accept_tos']}}>
-                <label class="form-check-label" for="accept_tos">Akceptuję <a href="/about/tos" target="blank">Warunki użytkowania</a> i <a href="/about/privacy-policy" target="blank">Politykę prywatności</a> (zaktualizowana 17 stycznia 2018r.)</label>
+                <label class="form-check-label" for="accept_tos">Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia 2018r.)</label>
+                {% if not_accept %}
+                <small class="form-text text-danger">
+                    Aby się zarejestrować musisz zaakceptować!
+                </small>
+                {% endif %}
             </div><br>
             <input class="btn btn-primary" type=submit value="Zarejestruj się">
 		</form>
-		{% if error %}
-			<p class="error"><strong>Error:</strong>{{error}}</p>
-		{% endif %}
 	</div>
-
-    <div class="col-sm-2"></div>
   </div>
 {% endblock %}

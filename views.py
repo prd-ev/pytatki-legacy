@@ -16,13 +16,14 @@ def login_required(func):
     @wraps(func)
     def wrap(*args, **kwargs):
         if not 'logged_in' in session:
-            flash("Musisz być zalogowany.")
             return redirect('/')
         else:
             return func(*args, **kwargs)
     return wrap
 
-user=User()
+
+user = User()
+
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
@@ -33,14 +34,34 @@ def register():
             form = request.form
             username = form['username']
             email = form['email']
-            password = sha256_crypt.encrypt((str(form['password'])))
+            try:
+                if form['password']==form['confirm'] and not form['password']=='':
+                    password = sha256_crypt.encrypt((str(form['password'])))
+                    wrong_password=False
+                else:
+                    wrong_password = True
+            except Exception:
+                wrong_password = True
+            try:
+                accept = form['accept_tos']
+                if not accept == 'checked':
+                    not_accept=True
+                else:
+                    not_accept=False
+            except Exception:
+                not_accept=True
             used_username = User.query.filter_by(username=username).first()
             if used_username:
-                print('used')
-                return render_template('register.html', form=form, used_username=True)
+                used_username=True
+            else:
+                used_username=False
             if "@" not in email:
-                print('wrong')
-                return render_template('register.html', form=form, wrong_email=True)
+                wrong_email=True
+            else:
+                wrong_email=False
+            if not_accept or used_username or wrong_email or wrong_password:
+                return render_template('register.html', form=form, not_accept=not_accept, used_username=used_username,
+                                       wrong_email=wrong_email, wrong_password=wrong_password)
             user.email = email
             user.password = password
             user.username = username
@@ -49,8 +70,8 @@ def register():
             session['logged_in'] = True
             session['username'] = username
             return redirect('/')
-        return render_template('register.html', form=form)
     except Exception as error:
+        print(error)
         return redirect('/')
 
 
@@ -58,28 +79,27 @@ def register():
 def login():
     try:
         if request.method == "POST":
-            form = request.form
-            db_user = User.query.filter_by(username=form['username']).first()
+            db_user = User.query.filter_by(username=request.form['username']).first()
             if db_user:
                 db_password = db_user.password
-                if sha256_crypt.verify(form['password'], db_password):
+                if sha256_crypt.verify(request.form['password'], db_password):
                     session['logged_in'] = True
-                    session['username'] = form['username']
+                    session['username'] = request.form['username']
                     db_user.active = 1
                     DB.session.commit()
                     return redirect('/')
-            db_user = User.query.filter_by(email=form['username']).first()
+            db_user = User.query.filter_by(email=request.form['username']).first()
             if db_user:
                 db_password = db_user.password
-                if sha256_crypt.verify(form['password'], db_password):
+                if sha256_crypt.verify(request.form['password'], db_password):
                     session['logged_in'] = True
-                    session['username'] = User.query.filter_by(email=form['username']).first().username
-                    session['email'] = User.query.filter_by(email=form['username']).first().email
+                    session['username'] = User.query.filter_by(email=request.form['username']).first().username
+                    session['email'] = User.query.filter_by(email=request.form['username']).first().email
                     db_user.active = 1
                     DB.session.commit()
                     return redirect('/')
             else:
-                return render_template('login.html', wrong=True)
+                return render_template('login.html', form=request.form, wrong=True)
         return redirect('/')
     except Exception as e:
         print(e)
@@ -98,8 +118,14 @@ def logout():
     except Exception as e:
         return redirect('/')
 
+
 @APP.route('/')
 def homepage():
-    return render_template('homepage.html')
+    try:
+        admin = User.query.filter_by(username=session['username']).first().admin
+    except KeyError:
+        admin = False
+    return render_template('homepage.html', admin=admin)
+
 
 APP.secret_key = "sekretny klucz"
