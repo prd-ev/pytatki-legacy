@@ -82,13 +82,14 @@ def login():
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
         if user:
-            if user is None or not user.check_password(request.form['password']):
-                return render_template('login.html', form=request.form, wrong=True)
-        login_user(user)
-        flash('Zalogowano pomyślnie!', 'success')
+            if user.check_password(request.form['password']):
+                login_user(user)
+                flash('Zalogowano pomyślnie!', 'success')
+                return redirect('/')
+        return render_template('login.html', form=request.form, wrong=True)
     else:
         return render_template('login.html')
-    return redirect('/')
+
 
 
 @APP.route("/logout/")
