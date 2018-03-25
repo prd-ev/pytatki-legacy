@@ -23,10 +23,21 @@ def login_required(func):
             return func(*args, **kwargs)
     return wrap
 
+def ban(func):
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        if current_user.is_authenticated:
+            if current_user.ban:
+                flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
+                return redirect('/logout/')
+            else:
+                return func(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
+    return wrap
+
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
-    """Rejestruje użytkownika dopisując go do bazy danych automatycznie logując
-    i ustawiając jego status na aktywny"""
     try:
         if request.method == "POST":
             form = request.form
@@ -84,7 +95,6 @@ def login():
         if user:
             if user.check_password(request.form['password']):
                 login_user(user)
-                flash('Zalogowano pomyślnie!', 'success')
                 return redirect('/')
         return render_template('login.html', form=request.form, wrong=True)
     else:
@@ -95,10 +105,8 @@ def login():
 @APP.route("/logout/")
 @login_required
 def logout():
-    """Wylogowuje ustawiając status na niaktywny"""
     try:
         logout_user()
-        flash('Zostaweł poprawnie wylogowany', 'success')
         return redirect('/')
     except Exception as e:
         flash('Błąd: '+str(e), 'danger')
@@ -106,6 +114,7 @@ def logout():
 
 
 @APP.route('/')
+@ban
 def homepage():
     if current_user.is_authenticated:
         try:
@@ -118,24 +127,23 @@ def homepage():
 
 
 @APP.route('/user/<username>/')
+@ban
 def user_info(username):
-    """
-    Tu będą wyświetlane gamejamy, drużyny, gry i dokłade dane dotyczące użytkownika
-    """
-    if username==current_user.username and current_user.username=='piotr' or username!="piotr":
-        try:
-            admin = User.query.filter_by(username=current_user.username).first().admin
-        except Exception:
-            admin = False
-        user=User.query.filter_by(username=username).first()
+    try:
+        admin = User.query.filter_by(username=current_user.username).first().admin
+    except Exception:
+        admin = False
+    user=User.query.filter_by(username=username).first()
+    if user:
         return render_template('user.html', user=user, admin=admin)
-    return redirect('/user/'+current_user.username)
+    else:
+        flash('Nie ma takiego użytkownika', 'warning')
+        return redirect('/')
 
 
 @APP.route("/admin/")
 @login_required
 def admin():
-    """to samo co user info tylko dla admina"""
     try:
         admin = User.query.filter_by(username=current_user.username).first().admin
     except Exception:
@@ -148,8 +156,6 @@ def admin():
 @APP.route('/delete/<int:id>/')
 @login_required
 def delete(id):
-    """NIE DZIAłA NA UŻYTKOWNIKA PIOTR"""
-    """Funkcja usuwa użytkownika, po czym jeżeli zalogoway użytkownik to admin, zwraca listę użytkowników, w przeciwnym przypadku wraca na stronę główną"""
     if id == User.query.filter_by(username=current_user.username).first().id or User.query.filter_by(
             username=current_user.username).first().admin:
         user = User.query.filter_by(id=id).first()
@@ -170,8 +176,89 @@ def delete(id):
             else:
                 DB.session.delete(user)
                 DB.session.commit()
-                return redirect('/user_list')
+                flash('Użytkownik został usunięty', 'success')
+                return redirect('/admin/user-list')
+        else:
+            flash('Nie ma takiego użytkownika', 'warning')
+            return redirect('/')
     flash('Nie możesz tego zrobić!', 'warning')
+    return redirect('/')
+
+@APP.route("/admin/user-list/")
+@login_required
+def user_list():
+    """wyświetla listę użytkowników wraz z linkami dla adminów do edycji kont użytkowników"""
+    """nie wyświetla użytkownika piotr"""
+    try:
+        admin = User.query.filter_by(username=current_user.username).first().admin
+    except KeyError:
+        admin = False
+    if User.query.filter_by(username=current_user.username).first().admin:
+        users=User.query.order_by(User.id.asc()).all()
+        admini = 0
+        for user in users:
+            if user.admin:
+                admini += 1
+        return render_template('user_list.html', users=users, admini=admini, admin=admin)
+    flash('Nie możesz tego zrobić!', 'warning')
+    return redirect('/')
+
+@APP.route('/admin/ban/<username>')
+@login_required
+def ban(username):
+    user = User.query.filter_by(username=username).first()
+    if user:
+        user.ban = True
+        DB.session.commit()
+        flash('Użytkownik '+user.username+' został zbanowany', 'success')
+    else:
+        flash('Nie ma takiego użytkownika', 'warning')
+    return redirect('/admin/user-list')
+
+@APP.route('/admin/unban/<username>')
+@login_required
+def unban(username):
+    user = User.query.filter_by(username=username).first()
+    if user:
+        user.ban = False
+        DB.session.commit()
+        flash('Użytkownik '+user.username+' został odbanowany', 'success')
+    else:
+        flash('Nie ma takiego użytkownika', 'warning')
+    return redirect('/admin/user-list')
+
+@APP.route('/give-admin/<int:id>')
+@login_required
+def give_admin(id):
+    if id != 1:
+        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
+                id=id).first() and User.query.filter_by(id=id).first() != User.query.filter_by(
+                username=current_user.username).first():
+            try:
+                User.query.filter_by(id=id).first().admin = True
+                User.query.filter_by(id=id).first().a = True
+                DB.session.commit()
+                flash('Przekazano uprawnienia administratora użytkownikowi ' + str(
+                    User.query.filter_by(id=id).first().username), 'success')
+                return redirect('/admin/user-list')
+            except:
+                return redirect('/')
+    return redirect('/')
+
+@APP.route('/take-admin/<int:id>')
+@login_required
+def take_admin(id):
+    if id != 1:
+        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
+            try:
+                User.query.filter_by(id=id).first().admin = False
+                User.query.filter_by(id=id).first().a = False
+                DB.session.commit()
+                flash('Odebrano uprawnienia administratora użytkownikowi ' + str(
+                    User.query.filter_by(id=id).first().username), 'success')
+                return redirect('/admin/user-list')
+            except:
+                return redirect('/')
     return redirect('/')
 
 
