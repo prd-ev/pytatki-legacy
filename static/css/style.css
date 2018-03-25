@@ -44,23 +44,8 @@ html, body{
 .form {
     background-color: #dddddd;
 }
-.login-row{
-    margin-top: 15%;
-    margin-bottom: 15%;
-}
-.register-row{
-    margin-top: 10%;
-    margin-bottom: 10%;
-}
 @media (max-width: 768px){
-    .login-row{
-        margin-top:0px;
-        margin-bottom:0px;
-    }
-    .register-row{
-        margin-top:0px;
-        margin-bottom:0px;
-    }
+
 }
 
 

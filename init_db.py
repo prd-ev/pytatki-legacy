@@ -12,11 +12,10 @@ def db_start():
     DB.create_all()
     DB.session.commit()
 
-    user = models.User()
-    user.username = "patryk"
-    user.password = sha256_crypt.encrypt("h@sl0")
-    user.email = 'pniedzwiedzinski19@gmail.com'
+    user = models.User(username='patryk', password=sha256_crypt.encrypt("h@sl0"), email='pniedzwiedzinski19@gmail.com')
+    user.confirm_mail = True
     user.admin = True
+    user.ban = True
     DB.session.add(user)
     DB.session.commit()
 

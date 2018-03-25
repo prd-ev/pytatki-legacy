@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+<title>{{ current_user.username }}</title>
+{% set page_id = "current_user.username" %}
+{% block content %}
+  <div class="row mt-3">
+      <div class="col-md-8">
+
+            {%if user.username==current_user.username%}
+          <h2>{{ current_user.username}}<span class="ml-3 badge badge-secondary">TO TY!</span></h2>
+            {%else%}
+                <h2>current_user.username</h2>
+            {%endif%}
+    </div>
+    <div class="col-md-4">
+         {%if user.username==current_user.username%}
+            <button class="btn btn-danger btn-block" role="presentation" data-toggle="modal" data-target="#are-you-sure" href="#" > Usuń swoje konto</button><br>
+
+         <div class="modal fade" id="are-you-sure" tabindex="-5" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="text-align: left;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Jesteś pewien?</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+              <div class="container">
+                <p>Właśnie zamierzasz usunąć użytkownika <b>{{user.username}}</b>. Jesteś tego pewien?</p>
+                <a class="btn btn-danger" href="/delete/{{user.id}}">Usuń</a>
+                <a class="btn btn-primary" data-dismiss="modal" href="#">Anuluj</a>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  {%endif%}
+    </div>
+  </div>
+{% endblock %}

@@ -6,7 +6,7 @@
 
     </div>
     <div class="col-lg-8">
-{% if session['logged_in']%}
+{% if current_user.is_authenticated%}
 {% else %}
         <div class="rounded alert-danger" style="padding: 20px; margin-top:50px; margin-bottom:50px">
             <h3 class="text-center">Musisz być zalogowany!</h3>

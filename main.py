@@ -17,6 +17,7 @@ DB.app = APP
 DB.init_app(APP)
 LM = LoginManager()
 LM.init_app(APP)
+LM.login_view = 'login'
 BCRYPT = Bcrypt()
 CONFIG = Localhost
 

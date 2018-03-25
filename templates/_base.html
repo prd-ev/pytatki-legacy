@@ -9,7 +9,7 @@
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="{% if page_id == 'register' or page_id == 'login' %}form{%else%}normal{%endif%}">
+<body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}">
     <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
         <a class="navbar-brand" href="/">Pliki</a>
         {% if page_id == 'register' or page_id == 'login' %}
@@ -20,9 +20,9 @@
         </button>
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="navbar-nav mr-auto">
-                {% if session['logged_in']%}
+                {% if current_user.is_authenticated%}
                 <li class="nav-item {% if page_id == 'user' %}active{% endif %}">
-                    <a class="nav-link" href="/user">{{session['username']}}</a>
+                    <a class="nav-link" href="/user/{{current_user.username}}">{{current_user.username}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Wyloguj się</a>
@@ -43,11 +43,38 @@
                 </li>
                 {% endif %}
             </ul>
+            {% if page_id == 'homepage' and current_user.is_authenticated%}
+            <ul class="navbar-nav">
+                <hr>
+            <li class="align-left nav-item">
+                <a class="btn btn-primary btn-block" href="/add">Dodaj</a>
+            </li>
+            </ul>
+            {%endif%}
         </div>
     {% endif %}
     </nav>
 
+
     <div class="container">
+        <div class="row">
+      <div class="col-12">
+        <div id="messages">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+              <div data-alert class="alert alert-{{category}} alert-dismissible show">
+                  {{ message|urlize(30) }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
         {% block content %}{% endblock %}
     </div>
     {% if page_id != 'register' %}
