@@ -6,10 +6,11 @@ from main import BCRYPT
 from main import LM
 from flask import render_template, redirect, request, session, flash
 from passlib.hash import sha256_crypt
-from models import User
+from models import User, Subject, Topic, Note
 from functools import wraps
 import gc
 from flask_login import login_user, logout_user, current_user
+from datetime import datetime
 
 __author__ = 'Patryk Niedźwiedziński'
 
@@ -260,6 +261,61 @@ def take_admin(id):
             except:
                 return redirect('/')
     return redirect('/')
+
+@APP.route('/add/', methods=["GET", "POST"])
+@login_required
+def add():
+    if request.method == 'POST':
+        form = request.form
+        note = Note()
+        note.name = form['name']
+        note.author_id = current_user.username
+        note.subject_id = form['subject']
+        note.topic_id = form['topic']
+        note.date = datetime.date.today()
+        print(note.data)
+        DB.session.add(note)
+        DB.session.commit()
+        flash('Notatka została dodana!', 'success')
+        return redirect('/')
+    else:
+        return render_template('add.html')
+
+@APP.route('/admin/add/', methods=["GET", "POST"])
+@login_required
+def admin_add():
+    if current_user.admin or current_user.modderator:
+        if request.method == 'POST':
+            print(request.form)
+            if request.form['type']=='subject':
+                try:
+                    subject = Subject()
+                    subject.name = request.form['title']
+                    DB.session.add(subject)
+                    DB.session.commit()
+                    flash('Dodano przedmiot!', 'success')
+                except Exception as e:
+                    flash('Błąd: '+str(e), 'danger')
+                return redirect('/')
+            elif request.form['type'] == 'topic':
+                try:
+                    topic = Topic()
+                    topic.name = request.form['title']
+                    topic.subject_id = request.form['subject']
+                    DB.session.add(topic)
+                    DB.session.commit()
+                    flash('Dodano dział!', 'success')
+                except Exception as e:
+                    flash('Błąd: '+str(e), 'danger')
+                return redirect('/')
+        else:
+            subjects = Subject.query.order_by(Subject.id.asc()).all()
+            topics = Topic.query.order_by(Topic.id.asc()).all()
+            print(subjects)
+            return render_template('admin_add.html', subjects=subjects, topics=topics)
+    else:
+        flash('Nie masz dostępu', 'warning')
+        return redirect('/')
 
 
 APP.secret_key = "sekretny klucz"

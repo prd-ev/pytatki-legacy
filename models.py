@@ -23,7 +23,9 @@ class User(DB.Model):
     email = Column(String(200))
     confirm_mail = Column(Boolean, default=True)
     password = Column(String(200), default='')
+    modderator = Column(Boolean, default=False)
     admin = Column(Boolean, default=False)
+    superuser = Column(Boolean, default=False)
     ban = Column(Boolean, default=False)
 
     def check_password(self, password):
@@ -55,6 +57,7 @@ class Note(DB.Model):
     __tablename__ = 'note'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String(200))
+    author_id = Column(Integer)
     subject_id = Column(Integer)
     topic_id = Column(Integer)
     date = Column(String(20))

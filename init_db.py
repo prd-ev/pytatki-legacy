@@ -14,7 +14,9 @@ def db_start():
 
     user = models.User(username='patryk', password=sha256_crypt.encrypt("h@sl0"), email='pniedzwiedzinski19@gmail.com')
     user.confirm_mail = True
+    user.modderator = True
     user.admin = True
+    user.superuser = True
     user.ban = False
     DB.session.add(user)
     DB.session.commit()

@@ -4,12 +4,19 @@
 {% block content %}
   <div class="row mt-3">
       <div class="col-md-8">
-
+        <h2>
             {%if user.username==current_user.username%}
-          <h2>{{ current_user.username}}<span class="ml-3 badge badge-secondary">TO TY!</span></h2>
+          {{ current_user.username}}<span class="ml-3 badge badge-secondary">TO TY!</span>
             {%else%}
-          <h2>{{user.username}}</h2>
+          {{user.username}}
             {%endif%}
+          {% if user.admin %}
+          <span class="ml-3 badge badge-primary">ADMIN</span>
+          {% endif %}
+          {% if user.modderator %}
+          <span class="ml-3 badge badge-warning">MOD</span>
+          {% endif %}
+        </h2>
     </div>
     <div class="col-md-4">
          {%if user.username==current_user.username%}
