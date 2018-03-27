@@ -1,22 +1,50 @@
 {% extends "_base.html" %}
 {% set page_id = "homepage" %}
 {% block content %}
+<script>
+    function check_hash(){
+    /*document.getElementById('breadcrumb').innerHTML = window.location.hash;*/
+    console.log(window.location.hash);
+    if (window.location.hash == ""){
+        home = "{%for subject in subjects%}<a href='/#{{subject.name}}' class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'>{{subject.name}}</a>{%endfor%}";
+        document.getElementById('data').innerHTML = home;
+        breadcrumb_home = "<li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#'>Home</a></li>";
+        document.getElementById('breadcrumb').innerHTML = breadcrumb_home;
+    }
+    {% for subject in subjects %}
+    if (window.location.hash == "#{{subject.name}}"){
+        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}<a href='/#{{subject.name}}#{{topic.name}}' class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'>{{topic.name}}</a>{%endif%}{%endfor%}";
+        document.getElementById('data').innerHTML = html;
+        breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.name}}'>{{subject.name}}</a></li>"
+        document.getElementById('breadcrumb').innerHTML = breadcrumb;
+    }
+    {%endfor%}
+    }
+</script>
 <div class="row">
-    <div class="col-md-2">
-
-    </div>
-    <div class="col-lg-8">
 {% if current_user.is_authenticated%}
+    <div class="col-lg-12">
+        <nav>
+            <ol id="breadcrumb" class="breadcrumb secondary-light">
+                <li class="breadcrumb-item active" aria-current="page"><a class="text-light" href="#">Home</a></li>
+            </ol>
+        </nav>
+        <div id="data" class="row data p-3">
+            {%for subject in subjects%}
+            <a href="/#{{subject.name}}" class="col-lg primary text-light rounded p-3 m-2" style="height:118px; text-decoration: none;">{{subject.name}}</a>
+            {%endfor%}
+        </div>
+    </div>
 {% else %}
+    <div class="col-md-2"></div>
+    <div class="col-lg-8">
         <div style="height: 200px">
         <div class="rounded alert-danger" style="padding: 20px; margin-top:50px; margin-bottom:50px">
             <h3 class="text-center">Musisz być zalogowany!</h3>
         </div>
         </div>
+    </div>
+    <div class="col-md-2"></div>
 {% endif%}
-    </div>
-    <div class="col-md-2">
-
-    </div>
 </div>
 {% endblock %}

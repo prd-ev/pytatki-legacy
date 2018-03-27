@@ -122,6 +122,9 @@ def homepage():
             admin = User.query.filter_by(username=current_user.username).first().admin
         except Exception:
             admin = False
+        subjects = Subject.query.order_by(Subject.id.asc()).all()
+        topics = Topic.query.order_by(Topic.id.asc()).all()
+        return render_template('homepage.html', admin=admin, subjects=subjects, topics=topics)
     else:
         admin = False
     return render_template('homepage.html', admin=admin)
@@ -286,7 +289,6 @@ def add():
 def admin_add():
     if current_user.admin or current_user.modderator:
         if request.method == 'POST':
-            print(request.form)
             if request.form['type']=='subject':
                 try:
                     subject = Subject()
@@ -311,7 +313,6 @@ def admin_add():
         else:
             subjects = Subject.query.order_by(Subject.id.asc()).all()
             topics = Topic.query.order_by(Topic.id.asc()).all()
-            print(subjects)
             return render_template('admin_add.html', subjects=subjects, topics=topics)
     else:
         flash('Nie masz dostępu', 'warning')

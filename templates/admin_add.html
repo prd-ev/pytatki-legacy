@@ -6,7 +6,7 @@
 <script>
     function select_check(){
         if (document.getElementById('topic-type').selected){
-            var $html = $('<select class="custom-select" id="subject">{%for subject in subjects%}<option value="{{subject.id}}">{{subject.name}}</option>{%endfor%}</select>');
+            var $html = $('<select class="custom-select" id="subject" name="subject">{%for subject in subjects%}<option value="{{subject.id}}">{{subject.name}}</option>{%endfor%}</select>');
             str = $html.prop('outerHTML');
             document.getElementById('choose-subject').innerHTML = str;
         }
