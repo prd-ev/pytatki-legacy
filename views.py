@@ -14,16 +14,6 @@ from datetime import datetime
 
 __author__ = 'Patryk Niedźwiedziński'
 
-def login_required(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if not current_user.is_authenticated:
-            flash("Musisz być zalogowany", 'warning')
-            return redirect('/login/')
-        else:
-            return func(*args, **kwargs)
-    return wrap
-
 def ban(func):
     @wraps(func)
     def wrap(*args, **kwargs):
@@ -35,6 +25,23 @@ def ban(func):
                 return func(*args, **kwargs)
         else:
             return func(*args, **kwargs)
+    return wrap
+
+def login_required(func):
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash("Musisz być zalogowany", 'warning')
+            return redirect('/login/')
+        else:
+            if current_user.is_authenticated:
+                if current_user.ban:
+                    flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
+                    return redirect('/logout/')
+                else:
+                    return func(*args, **kwargs)
+            else:
+                return func(*args, **kwargs)
     return wrap
 
 @APP.route('/register/', methods=["GET", "POST"])
@@ -323,6 +330,12 @@ def admin_add():
     else:
         flash('Nie masz dostępu', 'warning')
         return redirect('/')
+
+@APP.route('/admin/notes/')
+@login_required
+def notes():
+    notes = Note.query.order_by(Note.id.asc()).all()
+    return render_template('notes.html', notes=notes)
 
 
 APP.secret_key = "sekretny klucz"
