@@ -6,14 +6,14 @@
     /*document.getElementById('breadcrumb').innerHTML = window.location.hash;*/
     console.log(window.location.hash);
     if (window.location.hash == ""){
-        home = "{%for subject in subjects%}<a href='/#{{subject.name}}' class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'>{{subject.name}}</a>{%endfor%}";
+        home = "{%for subject in subjects%}<div class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.name}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;'>{{subject.name}}</a></div>{%endfor%}";
         document.getElementById('data').innerHTML = home;
         breadcrumb_home = "<li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#'>Home</a></li>";
         document.getElementById('breadcrumb').innerHTML = breadcrumb_home;
     }
     {% for subject in subjects %}
-    if (window.location.hash == "#{{subject.name}}"){
-        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}<a href='/#{{subject.name}}#{{topic.name}}' class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'>{{topic.name}}</a>{%endif%}{%endfor%}";
+    if (window.location.hash == "#{% set subject_name_raw = subject.name.split(' ') %}{% set subject_name = '' %}{% for word in subject_name_raw %}{%if loop.index > 1 %}{{'%20' + word}}{%else%}{{word}}{%endif%}{% endfor %}"){
+        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}<div class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.name}}#{{topic.name}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;'>{{topic.name}}</a></div>{%endif%}{%endfor%}";
         document.getElementById('data').innerHTML = html;
         breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.name}}'>{{subject.name}}</a></li>"
         document.getElementById('breadcrumb').innerHTML = breadcrumb;
@@ -31,7 +31,7 @@
         </nav>
         <div id="data" class="row data p-3">
             {%for subject in subjects%}
-            <a href="/#{{subject.name}}" class="col-lg primary text-light rounded p-3 m-2" style="height:118px; text-decoration: none;">{{subject.name}}</a>
+            <div class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.name}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;'>{{subject.name}}</a></div>
             {%endfor%}
         </div>
     </div>
