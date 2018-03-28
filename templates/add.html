@@ -3,6 +3,21 @@
 {% set page_id = 'add' %}
 
 {% block content %}
+<script>
+    function select_check(){
+        subject = document.getElementById('subject').value;
+        console.log(subject);
+        {% for subject in subjects %}
+        if (subject == "{{subject.id}}"){
+            document.getElementById('topic-group').innerHTML = "<select class='custom-select' id='topic' name='topic'></select>";
+            document.getElementById('topic').innerHTML = "{% for topic in topics %}{% if topic.subject_id == subject.id %}<option value='{{topic.id}}'>{{topic.name}}</option>{%endif%}{% endfor %}";
+        }
+        if (subject == ""){
+            document.getElementById('topic-group').innerHTML = "<label for='topic'>Wybierz dział</label><select class='custom-select' id='topic' name='topic' disabled><option value='' selected>Najpierw wybierz przedmiot</option></select>";
+        }
+        {% endfor %}
+    }
+</script>
   <div class="row">
     <div class="col-lg-2">
     </div>
@@ -14,7 +29,7 @@
             </div>
             <div class="form-group">
                 <label for="type">Wybierz kategorię</label>
-                <select class="custom-select" id="type" multiple>
+                <select class="custom-select" id="type" name="type">
                   <option value="note" selected>Notatka / Materiał powtórzeniowy</option>
                   <option value="test">Sprawdzian</option>
                   <option value="other">Inne</option>
@@ -25,13 +40,16 @@
               <label class="custom-file-label" for="file">Wybierz plik</label>
             </div>
             <div class="form-group">
-                <select class="custom-select" id="subject">
+                <label for="subject">Wybierz przedmiot</label>
+                <select class="custom-select" id="subject" name="subject" onchange="select_check()">
+                    <option value="" selected>-- Wybierz --</option>
                     {%for subject in subjects%}<option value="{{subject.id}}">{{subject.name}}</option>{%endfor%}
                 </select>
             </div>
-            <div class="form-group">
-                <select class="custom-select" id="topic">
-                    <option value="1">One</option>
+            <div id="topic-group" class="form-group">
+                <label for="topic">Wybierz dział</label>
+                <select class="custom-select" id="topic" name="topic" disabled>
+                    <option value='' selected>Najpierw wybierz przedmiot</option>
                 </select>
             </div>
             <input class="btn btn-primary" type=submit value="Wyślij">

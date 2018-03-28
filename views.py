@@ -124,7 +124,8 @@ def homepage():
             admin = False
         subjects = Subject.query.order_by(Subject.id.asc()).all()
         topics = Topic.query.order_by(Topic.id.asc()).all()
-        return render_template('homepage.html', admin=admin, subjects=subjects, topics=topics)
+        notes = Note.query.order_by(Note.id.asc()).all()
+        return render_template('homepage.html', admin=admin, subjects=subjects, topics=topics, notes=notes)
     else:
         admin = False
     return render_template('homepage.html', admin=admin)
@@ -269,20 +270,25 @@ def take_admin(id):
 @login_required
 def add():
     if request.method == 'POST':
-        form = request.form
-        note = Note()
-        note.name = form['name']
-        note.author_id = current_user.username
-        note.subject_id = form['subject']
-        note.topic_id = form['topic']
-        note.date = datetime.date.today()
-        print(note.data)
-        DB.session.add(note)
-        DB.session.commit()
-        flash('Notatka została dodana!', 'success')
-        return redirect('/')
+        try:
+            form = request.form
+            note = Note()
+            note.name = form['title']
+            note.author_id = current_user.id
+            note.subject_id = form['subject']
+            note.topic_id = form['topic']
+            note.date = datetime.now()
+            DB.session.add(note)
+            DB.session.commit()
+            flash('Notatka została dodana!', 'success')
+            return redirect('/')
+        except Exception as error:
+            flash("Błąd: " + str(error), 'danger')
+            return redirect('/')
     else:
-        return render_template('add.html')
+        subjects = Subject.query.order_by(Subject.id.asc()).all()
+        topics = Topic.query.order_by(Topic.id.asc()).all()
+        return render_template('add.html', subjects=subjects, topics=topics)
 
 @APP.route('/admin/add/', methods=["GET", "POST"])
 @login_required

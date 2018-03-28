@@ -6,18 +6,30 @@
     /*document.getElementById('breadcrumb').innerHTML = window.location.hash;*/
     console.log(window.location.hash);
     if (window.location.hash == ""){
-        home = "{%for subject in subjects%}<div class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;'>{{subject.name}}</a></div>{%endfor%}";
+        home = "{%for subject in subjects%}<div class='col-lg-5 primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;color: white;'>{{subject.name}}</a></div>{%endfor%}";
         document.getElementById('data').innerHTML = home;
         breadcrumb_home = "<li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#'>Home</a></li>";
         document.getElementById('breadcrumb').innerHTML = breadcrumb_home;
     }
     {% for subject in subjects %}
     if (window.location.hash == "#{{subject.id}}"){
-        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}<div class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}#{{topic.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;'>{{topic.name}}</a></div>{%endif%}{%endfor%}";
+        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}<div class='col-lg-5 primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}#{{topic.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;color: white;'>{{topic.name}}</a></div>{%endif%}{%endfor%}";
         document.getElementById('data').innerHTML = html;
         breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.id}}'>{{subject.name}}</a></li>"
         document.getElementById('breadcrumb').innerHTML = breadcrumb;
     }
+    {%endfor%}
+    {% for subject in subjects %}
+    {% for topic in topics %}
+    {% if topic.subject_id == subject.id %}
+    if (window.location.hash == "#{{subject.id}}#{{topic.id}}"){
+        html = "{%for note in notes%}{% if note.subject_id == subject.id%}{%if note.topic_id == topic.id %}<div class='col-lg-5 primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}#{{topic.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;color: white;'>{{note.name}}</a></div>{%endif%}{%endif%}{%endfor%}";
+        document.getElementById('data').innerHTML = html;
+        breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#{{subject.id}}'>{{subject.name}}</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.id}}#{{topic.id}}'>{{topic.name}}</a></li>"
+        document.getElementById('breadcrumb').innerHTML = breadcrumb;
+    }
+    {% endif %}
+    {%endfor%}
     {%endfor%}
     }
 </script>
@@ -31,7 +43,7 @@
         </nav>
         <div id="data" class="row data p-3">
             {%for subject in subjects%}
-            <div class='col-lg primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none;'>{{subject.name}}</a></div>
+            <div class='col-lg-5 primary text-light rounded p-3 m-2' style='height:118px; text-decoration: none;'><a href='/#{{subject.id}}' style='top: 0; left: 0; width: 100%; height: 100%; position: absolute; text-decoration: none; color: white;'>{{subject.name}}</a></div>
             {%endfor%}
         </div>
     </div>
