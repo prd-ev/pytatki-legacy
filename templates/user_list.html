@@ -4,35 +4,31 @@
 {% block content %}
   <div class="row mt-3">
       <div class="col-xl-3">
+          {% if current_user.admin %}
           <a class="btn btn-warning btn-block" href="/admin">< Funkcje administratora</a>
+          {% else %}
+          <a class="btn btn-warning btn-block" href="/admin">< Funkcje moderatora</a>
+          {% endif %}
           <hr>
       </div>
-  <div class="col-xl-4 mb-3">
-        <div class="list-group">
-            <li class="list-group-item active" href=""><h4>Admini<span class="float-right badge badge-light badge-pill">{{admini - 1}}</span></h4></li>
-            {%for a in users%}
-            {%if a.admin and a.id!=1%}
-            <li class="list-group-item list-group-item-active">
-                <a class="btn m-1" href="/user/{{a.id}}"><h5>{{a.username}}</h5></a>
-                <a class="float-right btn btn-info m-1" href="/take-admin/{{a.id}}">Odbierz admina</a>
-            </li>
-          {%endif%}
-              {%endfor%}
-        </div>
-    </div>
-    <div class="col-xl-5 mb-3">
+    <div class="col-xl-9 mb-3">
         <div class="list-group">
             <li class="list-group-item active" href=""><h4>Użytkownicy<span class="float-right badge badge-light badge-pill">{{users|length - 1}}</span></h4></li>
             {%for a in users%}
             {%if a.id!=1%}
             <li class="list-group-item">
-                <a class="btn m-1" href="/user/{{a.username}}"><h5>{{a.username}}</h5></a>
-                <a class="float-right btn btn-danger m-1" href="/delete/{{a.id}}">Usuń</a>
-                {% if a.ban %}
-                <a class="float-right btn btn-danger m-1" href="/admin/unban/{{a.username}}">Odbanuj</a>
-                {% else %}
-                <a class="float-right btn btn-warning m-1" href="/admin/ban/{{a.username}}">Ban</a>
-                {% if not a.admin%}<a class="float-right btn btn-info m-1" href="/give-admin/{{a.id}}">Daj admina</a>{%endif%}
+                <a class="btn m-1" href="/user/{{a.username}}"><h5>{{a.username}}{% if a.ban %}<span class="ml-3 badge badge-danger">BAN</span>{%else%}{% if a.admin %}<span class="ml-3 badge badge-primary">ADMIN</span>{% endif %}{% if a.modderator %}<span class="ml-3 badge badge-warning">MOD</span>{% endif %}{% endif %}</h5></a>
+                {% if current_user.admin %}<a class="float-right btn btn-danger m-1" href="/delete/{{a.id}}">Usuń</a>{%endif%}
+                {% if not a.modderator and not a.admin and not current_user.username == a.username%}
+                    {% if a.ban %}
+                    <a class="float-right btn btn-danger m-1" href="/admin/unban/{{a.username}}">Odbanuj</a>
+                    {% else %}
+                    <a class="float-right btn btn-warning m-1" href="/admin/ban/{{a.username}}">Ban</a>
+                    {%endif%}
+                {%endif%}
+                {% if current_user.admin and not a.ban%}
+                {% if not a.admin%}<a class="float-right btn btn-info m-1" href="/give-admin/{{a.id}}">Daj admina</a>{%else%}<a class="float-right btn btn-info m-1" href="/take-admin/{{a.id}}">Odbierz admina</a>{%endif%}
+                {% if not a.modderator%}<a class="float-right btn btn-info m-1" href="/give-mod/{{a.id}}">Daj mod'a</a>{%else%}<a class="float-right btn btn-info m-1" href="/take-mod/{{a.id}}">Odbierz mod'a</a>{%endif%}
                 {% endif %}
             </li>
           {%endif%}

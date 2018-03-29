@@ -1,7 +1,7 @@
 '''Plik główny aplikacji'''
 
 from os import path
-from config import Localhost
+from config import CONFIG
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -19,10 +19,8 @@ LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login'
 BCRYPT = Bcrypt()
-CONFIG = Localhost
 
 APP.static_path = path.join(path.abspath(__file__), 'static')
-
 
 if __name__ == '__main__':
     from views import *

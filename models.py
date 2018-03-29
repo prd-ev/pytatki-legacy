@@ -57,6 +57,7 @@ class Note(DB.Model):
     __tablename__ = 'note'
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String(200))
+    file = Column(String(200), default="")
     author_id = Column(Integer)
     subject_id = Column(Integer)
     topic_id = Column(Integer)

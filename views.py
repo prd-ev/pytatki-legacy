@@ -4,6 +4,7 @@ from main import APP
 from main import DB
 from main import BCRYPT
 from main import LM
+from config import CONFIG
 from flask import render_template, redirect, request, session, flash
 from passlib.hash import sha256_crypt
 from models import User, Subject, Topic, Note
@@ -11,8 +12,14 @@ from functools import wraps
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
+import os
 
 __author__ = 'Patryk Niedźwiedziński'
+
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+target = os.path.join(APP_ROOT, 'games')
+UPLOAD_FOLDER = target
+APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def ban(func):
     @wraps(func)
@@ -27,7 +34,7 @@ def ban(func):
             return func(*args, **kwargs)
     return wrap
 
-def login_required(func):
+def login_manager(func):
     @wraps(func)
     def wrap(*args, **kwargs):
         if not current_user.is_authenticated:
@@ -42,6 +49,16 @@ def login_required(func):
                     return func(*args, **kwargs)
             else:
                 return func(*args, **kwargs)
+    return wrap
+
+def login_required(func):
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash("Musisz być zalogowany", 'warning')
+            return redirect('/login/')
+        else:
+            return func(*args, **kwargs)
     return wrap
 
 @APP.route('/register/', methods=["GET", "POST"])
@@ -154,19 +171,19 @@ def user_info(username):
 
 
 @APP.route("/admin/")
-@login_required
+@login_manager
 def admin():
     try:
         admin = User.query.filter_by(username=current_user.username).first().admin
     except Exception:
         admin = False
-    if admin:
+    if admin or User.query.filter_by(username=current_user.username).first().modderator:
         return render_template('admin.html', admin=admin)
     return redirect('/')
 
 
 @APP.route('/delete/<int:id>/')
-@login_required
+@login_manager
 def delete(id):
     if id == User.query.filter_by(username=current_user.username).first().id or User.query.filter_by(
             username=current_user.username).first().admin:
@@ -197,7 +214,7 @@ def delete(id):
     return redirect('/')
 
 @APP.route("/admin/user-list/")
-@login_required
+@login_manager
 def user_list():
     """wyświetla listę użytkowników wraz z linkami dla adminów do edycji kont użytkowników"""
     """nie wyświetla użytkownika piotr"""
@@ -205,7 +222,7 @@ def user_list():
         admin = User.query.filter_by(username=current_user.username).first().admin
     except KeyError:
         admin = False
-    if User.query.filter_by(username=current_user.username).first().admin:
+    if User.query.filter_by(username=current_user.username).first().admin or User.query.filter_by(username=current_user.username).first().modderator:
         users=User.query.order_by(User.id.asc()).all()
         admini = 0
         for user in users:
@@ -216,7 +233,7 @@ def user_list():
     return redirect('/')
 
 @APP.route('/admin/ban/<username>')
-@login_required
+@login_manager
 def ban(username):
     user = User.query.filter_by(username=username).first()
     if user:
@@ -228,7 +245,7 @@ def ban(username):
     return redirect('/admin/user-list')
 
 @APP.route('/admin/unban/<username>')
-@login_required
+@login_manager
 def unban(username):
     user = User.query.filter_by(username=username).first()
     if user:
@@ -240,7 +257,7 @@ def unban(username):
     return redirect('/admin/user-list')
 
 @APP.route('/give-admin/<int:id>')
-@login_required
+@login_manager
 def give_admin(id):
     if id != 1:
         if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
@@ -248,7 +265,6 @@ def give_admin(id):
                 username=current_user.username).first():
             try:
                 User.query.filter_by(id=id).first().admin = True
-                User.query.filter_by(id=id).first().a = True
                 DB.session.commit()
                 flash('Przekazano uprawnienia administratora użytkownikowi ' + str(
                     User.query.filter_by(id=id).first().username), 'success')
@@ -257,14 +273,46 @@ def give_admin(id):
                 return redirect('/')
     return redirect('/')
 
+@APP.route('/take-mod/<int:id>')
+@login_manager
+def take_mod(id):
+    if id != 1:
+        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
+            try:
+                User.query.filter_by(id=id).first().modderator = False
+                DB.session.commit()
+                flash('Odebrano uprawnienia moderatora użytkownikowi ' + str(
+                    User.query.filter_by(id=id).first().username), 'success')
+                return redirect('/admin/user-list')
+            except Exception as error:
+                flash("Błąd: "+str(error),'danger')
+                return redirect('/')
+    return redirect('/')
+
+@APP.route('/give-mod/<int:id>')
+@login_manager
+def give_mod(id):
+    if id != 1:
+        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
+                id=id).first() and User.query.filter_by(id=id).first() != User.query.filter_by(
+                username=current_user.username).first():
+            try:
+                User.query.filter_by(id=id).first().modderator = True
+                DB.session.commit()
+                flash('Przekazano uprawnienia moderatora użytkownikowi ' + str(
+                    User.query.filter_by(id=id).first().username), 'success')
+                return redirect('/admin/user-list')
+            except:
+                return redirect('/')
+    return redirect('/')
+
 @APP.route('/take-admin/<int:id>')
-@login_required
+@login_manager
 def take_admin(id):
     if id != 1:
         if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
             try:
                 User.query.filter_by(id=id).first().admin = False
-                User.query.filter_by(id=id).first().a = False
                 DB.session.commit()
                 flash('Odebrano uprawnienia administratora użytkownikowi ' + str(
                     User.query.filter_by(id=id).first().username), 'success')
@@ -274,7 +322,7 @@ def take_admin(id):
     return redirect('/')
 
 @APP.route('/add/', methods=["GET", "POST"])
-@login_required
+@login_manager
 def add():
     if request.method == 'POST':
         try:
@@ -298,7 +346,7 @@ def add():
         return render_template('add.html', subjects=subjects, topics=topics)
 
 @APP.route('/admin/add/', methods=["GET", "POST"])
-@login_required
+@login_manager
 def admin_add():
     if current_user.admin or current_user.modderator:
         if request.method == 'POST':
@@ -332,10 +380,16 @@ def admin_add():
         return redirect('/')
 
 @APP.route('/admin/notes/')
-@login_required
+@login_manager
 def notes():
     notes = Note.query.order_by(Note.id.asc()).all()
     return render_template('notes.html', notes=notes)
 
+@APP.route('/admin/')
 
-APP.secret_key = "sekretny klucz"
+@APP.route('/download/<file>/')
+def download(file):
+    return file
+
+
+APP.secret_key = CONFIG.secret_key
