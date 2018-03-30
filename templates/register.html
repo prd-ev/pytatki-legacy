@@ -8,9 +8,9 @@
     </div>
     <div class="col-lg-4 bg-white m-2 rounded" style="padding:15px;">
       <h3>Rejestracja</h3>
-		<form method=post action="/register/">
+		<form method=post action="{{url_for('register', next=request.args.get('next'))}}">
             <div class="form-group">
-                <input class="form-control" id="username" name="username" type="text" value="{{form['username']}}" autofocus placeholder="Nazwa użytkownika">
+                <input class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{% endif %}" autofocus placeholder="Nazwa użytkownika">
                 {% if used_username %}
                 <small class="form-text text-danger">
                     Ta nazwa użytkownika jest już zajęta!
@@ -23,7 +23,7 @@
                 {% endif %}
             </div>
             <div class="form-group">
-                <input class="form-control" id="email" name="email" type="email" value="{{form['email']}}" placeholder="Adres email">
+                <input class="form-control" id="email" name="email" type="email" value="{% if form %}{{form['email']}}{% endif %}" placeholder="Adres email">
                 {% if wrong_email %}
                 <small class="form-text text-danger">
                     Niepoprawny adres email!
@@ -42,7 +42,7 @@
                 {% endif %}
             </div>
             <div class="form-check">
-                <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked" {{form['accept_tos']}}>
+                <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked" {% if form %}{{form['accept_tos']}}{% endif %}>
                 <label class="form-check-label" for="accept_tos">Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia 2018r.)</label>
                 {% if not_accept %}
                 <small class="form-text text-danger">

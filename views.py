@@ -5,7 +5,7 @@ from main import DB
 from main import BCRYPT
 from main import LM
 from config import CONFIG
-from flask import render_template, redirect, request, session, flash
+from flask import render_template, redirect, request, session, flash, url_for
 from passlib.hash import sha256_crypt
 from models import User, Subject, Topic, Note
 from functools import wraps
@@ -39,7 +39,8 @@ def login_manager(func):
     def wrap(*args, **kwargs):
         if not current_user.is_authenticated:
             flash("Musisz być zalogowany", 'warning')
-            return redirect('/login/')
+            next_url = request.path
+            return redirect(url_for('login', next=next_url))
         else:
             if current_user.is_authenticated:
                 if current_user.ban:
@@ -56,71 +57,80 @@ def login_required(func):
     def wrap(*args, **kwargs):
         if not current_user.is_authenticated:
             flash("Musisz być zalogowany", 'warning')
-            return redirect('/login/')
+            next_url = request.url
+            return redirect(url_for('login', next=next_url))
         else:
             return func(*args, **kwargs)
     return wrap
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
-    try:
-        if request.method == "POST":
-            form = request.form
-            username = form['username']
-            email = form['email']
-            try:
-                if form['password']==form['confirm'] and not form['password']=='':
-                    password = sha256_crypt.encrypt((str(form['password'])))
-                    wrong_password=False
-                else:
+    next = request.args.get('next')
+    if not current_user.is_authenticated:
+        try:
+            if request.method == "POST":
+                form = request.form
+                username = form['username']
+                email = form['email']
+                try:
+                    if form['password']==form['confirm'] and not form['password']=='':
+                        password = sha256_crypt.encrypt((str(form['password'])))
+                        wrong_password=False
+                    else:
+                        wrong_password = True
+                except Exception:
                     wrong_password = True
-            except Exception:
-                wrong_password = True
-            try:
-                accept = form['accept_tos']
-                if not accept == 'checked':
+                try:
+                    accept = form['accept_tos']
+                    if not accept == 'checked':
+                        not_accept=True
+                    else:
+                        not_accept=False
+                except Exception:
                     not_accept=True
+                used_username = User.query.filter_by(username=username).first()
+                if used_username:
+                    used_username=True
                 else:
-                    not_accept=False
-            except Exception:
-                not_accept=True
-            used_username = User.query.filter_by(username=username).first()
-            if used_username:
-                used_username=True
+                    used_username=False
+                if " " in username:
+                    wrong_username = True
+                else:
+                    wrong_username = False
+                if "@" not in email:
+                    wrong_email=True
+                else:
+                    wrong_email=False
+                if not_accept or used_username or wrong_email or wrong_password or wrong_username:
+                    return render_template('register.html', form=form, not_accept=not_accept, used_username=used_username,
+                                           wrong_email=wrong_email, wrong_password=wrong_password, wrong_username=wrong_username)
+                user = User(username=username, password=password, email=email)
+                DB.session.add(user)
+                DB.session.commit()
+                flash("Zarejestrowano pomyślnie!", 'success')
+                return redirect(url_for('login', next=next, username=username))
             else:
-                used_username=False
-            if " " in username:
-                wrong_username = True
-            else:
-                wrong_username = False
-            if "@" not in email:
-                wrong_email=True
-            else:
-                wrong_email=False
-            if not_accept or used_username or wrong_email or wrong_password or wrong_username:
-                return render_template('register.html', form=form, not_accept=not_accept, used_username=used_username,
-                                       wrong_email=wrong_email, wrong_password=wrong_password, wrong_username=wrong_username)
-            user = User(username=username, password=password, email=email)
-            DB.session.add(user)
-            DB.session.commit()
-            flash("Zarejestrowano pomyślnie!", 'success')
-            return redirect('/login/')
-        return redirect('/login/')
-    except Exception as error:
-        flash('Błąd: '+str(error), 'danger')
-        return redirect('/')
+                return render_template('register.html')
+        except Exception as error:
+            flash('Błąd: '+str(error), 'danger')
+            return redirect('/')
+    else:
+        flash("Jesteś już zalogowany!", 'warning')
+        return redirect(next)
 
 
 @APP.route('/login/', methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
         flash('Już jesteś zalogowany!', 'warning')
+        return redirect(request.args.get('next'))
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
-        if user:
-            if user.check_password(request.form['password']):
-                login_user(user)
-                return redirect('/')
+        if user and user.check_password(request.form['password']):
+            login_user(user)
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
         return render_template('login.html', form=request.form, wrong=True)
     else:
         return render_template('login.html')
@@ -179,6 +189,7 @@ def admin():
         admin = False
     if admin or User.query.filter_by(username=current_user.username).first().modderator:
         return render_template('admin.html', admin=admin)
+    flash("Nie możesz tego zrobić", 'warning')
     return redirect('/')
 
 
