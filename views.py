@@ -123,7 +123,9 @@ def register():
 def login():
     if current_user.is_authenticated:
         flash('Już jesteś zalogowany!', 'warning')
-        return redirect(request.args.get('next'))
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
+        return redirect('/')
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
         if user and user.check_password(request.form['password']):

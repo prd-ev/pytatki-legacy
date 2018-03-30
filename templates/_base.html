@@ -17,7 +17,7 @@
         });
   </script>
 </head>
-<body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}" {%if page_id == 'homepage'%}onhashchange="check_hash()"{%endif%}>
+<body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}" {%if current_user.is_authenticated and page_id == 'homepage'%}onhashchange="check_hash()" onload="check_hash()"{%endif%}>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
         <a class="navbar-brand" href="/">Pliki</a>
         {% if page_id == 'register' or page_id == 'login' %}
