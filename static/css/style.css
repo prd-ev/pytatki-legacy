@@ -45,9 +45,6 @@ html, body{
 .form {
     background-color: #dddddd;
 }
-@media (max-width: 768px){
-
-}
 .kafelek{
     top: 0;
     left: 0;
@@ -61,10 +58,9 @@ html, body{
     font-size: 15px;
     font-weight: 700;
     line-height: 20px;
-    width: 400px;
+    width: 100%;
     white-space: nowrap;
     display: inline-block;
-    position: absolute;
     overflow: hidden;
     text-overflow: ellipsis;
     top: 40px;
