@@ -5,7 +5,8 @@ from main import DB
 from main import BCRYPT
 from main import LM
 from config import CONFIG
-from flask import render_template, redirect, request, session, flash, url_for
+from flask import render_template, redirect, request, session, flash, url_for, send_from_directory
+from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
 from models import User, Subject, Topic, Note
 from functools import wraps
@@ -16,9 +17,8 @@ import os
 
 __author__ = 'Patryk Niedźwiedziński'
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-target = os.path.join(APP_ROOT, 'games')
-UPLOAD_FOLDER = target
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def ban(func):
@@ -398,24 +398,43 @@ def take_admin(id):
         return redirect(request.args.get('next'))
     return redirect('/')
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
 def add():
     if request.method == 'POST':
         try:
             form = request.form
+            if 'file' not in request.files:
+                flash('Błąd: No file part', 'danger')
+                return redirect(request.url)
+            file = request.files['file']
+            if file.filename == '':
+                flash('Nie wybrano pliku', 'warning')
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
             note = Note()
             note.name = form['title']
             note.author_id = current_user.id
             note.subject_id = form['subject']
             note.topic_id = form['topic']
+            note.file = str(filename)
             note.date = datetime.now()
             DB.session.add(note)
             DB.session.commit()
             flash('Notatka została dodana!', 'success')
-            return redirect('/')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/#'+str(form['subject'])+'#'+str(form['topic']))
         except Exception as error:
             flash("Błąd: " + str(error), 'danger')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
             return redirect('/')
     else:
         subjects = Subject.query.order_by(Subject.id.asc()).all()
@@ -462,11 +481,9 @@ def notes():
     notes = Note.query.order_by(Note.id.asc()).all()
     return render_template('notes.html', notes=notes)
 
-@APP.route('/admin/')
-
 @APP.route('/download/<file>/')
 def download(file):
-    return file
-
+    return send_from_directory(APP.config['UPLOAD_FOLDER'],
+                               file)
 
 APP.secret_key = CONFIG.secret_key
