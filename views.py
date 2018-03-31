@@ -195,35 +195,69 @@ def admin():
     return redirect('/')
 
 
-@APP.route('/delete/<int:id>/')
+@APP.route('/admin/delete/user/<int:id>/', methods=["GET"])
 @login_manager
-def delete(id):
-    if id == User.query.filter_by(username=current_user.username).first().id or User.query.filter_by(
-            username=current_user.username).first().admin:
-        user = User.query.filter_by(id=id).first()
-        if user:
-            if id == User.query.filter_by(username=current_user.username).first().id:
-                logout_user()
-                DB.session.delete(user)
-                DB.session.commit()
-                gc.collect()
-                try:
-                    session.clear()
-                    gc.collect()
+def delete_user(id):
+    if not User.query.filter_by(id=id).first().superuser:
+        if id == User.query.filter_by(username=current_user.username).first().id or User.query.filter_by(
+                username=current_user.username).first().admin:
+            user = User.query.filter_by(id=id).first()
+            if user:
+                if id == User.query.filter_by(username=current_user.username).first().id:
+                    try:
+                        logout_user()
+                        DB.session.delete(user)
+                        DB.session.commit()
+                        gc.collect()
+                        session.clear()
+                        gc.collect()
+                        flash('Twoje konto zostało usunięte', 'success')
+                        return redirect('/')
+                    except Exception as e:
+                        flash('Błąd: '+str(e), 'danger')
+                        return redirect('/')
+                else:
+                    DB.session.delete(user)
+                    DB.session.commit()
                     flash('Użytkownik został usunięty', 'success')
-                    return redirect('/')
-                except Exception as e:
-                    flash('Błąd: '+str(e), 'danger')
+                    if request.args.get('next'):
+                        return redirect(request.args.get('next'))
                     return redirect('/')
             else:
-                DB.session.delete(user)
+                flash('Nie ma takiego użytkownika', 'warning')
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
+                return redirect('/')
+    flash('Nie możesz tego zrobić!', 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
+
+@APP.route('/admin/delete/note/<int:id>/', methods=["GET"])
+def delete_note(id):
+    print("e")
+    if current_user.admin or current_user.modderator:
+        note = Note.query.filter_by(id=id).first()
+        if note:
+            try:
+                DB.session.delete(note)
                 DB.session.commit()
-                flash('Użytkownik został usunięty', 'success')
-                return redirect('/admin/user-list')
+                flash('Notatka została usunięta!', 'success')
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
+                return redirect('/')
+            except Exception as e:
+                flash('Błąd: '+str(e), 'danger')
+                return redirect('/')
+
         else:
-            flash('Nie ma takiego użytkownika', 'warning')
+            flash('Nie ma takiej notatki', 'warning')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
             return redirect('/')
     flash('Nie możesz tego zrobić!', 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
     return redirect('/')
 
 @APP.route("/admin/user-list/")
@@ -245,7 +279,7 @@ def user_list():
     flash('Nie możesz tego zrobić!', 'warning')
     return redirect('/')
 
-@APP.route('/admin/ban/<username>')
+@APP.route('/admin/ban/<username>/', methods=["GET"])
 @login_manager
 def ban(username):
     user = User.query.filter_by(username=username).first()
@@ -255,9 +289,11 @@ def ban(username):
         flash('Użytkownik '+user.username+' został zbanowany', 'success')
     else:
         flash('Nie ma takiego użytkownika', 'warning')
-    return redirect('/admin/user-list')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
 
-@APP.route('/admin/unban/<username>')
+@APP.route('/admin/unban/<username>/', methods=["GET"])
 @login_manager
 def unban(username):
     user = User.query.filter_by(username=username).first()
@@ -267,71 +303,99 @@ def unban(username):
         flash('Użytkownik '+user.username+' został odbanowany', 'success')
     else:
         flash('Nie ma takiego użytkownika', 'warning')
-    return redirect('/admin/user-list')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
 
-@APP.route('/give-admin/<int:id>')
+@APP.route('/give-admin/<int:id>/', methods=["GET"])
 @login_manager
 def give_admin(id):
-    if id != 1:
-        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
-                id=id).first() and User.query.filter_by(id=id).first() != User.query.filter_by(
-                username=current_user.username).first():
-            try:
-                User.query.filter_by(id=id).first().admin = True
-                DB.session.commit()
-                flash('Przekazano uprawnienia administratora użytkownikowi ' + str(
-                    User.query.filter_by(id=id).first().username), 'success')
-                return redirect('/admin/user-list')
-            except:
-                return redirect('/')
+    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
+            id=id).first() and User.query.filter_by(id=id).first() != User.query.filter_by(
+            username=current_user.username).first():
+        try:
+            User.query.filter_by(id=id).first().admin = True
+            DB.session.commit()
+            flash('Przekazano uprawnienia administratora użytkownikowi ' + str(
+                User.query.filter_by(id=id).first().username), 'success')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+        except Exception as error:
+            flash("Błąd: "+str(error), 'danger')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/take-mod/<int:id>')
+@APP.route('/take-mod/<int:id>/', methods=["GET"])
 @login_manager
 def take_mod(id):
-    if id != 1:
-        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
-            try:
-                User.query.filter_by(id=id).first().modderator = False
-                DB.session.commit()
-                flash('Odebrano uprawnienia moderatora użytkownikowi ' + str(
-                    User.query.filter_by(id=id).first().username), 'success')
-                return redirect('/admin/user-list')
-            except Exception as error:
-                flash("Błąd: "+str(error),'danger')
-                return redirect('/')
+    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
+        try:
+            User.query.filter_by(id=id).first().modderator = False
+            DB.session.commit()
+            flash('Odebrano uprawnienia moderatora użytkownikowi ' + str(
+                User.query.filter_by(id=id).first().username), 'success')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+        except Exception as error:
+            flash("Błąd: "+str(error),'danger')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+    flash("Nie można tego zrobić", 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/give-mod/<int:id>')
+@APP.route('/give-mod/<int:id>/', methods=["GET"])
 @login_manager
 def give_mod(id):
-    if id != 1:
-        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
-                id=id).first() and User.query.filter_by(id=id).first() != User.query.filter_by(
-                username=current_user.username).first():
-            try:
-                User.query.filter_by(id=id).first().modderator = True
-                DB.session.commit()
-                flash('Przekazano uprawnienia moderatora użytkownikowi ' + str(
-                    User.query.filter_by(id=id).first().username), 'success')
-                return redirect('/admin/user-list')
-            except:
-                return redirect('/')
+    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
+            id=id).first() and User.query.filter_by(id=id).first() != User.query.filter_by(
+            username=current_user.username).first():
+        try:
+            User.query.filter_by(id=id).first().modderator = True
+            DB.session.commit()
+            flash('Przekazano uprawnienia moderatora użytkownikowi ' + str(
+                User.query.filter_by(id=id).first().username), 'success')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+        except Exception as error:
+            flash("Błąd: "+str(error), 'danger')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+    flash("Nie możesz tego zrobić", 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/take-admin/<int:id>')
+@APP.route('/take-admin/<int:id>/', methods=["GET"])
 @login_manager
 def take_admin(id):
-    if id != 1:
+    if not User.query.filter_by(id=id).first().superuser:
         if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
             try:
                 User.query.filter_by(id=id).first().admin = False
                 DB.session.commit()
                 flash('Odebrano uprawnienia administratora użytkownikowi ' + str(
                     User.query.filter_by(id=id).first().username), 'success')
-                return redirect('/admin/user-list')
-            except:
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
                 return redirect('/')
+            except:
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
+                return redirect('/')
+    flash("Nie możesz tego zrobić", 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
     return redirect('/')
 
 @APP.route('/add/', methods=["GET", "POST"])
