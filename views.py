@@ -5,11 +5,11 @@ from main import DB
 from main import BCRYPT
 from main import LM
 from config import CONFIG
-from flask import render_template, redirect, request, session, flash, url_for, send_from_directory
+from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
 from models import User, Subject, Topic, Note
-from functools import wraps
+from functools import wraps, update_wrapper
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
@@ -33,6 +33,19 @@ def ban(func):
         else:
             return func(*args, **kwargs)
     return wrap
+
+
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Last-Modified'] = datetime.now()
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
+    return update_wrapper(no_cache, view)
 
 def login_manager(func):
     @wraps(func)
@@ -483,8 +496,12 @@ def notes():
 
 @APP.route('/download/<file>/')
 @login_manager
+@nocache
 def download(file):
-    return send_from_directory(APP.config['UPLOAD_FOLDER'],
-                               file)
+    if current_user.is_authenticated:
+        return send_from_directory(APP.config['UPLOAD_FOLDER'], file)
+    else:
+        flash("Musisz być zalogowany", 'warning')
+        return redirect('/')
 
 APP.secret_key = CONFIG.secret_key
