@@ -307,7 +307,7 @@ def unban(username):
         return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/give-admin/<int:id>/', methods=["GET"])
+@APP.route('/admin/give-admin/<int:id>/', methods=["GET"])
 @login_manager
 def give_admin(id):
     if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
@@ -330,7 +330,7 @@ def give_admin(id):
         return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/take-mod/<int:id>/', methods=["GET"])
+@APP.route('/admin/take-mod/<int:id>/', methods=["GET"])
 @login_manager
 def take_mod(id):
     if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=id).first():
@@ -352,7 +352,7 @@ def take_mod(id):
         return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/give-mod/<int:id>/', methods=["GET"])
+@APP.route('/admin/give-mod/<int:id>/', methods=["GET"])
 @login_manager
 def give_mod(id):
     if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
@@ -376,7 +376,7 @@ def give_mod(id):
         return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/take-admin/<int:id>/', methods=["GET"])
+@APP.route('/admin/take-admin/<int:id>/', methods=["GET"])
 @login_manager
 def take_admin(id):
     if not User.query.filter_by(id=id).first().superuser:

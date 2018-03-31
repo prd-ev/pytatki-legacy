@@ -27,8 +27,8 @@
                     {%endif%}
                 {%endif%}
                 {% if current_user.admin and not a.ban%}
-                {% if not a.admin%}<a class="float-right btn btn-info m-1" href="/give-admin/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Daj admina</a>{%else%}<a class="float-right btn btn-info m-1" href="/take-admin/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Odbierz admina</a>{%endif%}
-                {% if not a.modderator%}<a class="float-right btn btn-info m-1" href="/give-mod/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Daj mod'a</a>{%else%}<a class="float-right btn btn-info m-1" href="/take-mod/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Odbierz mod'a</a>{%endif%}
+                {% if not a.admin%}<a class="float-right btn btn-info m-1" href="/admin/give-admin/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Daj admina</a>{%else%}<a class="float-right btn btn-info m-1" href="/admin/take-admin/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Odbierz admina</a>{%endif%}
+                {% if not a.modderator%}<a class="float-right btn btn-info m-1" href="/admin/give-mod/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Daj mod'a</a>{%else%}<a class="float-right btn btn-info m-1" href="/admin/take-mod/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Odbierz mod'a</a>{%endif%}
                 {% endif %}
             </li>
           {%endif%}
