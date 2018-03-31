@@ -482,6 +482,7 @@ def notes():
     return render_template('notes.html', notes=notes)
 
 @APP.route('/download/<file>/')
+@login_manager
 def download(file):
     return send_from_directory(APP.config['UPLOAD_FOLDER'],
                                file)
