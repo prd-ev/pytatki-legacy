@@ -5,14 +5,14 @@
 <script>
     function check_hash(){
     if (window.location.hash == ""){
-        home = "{%for subject in subjects%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}' class='kafelek'><span style='margin:1em'></span> <span class='name'>{{subject.name}}</span></a></div></div>{%endfor%}";
+        home = "{%for subject in subjects%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}' class='kafelek col-12'><span style='margin:1em'></span> <span class='name'>{{subject.name}}</span></a></div></div>{%endfor%}";
         document.getElementById('data').innerHTML = home;
         breadcrumb_home = "<li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#'>Home</a></li>";
         document.getElementById('breadcrumb').innerHTML = breadcrumb_home;
     }
     {% for subject in subjects %}
     if (window.location.hash == "#{{subject.id}}"){
-        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}#{{topic.id}}' class='kafelek'><span style='margin:1em'></span> <span class='name'>{{topic.name}}</span></a></div></div>{%endif%}{%endfor%}";
+        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}#{{topic.id}}' class='kafelek col-12'><span style='margin:1em'></span> <span class='name'>{{topic.name}}</span></a></div></div>{%endif%}{%endfor%}";
         document.getElementById('data').innerHTML = html;
         breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.id}}'>{{subject.name}}</a></li>"
         document.getElementById('breadcrumb').innerHTML = breadcrumb;
@@ -22,7 +22,7 @@
     {% for topic in topics %}
     {% if topic.subject_id == subject.id %}
     if (window.location.hash == "#{{subject.id}}#{{topic.id}}"){
-        html = "{%for note in notes%}{% if note.subject_id == subject.id%}{%if note.topic_id == topic.id %}{{ kafelek_start|safe }}<a href='/download/{{note.id}}' class='kafelek'><span style='margin:1em'></span> <span class='name'>{{note.name}}</span></a></div></div>{%endif%}{%endif%}{%endfor%}";
+        html = "{%for note in notes%}{% if note.subject_id == subject.id%}{%if note.topic_id == topic.id %}{{ kafelek_start|safe }}<a href='/download/{{note.id}}' class='kafelek col-12'><span style='margin:1em'></span> <span class='name'>{{note.name}}</span></a></div></div>{%endif%}{%endif%}{%endfor%}";
         document.getElementById('data').innerHTML = html;
         breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#{{subject.id}}'>{{subject.name}}</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.id}}#{{topic.id}}'>{{topic.name}}</a></li>"
         document.getElementById('breadcrumb').innerHTML = breadcrumb;
@@ -42,7 +42,7 @@
         </nav>
         <div id="data" class="row data p-3">
             {%for subject in subjects%}
-            {{ kafelek_start|safe }}<a href='/#{{subject.id}}' class="text-light kafelek" style=''><span style="margin:1em"></span> <span class="name">{{subject.name}}</span></a></div></div>
+            {{ kafelek_start|safe }}<a href='/#{{subject.id}}' class="text-light kafelek col-12" style=''><span style="margin:1em"></span> <span class="name">{{subject.name}}</span></a></div></div>
             {%endfor%}
         </div>
     </div>
