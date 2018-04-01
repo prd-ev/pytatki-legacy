@@ -1,0 +1,47 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.2
+    steps:
+      - checkout
+      - run: sudo pip install -r requirements/common.txt
+      # Download and cache dependencies
+      - run: mkdir test-reports
+      #- run:
+       #   name: Download Selenium
+        #  command: |
+         #   curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
+      #- run:
+       #   name: Start Selenium
+        #  command: |
+         #   java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
+          #background: true
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/common.txt" }}
+
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements/common.txt" }}
+          paths:
+            - "venv"
+
+
+      # run tests!
+      # this example uses Django's built-in test-runner
+      # other common Python testing frameworks include pytest and nose
+      # https://pytest.org
+      # https://nose.readthedocs.io
+      - run:
+          command: |
+            . venv/bin/activate
+            python main.py
+      #- store_artifacts:
+       #   path: test-reports/
+        #  destination: tr1
+      #- store_test_results:
+       #   path: test-reports/
+
