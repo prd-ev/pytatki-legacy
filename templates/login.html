@@ -10,10 +10,10 @@
       <h3>Logowanie</h3>
 		<form method=post action="{% if request.args.get('next') %}{{request.path + "?next=" + request.args.get('next')}}{%else%}/login/{%endif%}">
             <div class="form-group">
-                <input class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{%elif request.args.get('username')%}{{request.args.get('username')}}{%else%}{%endif%}" {%if not request.args.get('username')%}autofocus{%endif%} placeholder="Login">
+                <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{%elif request.args.get('username')%}{{request.args.get('username')}}{%else%}{%endif%}" {%if not request.args.get('username')%}autofocus{%endif%} placeholder="Login">
             </div>
             <div class="form-group">
-                <input class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło" {%if request.args.get('username')%}autofocus{%endif%}>
+                <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło" {%if request.args.get('username')%}autofocus{%endif%}>
                 {% if wrong %}
                 <small class="form-text text-danger">
                     Niepoprawny login lub hasło!
