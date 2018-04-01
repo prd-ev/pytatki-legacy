@@ -20,7 +20,7 @@
     </div>
     <div class="col-lg-8 bg-white rounded m-2" style="padding:15px;">
       <h3>Dodaj</h3>
-		<form method=post id='add-form' action="/admin/add/">
+		<form method=post id='add-form' action="{{request.url}}">
             <div class="form-group">
                 <input class="form-control" id="title" name="title" type="text" value="" autofocus placeholder="Nazwa">
             </div>
@@ -35,18 +35,6 @@
             </div>
             <input class="btn btn-primary" type=submit value="Wyślij">
 		</form>
-            <script>
-                /*content =  document.getElementById('choose-subject').innerHTML
-                function select_check(){
-                    if (document.getElementById('topic-type').selected){
-                        document.getElementById('choose-subject').innerHTML = "l"
-                        x =
-                    }
-                    else {
-                        document.getElementById('choose-subject').innerHTML = content
-                    }
-                }*/
-            </script>
 		{% if error %}
 			<p class="error"><strong>Error:</strong>{{error}}</p>
 		{% endif %}
