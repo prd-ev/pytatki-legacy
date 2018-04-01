@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - checkout
-      - run: pip install -r requirements/common.txt
+      - run: sudo pip install -r requirements/common.txt
       # Download and cache dependencies
       - run: mkdir test-reports
       - run:
@@ -36,7 +36,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install -r requirements/common.txt
+            sudo pip install -r requirements/common.txt
       - save_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements/common.txt" }}
           paths:
