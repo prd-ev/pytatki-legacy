@@ -31,12 +31,7 @@ jobs:
           background: true
       - restore_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements/common.txt" }}
-      - run:
-          name: Install Python deps in a venv
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            sudo pip install -r requirements/common.txt
+
       - save_cache:
           key: deps1-{{ .Branch }}-{{ checksum "requirements/common.txt" }}
           paths:
