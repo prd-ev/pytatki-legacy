@@ -1,0 +1,25 @@
+{% extends "_base.html" %}
+
+{% set page_id = 'subjects' %}
+{% block content %}
+   <div class="row mt-3">
+      <div class="col-lg-3 mb-2">
+          <a class="btn btn-warning btn-block" href="/admin">< Funkcje administratora</a>
+          <hr>
+      </div>
+    <div class="col-lg-8">
+         <div class="list-group">
+            <li class="list-group-item active" href=""><h4>Przedmioty<span class="float-right badge badge-light badge-pill">{{subjects|length}}</span></h4></li>
+         </div>
+            {% for subject in subjects %}
+        <div class="list-group m-1">
+            <button class="list-group-item list-group-item-action active" href="/#{{subject.id}}"><h4 style="line-height:40px">{{subject.name}}<a class="float-right btn btn-danger m-1" href="/admin/delete/subject/{{subject.id}}/?next=%2Fadmin%2Fsubjects%2F">Usuń</a></h4></button>
+            {% for topic in topics %}{% if topic.subject_id == subject.id%}
+            <li class="list-group-item"><a class="btn m-1" href="/#{{subject.id}}#{{topic.id}}"><h5>{{topic.name}}</h5></a><a class="float-right btn btn-danger m-1" href="/admin/delete/topic/{{topic.id}}/?next=%2Fadmin%2Fsubjects%2F">Usuń</a> </li>
+            {% endif %}{% endfor %}
+        </div>
+            {% endfor %}
+     </div>
+      <div class="col-md-1 mb-2"></div>
+     </div>
+ {% endblock %}

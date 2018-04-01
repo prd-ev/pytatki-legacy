@@ -247,8 +247,8 @@ def delete_user(id):
     return redirect('/')
 
 @APP.route('/admin/delete/note/<int:id>/', methods=["GET"])
+@login_manager
 def delete_note(id):
-    print("e")
     if current_user.admin or current_user.modderator:
         note = Note.query.filter_by(id=id).first()
         if note:
@@ -265,6 +265,69 @@ def delete_note(id):
 
         else:
             flash('Nie ma takiej notatki', 'warning')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+    flash('Nie możesz tego zrobić!', 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
+
+@APP.route('/admin/delete/subject/<int:id>/', methods=["GET"])
+@login_manager
+def delete_subject(id):
+    if current_user.admin or current_user.modderator:
+        subject = Subject.query.filter_by(id=id).first()
+        if subject:
+            try:
+                DB.session.delete(subject)
+                for topic in Topic.query.order_by(Topic.id.asc()).all():
+                    if topic.subject_id == id:
+                        DB.session.delete(topic)
+                for note in Note.query.order_by(Note.id.asc()).all():
+                    if note.subject_id == id:
+                        DB.session.delete(note)
+                DB.session.commit()
+                flash('Przedmiot został usunięty!', 'success')
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
+                return redirect('/')
+            except Exception as e:
+                flash('Błąd: '+str(e), 'danger')
+                return redirect('/')
+
+        else:
+            flash('Nie ma takiego przedmiotu', 'warning')
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/')
+    flash('Nie możesz tego zrobić!', 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
+
+@APP.route('/admin/delete/topic/<int:id>/', methods=["GET"])
+@login_manager
+def delete_topic(id):
+    if current_user.admin or current_user.modderator:
+        topic = Topic.query.filter_by(id=id).first()
+        if topic:
+            try:
+                DB.session.delete(topic)
+                for note in Note.query.order_by(Note.id.asc()).all():
+                    if note.topic_id == id:
+                        DB.session.delete(note)
+                DB.session.commit()
+                flash('Dział został usunięty!', 'success')
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
+                return redirect('/')
+            except Exception as e:
+                flash('Błąd: '+str(e), 'danger')
+                return redirect('/')
+
+        else:
+            flash('Nie ma takiego działu', 'warning')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -442,7 +505,10 @@ def add():
             DB.session.commit()
             flash('Notatka została dodana!', 'success')
             if request.args.get('next'):
-                return redirect(request.args.get('next'))
+                if request.args.get('next')=='/':
+                    pass
+                else:
+                    return redirect(request.args.get('next'))
             return redirect('/#'+str(form['subject'])+'#'+str(form['topic']))
         except Exception as error:
             flash("Błąd: " + str(error), 'danger')
@@ -468,6 +534,8 @@ def admin_add():
                     flash('Dodano przedmiot!', 'success')
                 except Exception as e:
                     flash('Błąd: '+str(e), 'danger')
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
                 return redirect('/')
             elif request.form['type'] == 'topic':
                 try:
@@ -479,13 +547,17 @@ def admin_add():
                     flash('Dodano dział!', 'success')
                 except Exception as e:
                     flash('Błąd: '+str(e), 'danger')
+                if request.args.get('next'):
+                    return redirect(request.args.get('next'))
                 return redirect('/')
         else:
             subjects = Subject.query.order_by(Subject.id.asc()).all()
             topics = Topic.query.order_by(Topic.id.asc()).all()
             return render_template('admin_add.html', subjects=subjects, topics=topics)
     else:
-        flash('Nie masz dostępu', 'warning')
+        flash('Nie możesz tego zrobić', 'warning')
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
         return redirect('/')
 
 @APP.route('/admin/notes/')
@@ -493,6 +565,13 @@ def admin_add():
 def notes():
     notes = Note.query.order_by(Note.id.asc()).all()
     return render_template('notes.html', notes=notes)
+
+@APP.route('/admin/subjects/')
+@login_manager
+def subjects():
+    subjects = Subject.query.order_by(Subject.id.asc()).all()
+    topics = Topic.query.order_by(Topic.id.asc()).all()
+    return render_template('subjects.html', subjects=subjects, topics=topics)
 
 @APP.route('/download/<file>/')
 @login_manager
