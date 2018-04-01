@@ -84,6 +84,10 @@ def register():
             if request.method == "POST":
                 form = request.form
                 username = form['username']
+                if username == username.lower():
+                    upper = False
+                else:
+                    upper = True
                 email = form['email']
                 try:
                     if form['password']==form['confirm'] and not form['password']=='':
@@ -114,9 +118,10 @@ def register():
                     wrong_email=True
                 else:
                     wrong_email=False
-                if not_accept or used_username or wrong_email or wrong_password or wrong_username:
-                    return render_template('register.html', form=form, not_accept=not_accept, used_username=used_username,
-                                           wrong_email=wrong_email, wrong_password=wrong_password, wrong_username=wrong_username)
+                if not_accept or used_username or wrong_email or wrong_password or wrong_username or upper:
+                    return render_template('register.html', form=form, not_accept=not_accept,
+                                           used_username=used_username, wrong_email=wrong_email,
+                                           wrong_password=wrong_password, wrong_username=wrong_username, upper=upper)
                 user = User(username=username, password=password, email=email)
                 DB.session.add(user)
                 DB.session.commit()

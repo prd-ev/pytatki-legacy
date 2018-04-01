@@ -21,6 +21,11 @@
                     Nazwa użytkownika nie może zawierać spacji!
                 </small>
                 {% endif %}
+                {% if upper %}
+                <small class="form-text text-danger">
+                    Nazwa użytkownika nie może zawierać dużych liter!
+                </small>
+                {% endif %}
             </div>
             <div class="form-group">
                 <input autocapitalize="none" class="form-control" id="email" name="email" type="email" value="{% if form %}{{form['email']}}{% endif %}" placeholder="Adres email">
