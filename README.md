@@ -1,4 +1,5 @@
 # pytatki
+[![CodeFactor](https://www.codefactor.io/repository/github/butterfly-pn/pytatki/badge)](https://www.codefactor.io/repository/github/butterfly-pn/pytatki)
 
 Notatki we flasku
 
