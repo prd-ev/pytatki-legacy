@@ -180,6 +180,11 @@ def homepage():
     return render_template('homepage.html', admin=admin)
 
 
+@APP.route('/about/')
+def about():
+    return render_template('about.html')
+
+
 @APP.route('/user/<username>/')
 @ban
 def user_info(username):
