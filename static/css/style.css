@@ -65,6 +65,14 @@ html, body{
     text-overflow: ellipsis;
     top: 40px;
 }
+.ikona{
+    width: 80px;
+}
+@media (max-width:480px){
+    .name{
+        width: 45%;
+    }
+}
 
 
 

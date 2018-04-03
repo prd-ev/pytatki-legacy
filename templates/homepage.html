@@ -6,14 +6,14 @@
 <script>
     function check_hash(){
     if (window.location.hash == ""){
-        home = "{%for subject in subjects%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}' class='kafelek col-12'><span style='margin:1em; display: inline-block'><img style='width: 80px' src='{{url_for('static', filename='images/folder.png')}}'></span> <span style='display: inline-block' class='name'>{{subject.name}}</span></a></div></div>{%endfor%}";
+        home = "{%for subject in subjects%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}' class='kafelek col-12'><span style='margin:1em; display: inline-block'><img class='ikona' src='{{url_for('static', filename='images/folder.png')}}'></span> <span style='display: inline-block' class='name'>{{subject.name}}</span></a></div></div>{%endfor%}";
         document.getElementById('data').innerHTML = home;
         breadcrumb_home = "<li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#'>Home</a></li>";
         document.getElementById('breadcrumb').innerHTML = breadcrumb_home;
     }
     {% for subject in subjects %}
     if (window.location.hash == "#{{subject.id}}"){
-        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}#{{topic.id}}' class='kafelek col-12'><span style='margin:1em; display: inline-block'><img style='width: 80px' src='{{url_for('static', filename='images/folder.png')}}'></span> <span style='display: inline-block' class='name'>{{topic.name}}</span></a></div></div>{%endif%}{%endfor%}";
+        html = "{%for topic in topics%}{% if topic.subject_id == subject.id%}{{ kafelek_start|safe }}<a href='/#{{subject.id}}#{{topic.id}}' class='kafelek col-12'><span style='margin:1em; display: inline-block'><img class='ikona' src='{{url_for('static', filename='images/folder.png')}}'></span> <span style='display: inline-block' class='name'>{{topic.name}}</span></a></div></div>{%endif%}{%endfor%}";
         document.getElementById('data').innerHTML = html;
         breadcrumb = "<li class='breadcrumb-item' aria-current='page'><a class='text-light' href='#'>Home</a></li><li class='breadcrumb-item active' aria-current='page'><a class='text-light' href='#{{subject.id}}'>{{subject.name}}</a></li>"
         document.getElementById('breadcrumb').innerHTML = breadcrumb;
@@ -43,7 +43,7 @@
         </nav>
         <div id="data" class="row data p-3">
             {%for subject in subjects%}
-            {{ kafelek_start|safe }}<a href='/#{{subject.id}}' class="text-light kafelek col-12"><span style="display: inline-block" style="margin:1em"><img style="width: 80px" src="{{url_for('static', filename='images/folder.png')}}"></span> <span style="display: inline-block" class="name">{{subject.name}}</span></a></div></div>
+            {{ kafelek_start|safe }}<a href='/#{{subject.id}}' class="text-light kafelek col-12"><span style="display: inline-block" style="margin:1em"><img class="ikona" src="{{url_for('static', filename='images/folder.png')}}"></span> <span style="display: inline-block" class="name">{{subject.name}}</span></a></div></div>
             {%endfor%}
         </div>
     </div>
