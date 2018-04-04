@@ -3,7 +3,7 @@
 <head>
 
     <meta charset=utf-8>
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=300, height=device-height, target-densitydpi=medium-dpi" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=300, height=device-height, target-densitydpi=medium-dpi, user-scalable=no" />
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -27,7 +27,7 @@
       {%if current_user.is_authenticated and page_id == 'homepage'%}onhashchange="check_hash()" onload="check_hash()"
     {%endif%}>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
-        <a class="navbar-brand" href="/">Pliki</a>
+        <a class="navbar-brand" href="/" style="height: 40px"><span class="align-middle">Pliki</span> <span class="align-middle badge" style="border-color:#ffc107; color:#ffc107; border: 1px solid">alpha</span></a>
         {% if page_id == 'register' or page_id == 'login' %}
         {% else %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
