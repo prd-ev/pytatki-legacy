@@ -573,6 +573,13 @@ def subjects():
     topics = Topic.query.order_by(Topic.id.asc()).all()
     return render_template('subjects.html', subjects=subjects, topics=topics)
 
+@APP.route('/admin/edit/subject/<identifier>/', methods=['GET', 'POST'])
+def edit_subject(identifier):
+    form = {'name': 'text', 'logo': 'file'}
+    subject = Subject.query.filter_by(id=identifier).first()
+    return render_template('edit.html', form=form, subject=subject)
+
+
 @APP.route('/download/<file>/')
 @login_manager
 @nocache
