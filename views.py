@@ -226,7 +226,7 @@ def delete_user(identifier):
                 username=current_user.username).first().admin:
             user = User.query.filter_by(id=identifier).first()
             if user:
-                if id == User.query.filter_by(username=current_user.username).first().id:
+                if identifier == User.query.filter_by(username=current_user.username).first().id:
                     try:
                         logout_user()
                         DB.session.delete(user)
