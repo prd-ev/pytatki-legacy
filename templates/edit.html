@@ -1,0 +1,43 @@
+{% extends "_base.html" %}
+
+{% set page_id = 'edit' %}
+
+{% block content %}
+<title>Pytatki - Edit</title>
+  <div class="row mt-3">
+    <div class="col-lg-3 mb-2">
+        <a class="btn btn-primary btn-block" href="/admin/subjects">< Lista przedmiotów</a>
+        <a class="btn btn-warning btn-block" href="/admin">< Funkcje administratora</a>
+        <hr>
+    </div>
+    <div class="col-lg-8 bg-white rounded m-2" style="padding:15px;">
+      <h3>Edytuj</h3>
+		<form id="edit" method=post enctype=multipart/form-data>
+            <div class="form-group">
+                <input class="form-control" id="name" name="name" type="text" value="{{subject.name}}">
+            </div>
+            <div class="custom-file">
+                <script>
+                  var loadFile = function(event) {
+                    var output = document.getElementById('preview');
+                    output.src = URL.createObjectURL(event.target.files[0]);
+                  };
+                </script>
+                <label class="custom-file-label" for="logo">Wybierz plik</label>
+                <input type="file" id="logo" name="logo" value="" onchange="loadFile(event)">
+            </div>
+            <div class="form-group">
+                <img style="height: 100px" id="preview">
+            </div>
+
+            <input class="mt-2 btn btn-primary" type=submit value="Zapisz">
+		</form>
+
+		{% if error %}
+			<p class="error"><strong>Error:</strong>{{error}}</p>
+		{% endif %}
+	</div>
+    <div class="col-md-1 mb-2"></div>
+
+  </div>
+{% endblock %}
