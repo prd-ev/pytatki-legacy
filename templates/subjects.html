@@ -13,9 +13,17 @@
          </div>
             {% for subject in subjects %}
         <div class="list-group m-1">
-            <button class="list-group-item list-group-item-action active" href="/#{{subject.id}}"><h4 style="line-height:40px">{{subject.name}}<a class="float-right btn btn-danger m-1" href="/admin/delete/subject/{{subject.id}}/?next=%2Fadmin%2Fsubjects%2F">Usuń</a></h4></button>
+            <button class="list-group-item list-group-item-action active" href="/#{{subject.id}}"><h4 style="line-height:40px">
+                {{subject.name}}
+                <a class="float-right btn btn-danger m-1" href="/admin/delete/subject/{{subject.id}}/?next=%2Fadmin%2Fsubjects%2F">Usuń</a>
+                <a class="float-right btn btn-info m-1" href="/admin/subject/{{subject.id}}/edit/">Edytuj</a>
+            </h4></button>
             {% for topic in topics %}{% if topic.subject_id == subject.id%}
-            <li class="list-group-item"><a class="btn m-1" href="/#{{subject.id}}#{{topic.id}}"><h5>{{topic.name}}</h5></a><a class="float-right btn btn-danger m-1" href="/admin/delete/topic/{{topic.id}}/?next=%2Fadmin%2Fsubjects%2F">Usuń</a> </li>
+            <li class="list-group-item">
+                <a class="btn m-1" href="/#{{subject.id}}#{{topic.id}}"><h5>{{topic.name}}</h5></a>
+                <a class="float-right btn btn-danger m-1" href="/admin/delete/topic/{{topic.id}}/?next=%2Fadmin%2Fsubjects%2F">Usuń</a>
+                <a class="float-right btn btn-info m-1" href="/admin/topic/{{topic.id}}/edit/">Edytuj</a>
+            </li>
             {% endif %}{% endfor %}
         </div>
             {% endfor %}
