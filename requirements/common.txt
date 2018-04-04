@@ -3,7 +3,6 @@ Flask-Login==0.4.1
 Flask-SQLAlchemy==2.3.2
 Jinja2==2.10
 SQLAlchemy==1.2.5
-WTForms==2.1
 Werkzeug==0.12.2
 passlib==1.7.1
 requests==2.18.4
