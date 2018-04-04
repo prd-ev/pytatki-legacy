@@ -10,7 +10,7 @@
       <h3>Rejestracja</h3>
 		<form method=post action="{{url_for('register', next=request.args.get('next'))}}">
             <div class="form-group">
-                <input class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{% endif %}" autofocus placeholder="Nazwa użytkownika">
+                <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{% endif %}" autofocus placeholder="Nazwa użytkownika">
                 {% if used_username %}
                 <small class="form-text text-danger">
                     Ta nazwa użytkownika jest już zajęta!
@@ -21,9 +21,14 @@
                     Nazwa użytkownika nie może zawierać spacji!
                 </small>
                 {% endif %}
+                {% if upper %}
+                <small class="form-text text-danger">
+                    Nazwa użytkownika nie może zawierać dużych liter!
+                </small>
+                {% endif %}
             </div>
             <div class="form-group">
-                <input class="form-control" id="email" name="email" type="email" value="{% if form %}{{form['email']}}{% endif %}" placeholder="Adres email">
+                <input autocapitalize="none" class="form-control" id="email" name="email" type="email" value="{% if form %}{{form['email']}}{% endif %}" placeholder="Adres email">
                 {% if wrong_email %}
                 <small class="form-text text-danger">
                     Niepoprawny adres email!
@@ -31,10 +36,10 @@
                 {% endif %}
             </div>
             <div class="form-group">
-                <input class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło">
+                <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło">
             </div>
             <div class="form-group">
-                <input class="form-control" id="confirm" name="confirm" type="password" value="" placeholder="Powtórz hasło">
+                <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password" value="" placeholder="Powtórz hasło">
                 {% if wrong_password %}
                 <small class="form-text text-danger">
                     Błędne hasło
