@@ -573,11 +573,32 @@ def subjects():
     topics = Topic.query.order_by(Topic.id.asc()).all()
     return render_template('subjects.html', subjects=subjects, topics=topics)
 
-@APP.route('/admin/edit/subject/<identifier>/', methods=['GET', 'POST'])
+@APP.route('/admin/subject/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_subject(identifier):
-    form = {'name': 'text', 'logo': 'file'}
+    if request.method == 'POST':
+        form = request.form
+        Subject.query.filter_by(id=identifier).first().name = form['name']
+        DB.session.commit()
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
+        return redirect(request.path)
     subject = Subject.query.filter_by(id=identifier).first()
-    return render_template('edit.html', form=form, subject=subject)
+    return render_template('edit.html', subject=subject)
+
+
+@APP.route('/admin/topic/<identifier>/edit/', methods=['GET', 'POST'])
+def edit_topic(identifier):
+    if request.method == 'POST':
+        form = request.form
+        Topic.query.filter_by(id=identifier).first().name = form['name']
+        Topic.query.filter_by(id=identifier).first().subject_id = form['subject']
+        DB.session.commit()
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
+        return redirect(request.path)
+    topic = Topic.query.filter_by(id=identifier).first()
+    subjects = Subject.query.order_by(Subject.id.asc()).all()
+    return render_template('edit_t.html', topic=topic, subjects=subjects)
 
 
 @APP.route('/download/<file>/')
