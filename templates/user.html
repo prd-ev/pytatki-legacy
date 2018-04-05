@@ -16,7 +16,11 @@
           {% if user.modderator %}
           <span class="ml-3 badge badge-warning">MOD</span>
           {% endif %}
+          {% if user.superuser %}
+          <span class="ml-3 badge badge-dark">SU</span>
+          {% endif %}
         </h2>
+        <h4>{{user.email}}</h4>
     </div>
     <div class="col-md-4">
          {%if user.username==current_user.username%}
