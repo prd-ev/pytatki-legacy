@@ -263,6 +263,7 @@ def delete_note(identifier):
         note = Note.query.filter_by(id=identifier).first()
         if note:
             try:
+                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
                 DB.session.delete(note)
                 DB.session.commit()
                 flash('Notatka została usunięta!', 'success')
@@ -610,6 +611,39 @@ def edit_topic(identifier):
     topic = Topic.query.filter_by(id=identifier).first()
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     return render_template('edit_t.html', topic=topic, subjects=subjects)
+
+
+@APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
+def edit_note(identifier):
+    if request.method == 'POST':
+        print('post')
+        form = request.form
+        print(form)
+        Note.query.filter_by(id=identifier).first().name = form['name']
+        Note.query.filter_by(id=identifier).first().subject_id = form['subject']
+        Note.query.filter_by(id=identifier).first().topic_id = form['topic']
+        print('db1')
+        if 'file' in request.files:
+            if not request.files['file'].filename == '' and allowed_file(request.files['file'].filename):
+                print('if')
+                filename = secure_filename(request.files['file'].filename)
+                print('secure')
+                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+                print('save')
+                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(id=identifier).first().file))
+                print('del_old')
+                Note.query.filter_by(id=identifier).first().file = str(filename)
+                print('db')
+        flash('Zapisano zmiany!', 'success')
+        DB.session.commit()
+        print('commit')
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
+        return redirect(request.path)
+    note = Note.query.filter_by(id=identifier).first()
+    topics = Topic.query.order_by(Topic.id.asc()).all()
+    subjects = Subject.query.order_by(Subject.id.asc()).all()
+    return render_template('edit_n.html', note=note, topics=topics, subjects=subjects)
 
 
 @APP.route('/download/<filename>/')

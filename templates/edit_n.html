@@ -1,0 +1,55 @@
+{% extends "_base.html" %}
+
+{% set page_id = 'edit' %}
+
+{% block content %}
+<title>Pytatki - Edit</title>
+  <div class="row mt-3">
+    <div class="col-lg-3 mb-2">
+        <a class="btn btn-primary btn-block" href="/admin/notes">< Lista notatek</a>
+        <a class="btn btn-warning btn-block" href="/admin">< Funkcje administratora</a>
+        <hr>
+    </div>
+    <div class="col-lg-8 bg-white rounded m-2" style="padding:15px;">
+      <h3>Edytuj</h3>
+		<form id="edit" method=post enctype=multipart/form-data>
+            <div class="form-group">
+                <input class="form-control" id="name" name="name" type="text" value="{{note.name}}">
+            </div>
+            <div class="form-group">
+                <label for="subject">Przedmiot</label>
+                <select class="custom-select" id="subject" name="subject" onchange="select_check()">
+                    {%for subject in subjects%}<option value="{{subject.id}}" {% if subject.id == note.subject_id %}selected{%endif%}>{{subject.name}}</option>{%endfor%}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="subject">Dział</label>
+                <select class="custom-select" id="topic" name="topic" onchange="select_check()">
+                    {%for topic in topics%}<option value="{{topic.id}}" {% if topic.id == note.topic_id %}selected{%endif%}>{{topic.name}}</option>{%endfor%}
+                </select>
+            </div>
+            <div class="custom-file">
+                <script>
+                  var loadFile = function(event) {
+                    var output = document.getElementById('preview');
+                    output.src = URL.createObjectURL(event.target.files[0]);
+                  };
+                </script>
+                <label class="custom-file-label" for="file">Zaktualizuj plik</label>
+                <input type="file" id="file" name="file" value="" onchange="loadFile(event)">
+            </div>
+            <div class="form-group">
+                <a href="/download/{{note.file}}" class="btn btn-secondary">Wyświetl obecny plik</a>
+                <img style="height: 100px" id="preview">
+            </div>
+            <input class="mt-2 btn btn-primary" type=submit value="Zapisz">
+		</form>
+
+		{% if error %}
+			<p class="error"><strong>Error:</strong>{{error}}</p>
+		{% endif %}
+	</div>
+    <div class="col-md-1 mb-2"></div>
+
+  </div>
+{% endblock %}
