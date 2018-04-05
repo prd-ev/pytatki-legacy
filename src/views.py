@@ -2,14 +2,12 @@
 
 from main import APP
 from main import DB
-from main import BCRYPT
-from main import LM
 from main import MAIL
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
-from models import User, Subject, Topic, Note
+from src.models import User, Subject, Topic, Note
 from functools import wraps, update_wrapper
 import gc
 from flask_login import login_user, logout_user, current_user

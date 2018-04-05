@@ -3,11 +3,10 @@
 __author__ = "Patryk Niedzwiedzinski"
 
 from main import APP
-from views import ban, login_manager
-from models import User, Note, Subject, Topic
-from flask import request, render_template, redirect, flash
+from src.views import login_manager
+from src.models import User
+from flask import render_template, redirect, flash
 from flask_login import current_user
-from flask_mail import Message
 
 
 @APP.route('/user/<username>/')

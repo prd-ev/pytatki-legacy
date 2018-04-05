@@ -1,9 +1,9 @@
-__author__ = 'Patryk Niedźwiedziński'
-'''Skrypt tworzenia bazy danych'''
+__author__ = "Patryk Niedźwiedziński"
+"""Skrypt tworzenia bazy danych"""
 
 from sqlalchemy import create_engine
 from main import DB
-import models
+from src import models
 from passlib.hash import sha256_crypt
 
 
@@ -20,6 +20,7 @@ def db_start():
     user.ban = False
     DB.session.add(user)
     DB.session.commit()
+
 
 if __name__ == '__main__':
     db_start()
