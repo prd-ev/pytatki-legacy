@@ -4,6 +4,7 @@ from main import APP
 from main import DB
 from main import BCRYPT
 from main import LM
+from main import MAIL
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
@@ -14,6 +15,8 @@ import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 import os
+from flask_mail import Message
+
 
 __author__ = 'Patryk Niedźwiedziński'
 
@@ -28,6 +31,9 @@ def ban(func):
             if current_user.ban:
                 flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
                 return redirect('/logout/')
+            elif not current_user.confirm_mail:
+                flash('Potwierdź adres email', 'warning')
+                return func(*args, **kwargs)
             else:
                 return func(*args, **kwargs)
         else:
@@ -54,15 +60,14 @@ def login_manager(func):
             flash("Musisz być zalogowany", 'warning')
             next_url = request.path
             return redirect(url_for('login', next=next_url))
+        elif current_user.is_authenticated and current_user.ban:
+            flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
+            return redirect('/logout/')
+        elif not current_user.confirm_mail:
+            flash('Potwierdź adres email', 'warning')
+            return func(*args, **kwargs)
         else:
-            if current_user.is_authenticated:
-                if current_user.ban:
-                    flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-                    return redirect('/logout/')
-                else:
-                    return func(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
+            return func(*args, **kwargs)
     return wrap
 
 def login_required(func):
@@ -126,6 +131,9 @@ def register():
                 DB.session.add(user)
                 DB.session.commit()
                 flash("Zarejestrowano pomyślnie!", 'success')
+                msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients = [email])
+                msg.html = "Potwierdź adres email: <a href='"+"'>link</a>"
+                MAIL.send(msg)
                 return redirect(url_for('login', next=next_url, username=username))
             else:
                 return render_template('register.html')
@@ -188,21 +196,6 @@ def homepage():
 @APP.route('/about/')
 def about():
     return render_template('about.html')
-
-
-@APP.route('/user/<username>/')
-@ban
-def user_info(username):
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except Exception:
-        admin = False
-    user=User.query.filter_by(username=username).first()
-    if user:
-        return render_template('user.html', user=user, admin=admin)
-    else:
-        flash('Nie ma takiego użytkownika', 'warning')
-        return redirect('/')
 
 
 @APP.route("/admin/")
@@ -368,7 +361,7 @@ def user_list():
 
 @APP.route('/admin/ban/<username>/', methods=["GET"])
 @login_manager
-def ban(username):
+def ban_user(username):
     user = User.query.filter_by(username=username).first()
     if user:
         user.ban = True
