@@ -6,14 +6,15 @@ from main import MAIL
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
-from passlib.hash import sha256_crypt
+from passlib.hash import sha256_crypt, hex_sha1
 from src.models import User, Subject, Topic, Note
-from functools import wraps, update_wrapper
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 import os
 from flask_mail import Message
+from src.user import send_confirmation_email
+from src.view_manager import ban, login_required, login_manager, nocache
 
 
 __author__ = 'Patryk Niedźwiedziński'
@@ -22,62 +23,6 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def ban(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if current_user.is_authenticated:
-            if current_user.ban:
-                flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-                return redirect('/logout/')
-            elif not current_user.confirm_mail:
-                flash('Potwierdź adres email', 'warning')
-                return func(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-    return wrap
-
-
-def nocache(view):
-    @wraps(view)
-    def no_cache(*args, **kwargs):
-        response = make_response(view(*args, **kwargs))
-        response.headers['Last-Modified'] = datetime.now()
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '-1'
-        return response
-
-    return update_wrapper(no_cache, view)
-
-def login_manager(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if not current_user.is_authenticated:
-            flash("Musisz być zalogowany", 'warning')
-            next_url = request.path
-            return redirect(url_for('login', next=next_url))
-        elif current_user.is_authenticated and current_user.ban:
-            flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-            return redirect('/logout/')
-        elif not current_user.confirm_mail:
-            flash('Potwierdź adres email', 'warning')
-            return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-    return wrap
-
-def login_required(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if not current_user.is_authenticated:
-            flash("Musisz być zalogowany", 'warning')
-            next_url = request.url
-            return redirect(url_for('login', next=next_url))
-        else:
-            return func(*args, **kwargs)
-    return wrap
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
@@ -129,9 +74,7 @@ def register():
                 DB.session.add(user)
                 DB.session.commit()
                 flash("Zarejestrowano pomyślnie!", 'success')
-                msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients = [email])
-                msg.html = "Potwierdź adres email: <a href='"+"'>link</a>"
-                MAIL.send(msg)
+                send_confirmation_email(email)
                 return redirect(url_for('login', next=next_url, username=username))
             else:
                 return render_template('register.html')
