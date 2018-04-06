@@ -2,17 +2,15 @@
 
 from main import APP
 from main import DB
-from main import MAIL
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
-from passlib.hash import sha256_crypt, hex_sha1
+from passlib.hash import sha256_crypt
 from src.models import User, Subject, Topic, Note
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 import os
-from flask_mail import Message
 from src.user import send_confirmation_email
 from src.view_manager import ban, login_required, login_manager, nocache
 

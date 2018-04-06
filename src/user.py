@@ -9,7 +9,7 @@ from flask import render_template, redirect, flash, request
 from flask_login import current_user
 from passlib.hash import hex_sha1
 from flask_mail import Message
-from src.view_manager import ban, login_required, login_manager, nocache
+from src.view_manager import login_manager
 
 
 @APP.route('/user/<username>/')
