@@ -2,18 +2,18 @@
 
 from main import APP
 from main import DB
-from main import BCRYPT
-from main import LM
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
-from models import User, Subject, Topic, Note
-from functools import wraps, update_wrapper
+from src.models import User, Subject, Topic, Note
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 import os
+from src.user import send_confirmation_email
+from src.view_manager import ban, login_required, login_manager, nocache
+
 
 __author__ = 'Patryk Niedźwiedziński'
 
@@ -21,60 +21,6 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def ban(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if current_user.is_authenticated:
-            if current_user.ban:
-                flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-                return redirect('/logout/')
-            else:
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-    return wrap
-
-
-def nocache(view):
-    @wraps(view)
-    def no_cache(*args, **kwargs):
-        response = make_response(view(*args, **kwargs))
-        response.headers['Last-Modified'] = datetime.now()
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '-1'
-        return response
-
-    return update_wrapper(no_cache, view)
-
-def login_manager(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if not current_user.is_authenticated:
-            flash("Musisz być zalogowany", 'warning')
-            next_url = request.path
-            return redirect(url_for('login', next=next_url))
-        else:
-            if current_user.is_authenticated:
-                if current_user.ban:
-                    flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-                    return redirect('/logout/')
-                else:
-                    return func(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
-    return wrap
-
-def login_required(func):
-    @wraps(func)
-    def wrap(*args, **kwargs):
-        if not current_user.is_authenticated:
-            flash("Musisz być zalogowany", 'warning')
-            next_url = request.url
-            return redirect(url_for('login', next=next_url))
-        else:
-            return func(*args, **kwargs)
-    return wrap
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
@@ -126,6 +72,7 @@ def register():
                 DB.session.add(user)
                 DB.session.commit()
                 flash("Zarejestrowano pomyślnie!", 'success')
+                send_confirmation_email(email)
                 return redirect(url_for('login', next=next_url, username=username))
             else:
                 return render_template('register.html')
@@ -190,21 +137,6 @@ def about():
     return render_template('about.html')
 
 
-@APP.route('/user/<username>/')
-@ban
-def user_info(username):
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except Exception:
-        admin = False
-    user=User.query.filter_by(username=username).first()
-    if user:
-        return render_template('user.html', user=user, admin=admin)
-    else:
-        flash('Nie ma takiego użytkownika', 'warning')
-        return redirect('/')
-
-
 @APP.route("/admin/")
 @login_manager
 def admin():
@@ -263,6 +195,7 @@ def delete_note(identifier):
         note = Note.query.filter_by(id=identifier).first()
         if note:
             try:
+                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
                 DB.session.delete(note)
                 DB.session.commit()
                 flash('Notatka została usunięta!', 'success')
@@ -367,7 +300,7 @@ def user_list():
 
 @APP.route('/admin/ban/<username>/', methods=["GET"])
 @login_manager
-def ban(username):
+def ban_user(username):
     user = User.query.filter_by(username=username).first()
     if user:
         user.ban = True
@@ -610,6 +543,39 @@ def edit_topic(identifier):
     topic = Topic.query.filter_by(id=identifier).first()
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     return render_template('edit_t.html', topic=topic, subjects=subjects)
+
+
+@APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
+def edit_note(identifier):
+    if request.method == 'POST':
+        print('post')
+        form = request.form
+        print(form)
+        Note.query.filter_by(id=identifier).first().name = form['name']
+        Note.query.filter_by(id=identifier).first().subject_id = form['subject']
+        Note.query.filter_by(id=identifier).first().topic_id = form['topic']
+        print('db1')
+        if 'file' in request.files:
+            if not request.files['file'].filename == '' and allowed_file(request.files['file'].filename):
+                print('if')
+                filename = secure_filename(request.files['file'].filename)
+                print('secure')
+                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+                print('save')
+                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(id=identifier).first().file))
+                print('del_old')
+                Note.query.filter_by(id=identifier).first().file = str(filename)
+                print('db')
+        flash('Zapisano zmiany!', 'success')
+        DB.session.commit()
+        print('commit')
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
+        return redirect(request.path)
+    note = Note.query.filter_by(id=identifier).first()
+    topics = Topic.query.order_by(Topic.id.asc()).all()
+    subjects = Subject.query.order_by(Subject.id.asc()).all()
+    return render_template('edit_n.html', note=note, topics=topics, subjects=subjects)
 
 
 @APP.route('/download/<filename>/')

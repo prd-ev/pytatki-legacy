@@ -36,6 +36,8 @@ class Localhost:
     DEBUG = True #True oznacza, że aplikacja będzie sprawdzać zmiany w plikach
     HOST = "127.0.0.1" #Tutaj wpisujemy adres, na którym chcemy postawić stronę
     PORT = 5000 #Tutaj wpisujemy port, na którym ma działać aplikacja
+    EMAIL = "twoj@email" #Z tego maila wysyłane będą powiadomienia do użytkowników
+    EMAIL_PASSWORD = "haslo_do_twojego_maila" #Hasło do maila
     
     (...)
     
