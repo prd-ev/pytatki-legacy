@@ -32,8 +32,8 @@
 html, body{
     height: 100%;
     width: 100%;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 0;
 }
 /*-------------------------
 	Demo page
@@ -58,12 +58,20 @@ html, body{
     font-size: 15px;
     font-weight: 700;
     line-height: 20px;
-    width: 100%;
+    width: 70%;
     white-space: nowrap;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
     top: 40px;
+}
+.ikona{
+    width: 80px;
+}
+@media (max-width:480px){
+    .name{
+        width: 45%;
+    }
 }
 
 

@@ -6,12 +6,25 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_mail import Mail
 
 __author__ = 'Patryk Niedźwiedziński'
 
-APP = Flask(__name__)
-APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def create_app():
+    APP = Flask(__name__)
+    APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+    APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    APP.static_path = path.join(path.abspath(__file__), 'static')
+    return APP
+
+APP = create_app()
+APP.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME=CONFIG.EMAIL,
+    MAIL_PASSWORD=CONFIG.EMAIL_PASSWORD
+)
 DB = SQLAlchemy()
 DB.app = APP
 DB.init_app(APP)
@@ -19,9 +32,10 @@ LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login'
 BCRYPT = Bcrypt()
+MAIL = Mail(APP)
 
-APP.static_path = path.join(path.abspath(__file__), 'static')
 
 if __name__ == '__main__':
-    from views import *
+    from src.views import *
+    from src.user import *
     APP.run(debug=CONFIG.DEBUG, host=CONFIG.HOST, port=CONFIG.PORT)

@@ -1,8 +1,9 @@
 .idea
 __pycache__
 test.db
-config.py
-config.py
 records
 files
 *.pyc
+venv
+.cache
+.pytest_cache
