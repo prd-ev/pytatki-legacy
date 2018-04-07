@@ -407,7 +407,8 @@ def take_admin(identifier):
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
-            except:
+            except Exception as error:
+                flash("Błąd: " + str(error), 'danger')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
