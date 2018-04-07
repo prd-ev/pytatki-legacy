@@ -285,8 +285,7 @@ def delete_topic(identifier):
 @APP.route("/admin/user-list/")
 @login_manager
 def user_list():
-    """wyświetla listę użytkowników wraz z linkami dla adminów do edycji kont użytkowników"""
-    """nie wyświetla użytkownika piotr"""
+    """wyświetla listę użytkowników"""
     try:
         admin = User.query.filter_by(username=current_user.username).first().admin
     except KeyError:
@@ -411,7 +410,8 @@ def take_admin(identifier):
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
-            except:
+            except Exception as error:
+                flash("Błąd: " + str(error), 'danger')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
