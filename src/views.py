@@ -13,6 +13,7 @@ from datetime import datetime
 import os
 from src.user import send_confirmation_email
 from src.view_manager import ban, login_required, login_manager, nocache
+import re
 
 
 __author__ = 'Patryk Niedźwiedziński'
@@ -36,7 +37,9 @@ def register():
                     upper = True
                 email = form['email']
                 try:
-                    if form['password']==form['confirm'] and not form['password']=='':
+                    if form['password']==form['confirm'] and not form['password']=='' and len(
+                            form['password']) < 8 and re.search('[0-9]', form['password']) is None and re.search(
+                            '[A-Z]', form['password']) is None and re.search('[a-z]',form['password']) is None:
                         password = sha256_crypt.encrypt((str(form['password'])))
                         wrong_password=False
                     else:
@@ -282,8 +285,7 @@ def delete_topic(identifier):
 @APP.route("/admin/user-list/")
 @login_manager
 def user_list():
-    """wyświetla listę użytkowników wraz z linkami dla adminów do edycji kont użytkowników"""
-    """nie wyświetla użytkownika piotr"""
+    """wyświetla listę użytkowników"""
     try:
         admin = User.query.filter_by(username=current_user.username).first().admin
     except KeyError:
@@ -408,7 +410,8 @@ def take_admin(identifier):
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
-            except:
+            except Exception as error:
+                flash("Błąd: " + str(error), 'danger')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
