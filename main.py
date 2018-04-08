@@ -36,6 +36,5 @@ MAIL = Mail(APP)
 
 
 if __name__ == '__main__':
-    from src.views import *
-    from src.user import *
+    from src import *
     APP.run(debug=CONFIG.DEBUG, host=CONFIG.HOST, port=CONFIG.PORT)
