@@ -1,6 +1,6 @@
 '''Plik główny aplikacji'''
 
-from os import path
+import os
 from config import CONFIG
 from flask import Flask
 from flask_login import LoginManager
@@ -14,7 +14,7 @@ def create_app():
     APP = Flask(__name__)
     APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
     APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    APP.static_path = path.join(path.abspath(__file__), 'static')
+    APP.static_path = os.path.join(os.path.abspath(__file__), 'static')
     return APP
 
 APP = create_app()
@@ -33,6 +33,8 @@ LM.init_app(APP)
 LM.login_view = 'login'
 BCRYPT = Bcrypt()
 MAIL = Mail(APP)
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
+APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 if __name__ == '__main__':
