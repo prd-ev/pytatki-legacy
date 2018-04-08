@@ -5,15 +5,12 @@ from main import DB
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
 from werkzeug.utils import secure_filename
-from passlib.hash import sha256_crypt
 from src.models import User, Subject, Topic, Note
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 import os
-from src.user import send_confirmation_email
 from src.view_manager import ban, login_required, login_manager, nocache
-import re
 
 
 __author__ = 'Patryk Niedźwiedziński'
@@ -21,70 +18,6 @@ __author__ = 'Patryk Niedźwiedziński'
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
-@APP.route('/register/', methods=["GET", "POST"])
-def register():
-    next_url = request.args.get('next')
-    if not current_user.is_authenticated:
-        try:
-            if request.method == "POST":
-                form = request.form
-                username = form['username']
-                if username == username.lower():
-                    upper = False
-                else:
-                    upper = True
-                email = form['email']
-                try:
-                    if form['password']==form['confirm'] and not form['password']=='' and len(
-                            form['password']) < 8 and re.search('[0-9]', form['password']) is None and re.search(
-                            '[A-Z]', form['password']) is None and re.search('[a-z]',form['password']) is None:
-                        password = sha256_crypt.encrypt((str(form['password'])))
-                        wrong_password=False
-                    else:
-                        wrong_password = True
-                except Exception:
-                    wrong_password = True
-                try:
-                    accept = form['accept_tos']
-                    if not accept == 'checked':
-                        not_accept=True
-                    else:
-                        not_accept=False
-                except Exception:
-                    not_accept=True
-                used_username = User.query.filter_by(username=username).first()
-                if used_username:
-                    used_username=True
-                else:
-                    used_username=False
-                if " " in username:
-                    wrong_username = True
-                else:
-                    wrong_username = False
-                if "@" not in email:
-                    wrong_email=True
-                else:
-                    wrong_email=False
-                if not_accept or used_username or wrong_email or wrong_password or wrong_username or upper:
-                    return render_template('register.html', form=form, not_accept=not_accept,
-                                           used_username=used_username, wrong_email=wrong_email,
-                                           wrong_password=wrong_password, wrong_username=wrong_username, upper=upper)
-                user = User(username=username, password=password, email=email)
-                DB.session.add(user)
-                DB.session.commit()
-                flash("Zarejestrowano pomyślnie!", 'success')
-                send_confirmation_email(email)
-                return redirect(url_for('login', next=next_url, username=username))
-            else:
-                return render_template('register.html')
-        except Exception as error:
-            flash('Błąd: '+str(error), 'danger')
-            return redirect('/')
-    else:
-        flash("Jesteś już zalogowany!", 'warning')
-        return redirect(next_url)
 
 
 @APP.route('/login/', methods=["GET", "POST"])
