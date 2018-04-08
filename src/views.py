@@ -382,15 +382,10 @@ def give_mod(identifier):
             DB.session.commit()
             flash('Przekazano uprawnienia moderatora użytkownikowi ' + str(
                 User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
         except Exception as error:
             flash("Błąd: "+str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash("Nie możesz tego zrobić", 'warning')
+    else:
+        flash("Nie możesz tego zrobić", 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -405,15 +400,12 @@ def take_admin(identifier):
                 DB.session.commit()
                 flash('Odebrano uprawnienia administratora użytkownikowi ' + str(
                     User.query.filter_by(id=identifier).first().username), 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
             except Exception as error:
                 flash("Błąd: " + str(error), 'danger')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-    flash("Nie możesz tego zrobić", 'warning')
+        else:
+            flash("Nie możesz tego zrobić", 'warning')
+    else:
+        flash("Nie możesz tego zrobić", 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
