@@ -18,9 +18,7 @@ import re
 
 __author__ = 'Patryk Niedźwiedziński'
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
-APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @APP.route('/register/', methods=["GET", "POST"])
