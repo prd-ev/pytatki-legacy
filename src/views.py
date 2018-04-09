@@ -1,5 +1,5 @@
 """Widoki aplikacji"""
-
+from sqlalchemy import func, and_
 from main import APP
 from main import DB
 from config import CONFIG
@@ -463,11 +463,14 @@ def admin_add():
         if request.method == 'POST':
             if request.form['type']=='subject':
                 try:
-                    subject = Subject()
-                    subject.name = request.form['title']
-                    DB.session.add(subject)
-                    DB.session.commit()
-                    flash('Dodano przedmiot!', 'success')
+                    if Subject.query.filter(func.lower(Subject.name) == func.lower(request.form['title'])).first():
+                        flash("Dany przedmiot już istnieje", 'warning')
+                    else:
+                        subject = Subject()
+                        subject.name = request.form['title']
+                        DB.session.add(subject)
+                        DB.session.commit()
+                        flash('Dodano przedmiot!', 'success')
                 except Exception as e:
                     flash('Błąd: '+str(e), 'danger')
                 if request.args.get('next'):
@@ -475,12 +478,15 @@ def admin_add():
                 return redirect('/')
             elif request.form['type'] == 'topic':
                 try:
-                    topic = Topic()
-                    topic.name = request.form['title']
-                    topic.subject_id = request.form['subject']
-                    DB.session.add(topic)
-                    DB.session.commit()
-                    flash('Dodano dział!', 'success')
+                    if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(request.form['title']), Topic.subject_id == request.form['subject'])).first():
+                        flash("Dany dział już istnieje", 'warning')
+                    else:
+                        topic = Topic()
+                        topic.name = request.form['title']
+                        topic.subject_id = request.form['subject']
+                        DB.session.add(topic)
+                        DB.session.commit()
+                        flash('Dodano dział!', 'success')
                 except Exception as e:
                     flash('Błąd: '+str(e), 'danger')
                 if request.args.get('next'):
