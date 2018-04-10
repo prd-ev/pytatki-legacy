@@ -1,6 +1,8 @@
 """Plik konfiguracyjny"""
 __author__ = 'Patryk Niedźwiedziński'
 
+import ssl
+
 class Config():
     """Config class"""
     secret_key = str()
@@ -9,6 +11,10 @@ class Config():
     PORT = 5000
     EMAIL = ""
     EMAIL_PASSWORD = ""
+    SSL_CONTEXT = ssl.SSLContext(ssl.PROTOCOL_SSLv23).load_cert_chain(
+        '',
+        '')
+
 
     def __init__(self, secret):
         self.secret_key = secret

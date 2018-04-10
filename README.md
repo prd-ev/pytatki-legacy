@@ -19,6 +19,7 @@ pip install sqlalchemy
 pip install passlib
 pip install requests
 pip install bcrypt
+pip install numpy
 ```
 
 ### Instalacja
@@ -39,6 +40,9 @@ class Localhost:
     PORT = 5000 #Tutaj wpisujemy port, na którym ma działać aplikacja
     EMAIL = "twoj@email" #Z tego maila wysyłane będą powiadomienia do użytkowników
     EMAIL_PASSWORD = "haslo_do_twojego_maila" #Hasło do maila
+    SSL_CONTEXT = ssl.SSLContext(ssl.PROTOCOL_SSLv23).load_cert_chain(
+        '/etc/letsencrypt/live/pytatki-beta.pl/fullchain.pem', #Wpisujemy pełną ścieżkę certifikatu SSL do https://
+        '/etc/letsencrypt/live/pytatki-beta.pl/privkey.pem') #Wpisujemy pełną ścieżkę klucza prywatnego SSL do https://
     
     (...)
     
