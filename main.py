@@ -40,4 +40,4 @@ APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if __name__ == '__main__':
     from src.views import *
     from src.user import *
-    APP.run(debug=CONFIG.DEBUG, host=CONFIG.HOST, port=CONFIG.PORT)
+    APP.run(debug=CONFIG.DEBUG, host=CONFIG.HOST, port=CONFIG.PORT, ssl_context=CONFIG.SSL_CONTEXT)
