@@ -189,7 +189,7 @@
 
     var username = document.getElementById("username");
     var email = document.getElementById("email");
-    var password = document.getElementById("reg_password");
+    var password = document.getElementById("password");
     var confirm = document.getElementById("confirm");
     var letter = document.getElementById("letter");
     var number = document.getElementById("number");
@@ -211,25 +211,8 @@
         document.getElementById("pass").style.display = "none";
     }
 
-    username.onkeyup = function() {
-        if(username.value != "") {
-            username_status = true;
-        }else{
-            username_status = false;
-        }
-    }
-
-    email.onkeyup = function() {
-        if(email.value != "") {
-            email_status = true;
-        }else{
-            email_status = false;
-        }
-    }
-
     password.onkeyup = function() {
-
-        var lowerCaseLetters = /[a-z]/g;
+    var lowerCaseLetters = /[a-z]/g;
         var upperCaseLetters = /[A-Z]/g;
         if(password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
             letter.classList.remove("text-danger");
@@ -269,15 +252,33 @@
         }
     }
 
-    confirm.onkeyup = function() {
-        if(password.value == confirm.value) {
-            pass_confirm = true;
-        }else{
-            pass_confirm = false;
-        }
-    }
+
+
+
+
 
     form.onchange = function() {
+
+        if(password.value == confirm.value) {
+                pass_confirm = true;
+        }else{
+                pass_confirm = false;
+        }
+        if(email.value != "") {
+            email_status = true;
+        }else{
+            email_status = false;
+        }
+        if(email.value != "") {
+            email_status = true;
+        }else{
+            email_status = false;
+        }
+        if(username.value != "") {
+            username_status = true;
+        }else{
+            username_status = false;
+        }
         console.log(pass_status, pass_confirm, username_status, email_status);
         if(pass_status && pass_confirm && username_status && email_status) {
             document.getElementById("submit").disabled = "";
