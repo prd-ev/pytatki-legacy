@@ -73,7 +73,7 @@ def register():
                 DB.session.add(user)
                 DB.session.commit()
                 flash("Zarejestrowano pomyślnie!", 'success')
-                send_confirmation_email(email)
+                send_confirmation_email(user)
                 return redirect(url_for('login', next=next_url, username=username))
             else:
                 return render_template('register.html')
