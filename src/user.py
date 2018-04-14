@@ -27,9 +27,7 @@ def user_info(username):
         return redirect('/')
 
 
-def send_confirmation_email(email = ''):
-    if email == '':
-        email = current_user.email
+def send_confirmation_email(email = current_user.email):
     token = hex_sha1.hash(email)
     msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[email])
     msg.html = "Potwierdź adres email: <a href='" + str(request.host_url) + "user/confirm/" + token + "'>link</a>"
