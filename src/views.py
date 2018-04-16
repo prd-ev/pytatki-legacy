@@ -36,8 +36,8 @@ def register():
                 email = form['email']
                 try:
                     if form['password']==form['confirm'] and not form['password']=='' and len(
-                            form['password']) < 8 and re.search('[0-9]', form['password']) is None and re.search(
-                            '[A-Z]', form['password']) is None and re.search('[a-z]',form['password']) is None:
+                            form['password']) >= 8 and re.search('[0-9]', form['password']) and re.search(
+                            '[A-Z]', form['password'])  and re.search('[a-z]',form['password']):
                         password = sha256_crypt.encrypt((str(form['password'])))
                         wrong_password=False
                     else:
@@ -73,7 +73,7 @@ def register():
                 DB.session.add(user)
                 DB.session.commit()
                 flash("Zarejestrowano pomyślnie!", 'success')
-                send_confirmation_email(email)
+                send_confirmation_email(user)
                 return redirect(url_for('login', next=next_url, username=username))
             else:
                 return render_template('register.html')

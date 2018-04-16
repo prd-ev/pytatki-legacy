@@ -15,23 +15,17 @@ from src.view_manager import login_manager
 @APP.route('/user/<username>/')
 @login_manager
 def user_info(username):
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except Exception:
-        admin = False
     user=User.query.filter_by(username=username).first()
     if user:
-        return render_template('user.html', user=user, admin=admin)
+        return render_template('user.html', user=user)
     else:
         flash('Nie ma takiego użytkownika', 'warning')
         return redirect('/')
 
 
-def send_confirmation_email(email = ''):
-    if email == '':
-        email = current_user.email
-    token = hex_sha1.hash(email)
-    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[email])
+def send_confirmation_email(user = current_user):
+    token = hex_sha1.hash(user.email)
+    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[user.email])
     msg.html = "Potwierdź adres email: <a href='" + str(request.host_url) + "user/confirm/" + token + "'>link</a>"
     MAIL.send(msg)
 
