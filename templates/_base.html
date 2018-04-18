@@ -189,7 +189,7 @@
 
     var username = document.getElementById("username");
     var email = document.getElementById("email");
-    var password = document.getElementById("password");
+    var password = document.getElementById("reg_password");
     var confirm = document.getElementById("confirm");
     var letter = document.getElementById("letter");
     var number = document.getElementById("number");
@@ -205,6 +205,38 @@
 
     password.onfocus = function() {
         document.getElementById("pass").style.display = "block";
+        var lowerCaseLetters = /[a-z]/g;
+        var upperCaseLetters = /[A-Z]/g;
+        if(password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
+            letter.classList.remove("text-danger");
+            letter.classList.add("text-success");
+            pass.letter = true;
+        } else {
+            letter.classList.remove("text-success");
+            letter.classList.add("text-danger");
+            pass.letter = false;
+        }
+
+        var numbers = /[0-9]/g;
+        if(password.value.match(numbers)) {
+            number.classList.remove("text-danger");
+            number.classList.add("text-success");
+            pass.number = true;
+        } else {
+            number.classList.remove("text-success");
+            number.classList.add("text-danger");
+            pass.number = false;
+        }
+
+        if(password.value.length >= 8) {
+            length.classList.remove("text-danger");
+            length.classList.add("text-success");
+            pass.length = true;
+        } else {
+            length.classList.remove("text-success");
+            length.classList.add("text-danger");
+            pass.length = false;
+        }
     }
 
     password.onblur = function() {
@@ -244,20 +276,48 @@
             length.classList.add("text-danger");
             pass.length = false;
         }
+    }
+
+    form.onchange = function() {
+
+    var lowerCaseLetters = /[a-z]/g;
+        var upperCaseLetters = /[A-Z]/g;
+        if(password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
+            letter.classList.remove("text-danger");
+            letter.classList.add("text-success");
+            pass.letter = true;
+        } else {
+            letter.classList.remove("text-success");
+            letter.classList.add("text-danger");
+            pass.letter = false;
+        }
+
+        var numbers = /[0-9]/g;
+        if(password.value.match(numbers)) {
+            number.classList.remove("text-danger");
+            number.classList.add("text-success");
+            pass.number = true;
+        } else {
+            number.classList.remove("text-success");
+            number.classList.add("text-danger");
+            pass.number = false;
+        }
+
+        if(password.value.length >= 8) {
+            length.classList.remove("text-danger");
+            length.classList.add("text-success");
+            pass.length = true;
+        } else {
+            length.classList.remove("text-success");
+            length.classList.add("text-danger");
+            pass.length = false;
+        }
 
         if(pass.letter && pass.number && pass.length) {
             pass_status = true;
         }else{
             pass_status = false;
         }
-    }
-
-
-
-
-
-
-    form.onchange = function() {
 
         if(password.value == confirm.value) {
                 pass_confirm = true;
