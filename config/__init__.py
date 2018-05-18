@@ -1,5 +1,5 @@
 """Plik konfiguracyjny"""
-__author__ = 'Patryk Niedźwiedziński'
+__author__ = 'Patryk Niedzwiedzinski'
 
 class Config():
     """Config class"""
