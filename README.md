@@ -19,6 +19,7 @@ pip install sqlalchemy
 pip install passlib
 pip install requests
 pip install bcrypt
+pip install uwsgi
 ```
 
 ### Instalacja
