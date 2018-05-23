@@ -18,7 +18,7 @@ import re
 
 __author__ = 'Patryk Niedzwiedzinski'
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf', 'cpp'])
 
 
 @APP.route('/register/', methods=["GET", "POST"])
