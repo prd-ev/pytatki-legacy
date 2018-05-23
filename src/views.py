@@ -18,7 +18,7 @@ import re
 
 __author__ = 'Patryk Niedzwiedzinski'
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf', 'cpp'])
 
 
 @APP.route('/register/', methods=["GET", "POST"])
@@ -428,9 +428,13 @@ def add():
             if request_file.filename == '':
                 flash('Nie wybrano pliku', 'warning')
                 return redirect(request.url)
-            if request_file and allowed_file(request_file.filename):
-                filename = secure_filename(request_file.filename)
-                request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+            if request_file:
+                if allowed_file(request_file.filename):
+                    filename = secure_filename(request_file.filename)
+                    request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+                else:
+                    flash('Nieobslugiwane rozszerzenie', 'warning')
+                    return redirect(request.url)
             note = Note()
             note.name = form['title']
             note.author_id = current_user.id

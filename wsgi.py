@@ -4,7 +4,7 @@ from main import APP
 import time
 
 @APP.route('/long/')
-def long():
+def long_test():
     time.sleep(5)
     return "x"
 
