@@ -584,8 +584,7 @@ def edit_note(identifier):
 def download(filename):
     if current_user.is_authenticated:
         return send_from_directory(APP.config['UPLOAD_FOLDER'], filename)
-    else:
-        flash("Musisz byc zalogowany", 'warning')
-        return redirect('/')
+    flash("Musisz byc zalogowany", 'warning')
+    return redirect('/')
 
 APP.secret_key = CONFIG.secret_key
