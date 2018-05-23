@@ -1,4 +1,4 @@
-'''Plik główny aplikacji'''
+'''Plik glowny aplikacji'''
 
 import os
 from config import CONFIG
@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 
-__author__ = 'Patryk Niedźwiedziński'
+__author__ = 'Patryk Niedzwiedzinski'
 
 def create_app():
     APP = Flask(__name__)
@@ -35,9 +35,3 @@ BCRYPT = Bcrypt()
 MAIL = Mail(APP)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
-if __name__ == '__main__':
-    from src.views import *
-    from src.user import *
-    APP.run(debug=CONFIG.DEBUG, host=CONFIG.HOST, port=CONFIG.PORT)

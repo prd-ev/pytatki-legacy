@@ -16,7 +16,7 @@ from src.view_manager import ban, login_required, login_manager, nocache
 import re
 
 
-__author__ = 'Patryk Niedźwiedziński'
+__author__ = 'Patryk Niedzwiedzinski'
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx'])
 
@@ -72,30 +72,31 @@ def register():
                 user = User(username=username, password=password, email=email)
                 DB.session.add(user)
                 DB.session.commit()
-                flash("Zarejestrowano pomyślnie!", 'success')
+                flash("Zarejestrowano pomyslnie!", 'success')
                 send_confirmation_email(user)
                 return redirect(url_for('login', next=next_url, username=username))
             else:
                 return render_template('register.html')
         except Exception as error:
-            flash('Błąd: '+str(error), 'danger')
+            flash('Blad: '+str(error), 'danger')
             return redirect('/')
     else:
-        flash("Jesteś już zalogowany!", 'warning')
+        flash("Jestes juz zalogowany!", 'warning')
         return redirect(next_url)
 
 
 @APP.route('/login/', methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        flash('Już jesteś zalogowany!', 'warning')
+        flash('Juz jestes zalogowany!', 'warning')
         if request.args.get('next'):
             return redirect(request.args.get('next'))
         return redirect('/')
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
         if user and user.check_password(request.form['password']):
-            login_user(user)
+            print(bool(request.form['remember']))
+            login_user(user, remember=bool(request.form['remember']))
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -112,7 +113,7 @@ def logout():
         logout_user()
         return redirect('/')
     except Exception as e:
-        flash('Błąd: '+str(e), 'danger')
+        flash('Blad: '+str(e), 'danger')
         return redirect('/')
 
 
@@ -147,7 +148,7 @@ def admin():
         admin = False
     if admin or User.query.filter_by(username=current_user.username).first().modderator:
         return render_template('admin.html', admin=admin)
-    flash("Nie możesz tego zrobić", 'warning')
+    flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
 
 
@@ -167,24 +168,24 @@ def delete_user(identifier):
                         gc.collect()
                         session.clear()
                         gc.collect()
-                        flash('Twoje konto zostało usunięte', 'success')
+                        flash('Twoje konto zostalo usuniete', 'success')
                         return redirect('/')
                     except Exception as e:
-                        flash('Błąd: '+str(e), 'danger')
+                        flash('Blad: '+str(e), 'danger')
                         return redirect('/')
                 else:
                     DB.session.delete(user)
                     DB.session.commit()
-                    flash('Użytkownik został usunięty', 'success')
+                    flash('Uzytkownik zostal usuniety', 'success')
                     if request.args.get('next'):
                         return redirect(request.args.get('next'))
                     return redirect('/')
             else:
-                flash('Nie ma takiego użytkownika', 'warning')
+                flash('Nie ma takiego uzytkownika', 'warning')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
-    flash('Nie możesz tego zrobić!', 'warning')
+    flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -199,12 +200,12 @@ def delete_note(identifier):
                 os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
                 DB.session.delete(note)
                 DB.session.commit()
-                flash('Notatka została usunięta!', 'success')
+                flash('Notatka zostala usunieta!', 'success')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
             except Exception as e:
-                flash('Błąd: '+str(e), 'danger')
+                flash('Blad: '+str(e), 'danger')
                 return redirect('/')
 
         else:
@@ -212,7 +213,7 @@ def delete_note(identifier):
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
-    flash('Nie możesz tego zrobić!', 'warning')
+    flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -232,12 +233,12 @@ def delete_subject(identifier):
                     if note.subject_id == identifier:
                         DB.session.delete(note)
                 DB.session.commit()
-                flash('Przedmiot został usunięty!', 'success')
+                flash('Przedmiot zostal usuniety!', 'success')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
             except Exception as e:
-                flash('Błąd: '+str(e), 'danger')
+                flash('Blad: '+str(e), 'danger')
                 return redirect('/')
 
         else:
@@ -245,7 +246,7 @@ def delete_subject(identifier):
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
-    flash('Nie możesz tego zrobić!', 'warning')
+    flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -262,20 +263,20 @@ def delete_topic(identifier):
                     if note.topic_id == identifier:
                         DB.session.delete(note)
                 DB.session.commit()
-                flash('Dział został usunięty!', 'success')
+                flash('Dzial zostal usuniety!', 'success')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
             except Exception as e:
-                flash('Błąd: '+str(e), 'danger')
+                flash('Blad: '+str(e), 'danger')
                 return redirect('/')
 
         else:
-            flash('Nie ma takiego działu', 'warning')
+            flash('Nie ma takiego dzialu', 'warning')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
-    flash('Nie możesz tego zrobić!', 'warning')
+    flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -283,7 +284,7 @@ def delete_topic(identifier):
 @APP.route("/admin/user-list/")
 @login_manager
 def user_list():
-    """wyświetla listę użytkowników"""
+    """wyswietla liste uzytkownikow"""
     try:
         admin = User.query.filter_by(username=current_user.username).first().admin
     except KeyError:
@@ -295,7 +296,7 @@ def user_list():
             if user.admin:
                 admini += 1
         return render_template('user_list.html', users=users, admini=admini, admin=admin)
-    flash('Nie możesz tego zrobić!', 'warning')
+    flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
 @APP.route('/admin/ban/<username>/', methods=["GET"])
@@ -305,9 +306,9 @@ def ban_user(username):
     if user:
         user.ban = True
         DB.session.commit()
-        flash('Użytkownik '+user.username+' został zbanowany', 'success')
+        flash('Uzytkownik '+user.username+' zostal zbanowany', 'success')
     else:
-        flash('Nie ma takiego użytkownika', 'warning')
+        flash('Nie ma takiego uzytkownika', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -319,9 +320,9 @@ def unban(username):
     if user:
         user.ban = False
         DB.session.commit()
-        flash('Użytkownik '+user.username+' został odbanowany', 'success')
+        flash('Uzytkownik '+user.username+' zostal odbanowany', 'success')
     else:
-        flash('Nie ma takiego użytkownika', 'warning')
+        flash('Nie ma takiego uzytkownika', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -335,13 +336,13 @@ def give_admin(identifier):
         try:
             User.query.filter_by(id=identifier).first().admin = True
             DB.session.commit()
-            flash('Przekazano uprawnienia administratora użytkownikowi ' + str(
+            flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 User.query.filter_by(id=identifier).first().username), 'success')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
         except Exception as error:
-            flash("Błąd: "+str(error), 'danger')
+            flash("Blad: "+str(error), 'danger')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -356,17 +357,17 @@ def take_mod(identifier):
         try:
             User.query.filter_by(id=identifier).first().modderator = False
             DB.session.commit()
-            flash('Odebrano uprawnienia moderatora użytkownikowi ' + str(
+            flash('Odebrano uprawnienia moderatora uzytkownikowi ' + str(
                 User.query.filter_by(id=identifier).first().username), 'success')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
         except Exception as error:
-            flash("Błąd: "+str(error),'danger')
+            flash("Blad: "+str(error),'danger')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
-    flash("Nie można tego zrobić", 'warning')
+    flash("Nie mozna tego zrobic", 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -380,12 +381,12 @@ def give_mod(identifier):
         try:
             User.query.filter_by(id=identifier).first().modderator = True
             DB.session.commit()
-            flash('Przekazano uprawnienia moderatora użytkownikowi ' + str(
+            flash('Przekazano uprawnienia moderatora uzytkownikowi ' + str(
                 User.query.filter_by(id=identifier).first().username), 'success')
         except Exception as error:
-            flash("Błąd: "+str(error), 'danger')
+            flash("Blad: "+str(error), 'danger')
     else:
-        flash("Nie możesz tego zrobić", 'warning')
+        flash("Nie mozesz tego zrobic", 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -398,14 +399,14 @@ def take_admin(identifier):
             try:
                 User.query.filter_by(id=identifier).first().admin = False
                 DB.session.commit()
-                flash('Odebrano uprawnienia administratora użytkownikowi ' + str(
+                flash('Odebrano uprawnienia administratora uzytkownikowi ' + str(
                     User.query.filter_by(id=identifier).first().username), 'success')
             except Exception as error:
-                flash("Błąd: " + str(error), 'danger')
+                flash("Blad: " + str(error), 'danger')
         else:
-            flash("Nie możesz tego zrobić", 'warning')
+            flash("Nie mozesz tego zrobic", 'warning')
     else:
-        flash("Nie możesz tego zrobić", 'warning')
+        flash("Nie mozesz tego zrobic", 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -421,7 +422,7 @@ def add():
         try:
             form = request.form
             if 'file' not in request.files:
-                flash('Błąd: No file part', 'danger')
+                flash('Blad: No file part', 'danger')
                 return redirect(request.url)
             request_file = request.files['file']
             if request_file.filename == '':
@@ -439,7 +440,7 @@ def add():
             note.date = datetime.now()
             DB.session.add(note)
             DB.session.commit()
-            flash('Notatka została dodana!', 'success')
+            flash('Notatka zostala dodana!', 'success')
             if request.args.get('next'):
                 if request.args.get('next')=='/':
                     pass
@@ -447,7 +448,7 @@ def add():
                     return redirect(request.args.get('next'))
             return redirect('/#'+str(form['subject'])+'#'+str(form['topic']))
         except Exception as error:
-            flash("Błąd: " + str(error), 'danger')
+            flash("Blad: " + str(error), 'danger')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -464,7 +465,7 @@ def admin_add():
             if request.form['type']=='subject':
                 try:
                     if Subject.query.filter(func.lower(Subject.name) == func.lower(request.form['title'])).first():
-                        flash("Dany przedmiot już istnieje", 'warning')
+                        flash("Dany przedmiot juz istnieje", 'warning')
                     else:
                         subject = Subject()
                         subject.name = request.form['title']
@@ -472,23 +473,23 @@ def admin_add():
                         DB.session.commit()
                         flash('Dodano przedmiot!', 'success')
                 except Exception as e:
-                    flash('Błąd: '+str(e), 'danger')
+                    flash('Blad: '+str(e), 'danger')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
             elif request.form['type'] == 'topic':
                 try:
                     if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(request.form['title']), Topic.subject_id == request.form['subject'])).first():
-                        flash("Dany dział już istnieje", 'warning')
+                        flash("Dany dzial juz istnieje", 'warning')
                     else:
                         topic = Topic()
                         topic.name = request.form['title']
                         topic.subject_id = request.form['subject']
                         DB.session.add(topic)
                         DB.session.commit()
-                        flash('Dodano dział!', 'success')
+                        flash('Dodano dzial!', 'success')
                 except Exception as e:
-                    flash('Błąd: '+str(e), 'danger')
+                    flash('Blad: '+str(e), 'danger')
                 if request.args.get('next'):
                     return redirect(request.args.get('next'))
                 return redirect('/')
@@ -497,7 +498,7 @@ def admin_add():
             topics = Topic.query.order_by(Topic.id.asc()).all()
             return render_template('admin_add.html', subjects=subjects, topics=topics)
     else:
-        flash('Nie możesz tego zrobić', 'warning')
+        flash('Nie mozesz tego zrobic', 'warning')
         if request.args.get('next'):
             return redirect(request.args.get('next'))
         return redirect('/')
@@ -583,8 +584,7 @@ def edit_note(identifier):
 def download(filename):
     if current_user.is_authenticated:
         return send_from_directory(APP.config['UPLOAD_FOLDER'], filename)
-    else:
-        flash("Musisz być zalogowany", 'warning')
-        return redirect('/')
+    flash("Musisz byc zalogowany", 'warning')
+    return redirect('/')
 
 APP.secret_key = CONFIG.secret_key
