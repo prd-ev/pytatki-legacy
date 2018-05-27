@@ -429,8 +429,11 @@ def add():
                 flash('Nie wybrano pliku', 'warning')
                 return redirect(request.url)
             if request_file:
+                print("if1")
                 if allowed_file(request_file.filename):
+                    print("if2")
                     filename = secure_filename(request_file.filename)
+                    print("secure")
                     request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
@@ -552,24 +555,16 @@ def edit_topic(identifier):
 @APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_note(identifier):
     if request.method == 'POST':
-        print('post')
         form = request.form
-        print(form)
         Note.query.filter_by(id=identifier).first().name = form['name']
         Note.query.filter_by(id=identifier).first().subject_id = form['subject']
         Note.query.filter_by(id=identifier).first().topic_id = form['topic']
-        print('db1')
         if 'file' in request.files:
             if not request.files['file'].filename == '' and allowed_file(request.files['file'].filename):
-                print('if')
                 filename = secure_filename(request.files['file'].filename)
-                print('secure')
-                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-                print('save')
                 os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(id=identifier).first().file))
-                print('del_old')
+                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
                 Note.query.filter_by(id=identifier).first().file = str(filename)
-                print('db')
         flash('Zapisano zmiany!', 'success')
         DB.session.commit()
         print('commit')
