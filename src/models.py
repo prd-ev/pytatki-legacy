@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 """Modele rekordów wpisywanych do bazy danych"""
-from flask_login import UserMixin
-from flask_login._compat import unicode
+from passlib.utils import unicode
 from sqlalchemy import Column
 from sqlalchemy.types import Integer, String, Boolean
 from passlib.hash import sha256_crypt

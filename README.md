@@ -14,12 +14,7 @@ These instructions will get you a copy of the project up and running on your loc
 Aby uruchomić aplikację potrzebne są odpowiednie moduły python'a. Można je pobrać za pomocą pip'a wpisując następujące komendy:
 
 ```
-pip install flask
-pip install sqlalchemy
-pip install passlib
-pip install requests
-pip install bcrypt
-pip install uwsgi
+pip install -r requirements/common.txt
 ```
 
 ### Instalacja

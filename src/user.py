@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Obsluga uzytkownika"""
 
 __author__ = "Patryk Niedzwiedzinski"
