@@ -95,8 +95,10 @@ def login():
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
         if user and user.check_password(request.form['password']):
-            print(bool(request.form['remember']))
-            login_user(user, remember=bool(request.form['remember']))
+            try:
+                login_user(user, remember=bool(request.form['remember']))
+            except Exception as err:
+                login_user(user)
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
