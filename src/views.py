@@ -3,7 +3,7 @@ from sqlalchemy import func, and_
 from main import APP
 from main import DB
 from config import CONFIG
-from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
+from flask import render_template, redirect, request, session, flash, url_for, send_file
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
 from src.models import User, Subject, Topic, Note
@@ -434,7 +434,10 @@ def add():
                     print("if2")
                     filename = secure_filename(request_file.filename)
                     print("secure")
-                    request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'], form['topic'])):
+                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'], form['topic']))
+                        request_file.save(
+                            os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
@@ -443,7 +446,7 @@ def add():
             note.author_id = current_user.id
             note.subject_id = form['subject']
             note.topic_id = form['topic']
-            note.file = str(filename)
+            note.file = os.path.join(form['subject'], form['topic'], filename)
             note.date = datetime.now()
             DB.session.add(note)
             DB.session.commit()
@@ -577,12 +580,13 @@ def edit_note(identifier):
     return render_template('edit_n.html', note=note, topics=topics, subjects=subjects)
 
 
-@APP.route('/download/<filename>/')
+@APP.route('/download/<identifier>/')
 @login_manager
 @nocache
-def download(filename):
+def download(identifier):
     if current_user.is_authenticated:
-        return send_from_directory(APP.config['UPLOAD_FOLDER'], filename)
+        note = Note.query.filter_by(id=identifier).first()
+        return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
