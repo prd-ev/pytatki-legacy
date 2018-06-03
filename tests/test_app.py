@@ -1,6 +1,6 @@
-def add(a, b):
-    return a + b
+from main import create_app
 
 
-def test_config():
-    assert add(1, 2) == 3
+def test_app():
+    app = create_app()
+    app.run()
