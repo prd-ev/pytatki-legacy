@@ -2,7 +2,7 @@ __author__ = "Patryk Niedźwiedziński"
 """Skrypt tworzenia bazy danych"""
 
 from sqlalchemy import create_engine
-from main import DB
+from src.database import DB
 from src import models
 from passlib.hash import sha256_crypt
 

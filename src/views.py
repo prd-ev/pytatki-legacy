@@ -1,9 +1,9 @@
 """Widoki aplikacji"""
 from sqlalchemy import func, and_
 from main import APP
-from main import DB
+from src.database import DB
 from config import CONFIG
-from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
+from flask import render_template, redirect, request, session, flash, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
 from src.models import User, Subject, Topic, Note
