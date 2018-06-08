@@ -1,6 +1,8 @@
-def add(a, b):
-    return a + b
+from flask import url_for
 
+class TestApp:
 
-def test_config():
-    assert add(1, 2) == 3
+    def test_ping(self, client):
+        res = client.get(url_for('ping'))
+        assert res.status_code == 200
+        assert res.json == {'ping': 'pong'}

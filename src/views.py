@@ -1,9 +1,9 @@
 """Widoki aplikacji"""
 from sqlalchemy import func, and_
 from main import APP
-from main import DB
+from src.database import DB
 from config import CONFIG
-from flask import render_template, redirect, request, session, flash, url_for, send_from_directory, make_response
+from flask import render_template, redirect, request, session, flash, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
 from src.models import User, Subject, Topic, Note
@@ -95,8 +95,10 @@ def login():
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
         if user and user.check_password(request.form['password']):
-            print(bool(request.form['remember']))
-            login_user(user, remember=bool(request.form['remember']))
+            try:
+                login_user(user, remember=bool(request.form['remember']))
+            except Exception as err:
+                login_user(user)
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -429,8 +431,11 @@ def add():
                 flash('Nie wybrano pliku', 'warning')
                 return redirect(request.url)
             if request_file:
+                print("if1")
                 if allowed_file(request_file.filename):
+                    print("if2")
                     filename = secure_filename(request_file.filename)
+                    print("secure")
                     request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
@@ -552,24 +557,16 @@ def edit_topic(identifier):
 @APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_note(identifier):
     if request.method == 'POST':
-        print('post')
         form = request.form
-        print(form)
         Note.query.filter_by(id=identifier).first().name = form['name']
         Note.query.filter_by(id=identifier).first().subject_id = form['subject']
         Note.query.filter_by(id=identifier).first().topic_id = form['topic']
-        print('db1')
         if 'file' in request.files:
             if not request.files['file'].filename == '' and allowed_file(request.files['file'].filename):
-                print('if')
                 filename = secure_filename(request.files['file'].filename)
-                print('secure')
-                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-                print('save')
                 os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(id=identifier).first().file))
-                print('del_old')
+                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
                 Note.query.filter_by(id=identifier).first().file = str(filename)
-                print('db')
         flash('Zapisano zmiany!', 'success')
         DB.session.commit()
         print('commit')

@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 """Obsluga uzytkownika"""
 
 __author__ = "Patryk Niedzwiedzinski"
 
-from main import APP, DB, MAIL
+from main import APP, MAIL
+from src.database import DB
 from config import CONFIG
 from src.models import User
 from flask import render_template, redirect, flash, request
