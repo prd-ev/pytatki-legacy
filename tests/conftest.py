@@ -4,11 +4,11 @@ from flask import jsonify
 
 
 @pytest.fixture
-def app_fixture():
-    app = create_app()
+def app():
+    flask_app = create_app()
 
-    @app.route('/ping')
+    @flask_app.route('/ping')
     def _ping():
         return jsonify(ping='pong')
-    app.debug = True
-    return app
+    flask_app.debug = True
+    return flask_app
