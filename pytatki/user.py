@@ -46,4 +46,3 @@ def confirm_mail(token):
             DB.session.commit()
             flash('Potwierdzono adres email!', 'success')
     return redirect('/')
-
