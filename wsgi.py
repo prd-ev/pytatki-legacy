@@ -1,3 +1,4 @@
+#!./venv/bin python3
 from src.views import *
 from src.user import *
 from main import APP

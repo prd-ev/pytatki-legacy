@@ -9,3 +9,4 @@ venv
 .pytest_cache
 .DS_Store
 src/.DS_Store
+.vscode
