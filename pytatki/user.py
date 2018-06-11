@@ -20,9 +20,8 @@ def user_info(username):
     user=User.query.filter_by(username=username).first()
     if user:
         return render_template('user.html', user=user)
-    else:
-        flash('Nie ma takiego użytkownika', 'warning')
-        return redirect('/')
+    flash('Nie ma takiego użytkownika', 'warning')
+    return redirect('/')
 
 
 def send_confirmation_email(user = current_user):
