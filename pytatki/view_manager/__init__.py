@@ -13,11 +13,7 @@ def ban(func):
                 return redirect('/logout/')
             elif not current_user.confirm_mail:
                 flash('Potwierdź adres email. <a href="/user/send-confirmation-mail/">Wyślij ponownie</a>', 'warning')
-                return func(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
     return wrap
 
 
@@ -46,8 +42,7 @@ def login_manager(func):
         elif not current_user.confirm_mail:
             flash('Potwierdź adres email. <a href="/user/send-confirmation-mail/">Wyślij ponownie</a>', 'warning')
             return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
     return wrap
 
 def login_required(func):
@@ -57,6 +52,5 @@ def login_required(func):
             flash("Musisz być zalogowany", 'warning')
             next_url = request.url
             return redirect(url_for('login', next=next_url))
-        else:
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
     return wrap
