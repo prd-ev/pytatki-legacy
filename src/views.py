@@ -98,6 +98,7 @@ def login():
             try:
                 login_user(user, remember=bool(request.form['remember']))
             except Exception as err:
+                print(err)
                 login_user(user)
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
