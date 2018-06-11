@@ -1,5 +1,5 @@
 from setuptools import setup
-import src as app
+import pytatki as app
 
 setup(name='Pytatki',
       version=app.__version__,

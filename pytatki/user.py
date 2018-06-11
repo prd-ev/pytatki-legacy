@@ -4,14 +4,14 @@
 __author__ = "Patryk Niedzwiedzinski"
 
 from main import APP, MAIL
-from src.database import DB
+from pytatki.database import DB
 from config import CONFIG
-from src.models import User
+from pytatki.models import User
 from flask import render_template, redirect, flash, request
 from flask_login import current_user
 from passlib.hash import hex_sha1
 from flask_mail import Message
-from src.view_manager import login_manager
+from pytatki.view_manager import login_manager
 
 
 @APP.route('/user/<username>/')
