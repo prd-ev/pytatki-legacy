@@ -68,6 +68,7 @@ def update_email():
 
 
 @APP.route('/user/update-password/', methods=['POST'])
+@login_manager
 def update_password():
     try:
         user = User.query.filter_by(id=current_user.id).first()
