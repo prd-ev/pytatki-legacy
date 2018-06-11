@@ -12,6 +12,7 @@ from flask_login import current_user
 from passlib.hash import hex_sha1
 from flask_mail import Message
 from src.view_manager import login_manager
+from passlib.hash import sha256_crypt
 
 
 @APP.route('/user/<username>/')
@@ -48,3 +49,33 @@ def confirm_mail(token):
             flash('Potwierdzono adres email!', 'success')
     return redirect('/')
 
+
+@APP.route('/user/update-email/', methods=['POST'])
+def update_email():
+    try:
+        if not current_user.email == request.form['email']:
+            user = User.query.filter_by(id=current_user.id).first()
+            form = request.form
+            user.email = form['email']
+            user.confirm_mail = False
+            DB.session.commit()
+            send_confirmation_email(current_user)
+    except Exception as e:
+        flash('Blad: ' + str(e), 'danger')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
+
+
+@APP.route('/user/update-password/', methods=['POST'])
+def update_password():
+    try:
+        user = User.query.filter_by(id=current_user.id).first()
+        if user.check_password(request.form['password']):
+            user.password = sha256_crypt.encrypt((str(request.form['new-password'])))
+            DB.session.commit()
+    except Exception as e:
+        flash('Blad: ' + str(e), 'danger')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
