@@ -53,10 +53,6 @@ def register():
                 except Exception:
                     not_accept=True
                 used_username = User.query.filter_by(username=username).first()
-                if used_username:
-                    used_username=True
-                else:
-                    used_username=False
                 if " " in username:
                     wrong_username = True
                 else:
