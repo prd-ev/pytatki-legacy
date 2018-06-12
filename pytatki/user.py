@@ -4,15 +4,15 @@
 __author__ = "Patryk Niedzwiedzinski"
 
 from main import APP, MAIL
-from src.database import DB
+from pytatki.database import DB
 from config import CONFIG
-from src.models import User
+from pytatki.models import User
 from flask import render_template, redirect, flash, request
 from flask_login import current_user
 from passlib.hash import hex_sha1
 from flask_mail import Message
-from src.view_manager import login_manager
 from passlib.hash import sha256_crypt
+from pytatki.view_manager import login_manager
 
 
 @APP.route('/user/<username>/')
@@ -21,9 +21,8 @@ def user_info(username):
     user=User.query.filter_by(username=username).first()
     if user:
         return render_template('user.html', user=user)
-    else:
-        flash('Nie ma takiego użytkownika', 'warning')
-        return redirect('/')
+    flash('Nie ma takiego użytkownika', 'warning')
+    return redirect('/')
 
 
 def send_confirmation_email(user = current_user):

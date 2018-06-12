@@ -1,6 +1,6 @@
 #!./venv/bin python3
-from src.views import *
-from src.user import *
+from pytatki.views import *
+from pytatki.user import *
 from main import APP
 import time
 

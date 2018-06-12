@@ -1,18 +1,18 @@
 """Widoki aplikacji"""
 from sqlalchemy import func, and_
 from main import APP
-from src.database import DB
+from pytatki.database import DB
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
-from src.models import User, Subject, Topic, Note
+from pytatki.models import User, Subject, Topic, Note
 import gc
 from flask_login import login_user, logout_user, current_user
 from datetime import datetime
 import os
-from src.user import send_confirmation_email
-from src.view_manager import ban, login_required, login_manager, nocache
+from pytatki.user import send_confirmation_email
+from pytatki.view_manager import ban, login_required, login_manager, nocache
 import re
 
 
