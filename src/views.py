@@ -53,15 +53,7 @@ def register():
                 except Exception:
                     not_accept=True
                 used_username = User.query.filter_by(username=username).first()
-                if " " in username:
-                    wrong_username = True
-                else:
-                    wrong_username = False
-                if "@" not in email:
-                    wrong_email=True
-                else:
-                    wrong_email=False
-                if not_accept or used_username or wrong_email or wrong_password or wrong_username or upper:
+                if not_accept or used_username or "@" not in email or wrong_password or " " in username or upper:
                     return render_template('register.html', form=form, not_accept=not_accept,
                                            used_username=used_username, wrong_email=wrong_email,
                                            wrong_password=wrong_password, wrong_username=wrong_username, upper=upper)
