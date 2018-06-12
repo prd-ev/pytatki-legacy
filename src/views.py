@@ -20,8 +20,8 @@ __author__ = 'Patryk Niedzwiedzinski'
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf', 'cpp'])
 
-def getNextURL():
-    return request.args.get('next')
+def validPassword(password):
+    return re.search('[0-9]', password) and re.search('[A-Z]', password) and re.search('[a-z]',password)
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
@@ -36,9 +36,8 @@ def register():
                     upper = True
                 email = form['email']
                 try:
-                    if form['password']==form['confirm'] and not form['password']=='' and len(
-                            form['password']) >= 8 and re.search('[0-9]', form['password']) and re.search(
-                            '[A-Z]', form['password'])  and re.search('[a-z]',form['password']):
+                    if form['password']==form['confirm'] and len(
+                            form['password']) >= 8 and validPassword(form['password']):
                         password = sha256_crypt.encrypt((str(form['password'])))
                         wrong_password=False
                     else:
@@ -59,7 +58,7 @@ def register():
                 DB.session.commit()
                 flash("Zarejestrowano pomyslnie!", 'success')
                 send_confirmation_email(user)
-                return redirect(url_for('login', next=getNextURL(), username=username))
+                return redirect(url_for('login', next=request.args.get('next'), username=username))
             else:
                 return render_template('register.html')
         except Exception as error:
@@ -67,7 +66,7 @@ def register():
             return redirect('/')
     else:
         flash("Jestes juz zalogowany!", 'warning')
-        return redirect(getNextURL())
+        return redirect(request.args.get('next'))
 
 
 @APP.route('/login/', methods=["GET", "POST"])
