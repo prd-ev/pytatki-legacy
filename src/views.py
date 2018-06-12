@@ -20,10 +20,11 @@ __author__ = 'Patryk Niedzwiedzinski'
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf', 'cpp'])
 
+def getNextURL():
+    return request.args.get('next')
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
-    next_url = request.args.get('next')
     if not current_user.is_authenticated:
         try:
             if request.method == "POST":
@@ -58,7 +59,7 @@ def register():
                 DB.session.commit()
                 flash("Zarejestrowano pomyslnie!", 'success')
                 send_confirmation_email(user)
-                return redirect(url_for('login', next=next_url, username=username))
+                return redirect(url_for('login', next=getNextURL(), username=username))
             else:
                 return render_template('register.html')
         except Exception as error:
@@ -66,7 +67,7 @@ def register():
             return redirect('/')
     else:
         flash("Jestes juz zalogowany!", 'warning')
-        return redirect(next_url)
+        return redirect(getNextURL())
 
 
 @APP.route('/login/', methods=["GET", "POST"])
