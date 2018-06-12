@@ -23,6 +23,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'doc
 
 @APP.route('/register/', methods=["GET", "POST"])
 def register():
+    """Function for registration a new user"""
     next_url = request.args.get('next')
     if not current_user.is_authenticated:
         try:
@@ -35,14 +36,14 @@ def register():
                     upper = True
                 email = form['email']
                 try:
-                    if form['password']==form['confirm'] and not form['password']=='' and len(
-                            form['password']) >= 8 and re.search('[0-9]', form['password']) and re.search(
+                    if form['password']==form['confirm'] and len(form['password']) >= 8 and re.search('[0-9]', form['password']) and re.search(
                             '[A-Z]', form['password'])  and re.search('[a-z]',form['password']):
                         password = sha256_crypt.encrypt((str(form['password'])))
                         wrong_password=False
                     else:
                         wrong_password = True
-                except Exception:
+                except Exception as err:
+                    print(err)
                     wrong_password = True
                 try:
                     accept = form['accept_tos']
