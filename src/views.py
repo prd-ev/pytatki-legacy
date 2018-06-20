@@ -1,10 +1,9 @@
 """Widoki aplikacji"""
 import os
-import re
 import gc
 from datetime import datetime
 from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, url_for, send_file
+from flask import render_template, redirect, request, session, flash, send_file
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
 from flask_login import login_user, logout_user, current_user
@@ -446,7 +445,6 @@ def edit_topic_post(identifier):
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect(request.path)
-    
 
 
 @APP.route('/admin/topic/<identifier>/edit/', methods=['GET'])
