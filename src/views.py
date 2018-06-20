@@ -1,7 +1,6 @@
 """Widoki aplikacji"""
 from sqlalchemy import func, and_
-from main import APP
-from main import DB
+from main import APP, DB
 from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_file
 from werkzeug.utils import secure_filename
@@ -18,12 +17,31 @@ import re
 
 __author__ = 'Patryk Niedzwiedzinski'
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf', 'cpp'])
+ALLOWED_EXTENSIONS = set([
+    'txt',
+    'pdf',
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'doc',
+    'docx',
+    'ppt',
+    'pptx',
+    'xslx',
+    'xsl',
+    'odt',
+    'rtf',
+    'cpp',
+    ])
 
-def validPassword(password):
-    return re.search('[0-9]', password) and re.search('[A-Z]', password) and re.search('[a-z]',password)
+def valid_password(password):
+    """Validation of password"""
+    return re.search('[0-9]', password) and re.search('[A-Z]', password) \
+        and re.search('[a-z]', password)
 
-def validUsername(username):
+def valid_username(username):
+    """Validation of username"""
     return " " in username and username == username.lower()
 
 @APP.route('/register/', methods=["POST"])
@@ -34,7 +52,7 @@ def register_post():
         form = request.form
         try:
             if form['password'] == form['confirm'] and len(
-                    form['password']) >= 8 and validPassword(form['password']):
+                    form['password']) >= 8 and valid_password(form['password']):
                 password = sha256_crypt.encrypt((str(form['password'])))
                 wrong_password = False
             else:
@@ -47,7 +65,7 @@ def register_post():
             accept = ''
         used_username = User.query.filter_by(username=form['username']).first()
         if accept != 'checked' or used_username or '@' not in form['email'] \
-            or wrong_password or validUsername(form['username']):
+            or wrong_password or valid_username(form['username']):
             return render_template(
                 'register.html',
                 form=form,
@@ -64,7 +82,7 @@ def register_post():
         DB.session.commit()
         flash("Zarejestrowano pomyslnie!", 'success')
         send_confirmation_email(user)
-        return redirect(url_for('login', next=request.args.get('next'), username=username))
+        return redirect(url_for('login', next=request.args.get('next'), username=form['username']))
     else:
         flash("Jestes juz zalogowany!", 'warning')
     if request.args.get('next'):
@@ -77,6 +95,7 @@ def register_post():
 
 @APP.route('/register/', methods=["GET"])
 def register_get():
+    """Registration a new user"""
     if not current_user.is_authenticated:
         return render_template('register.html')
     else:
@@ -87,6 +106,7 @@ def register_get():
 
 @APP.route('/login/', methods=["GET", "POST"])
 def login():
+    """Login"""
     if current_user.is_authenticated:
         flash('Juz jestes zalogowany!', 'warning')
         if request.args.get('next'):
@@ -95,7 +115,6 @@ def login():
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
         if user and user.check_password(request.form['password']):
-            print(bool(request.form['remember']))
             login_user(user, remember=bool(request.form['remember']))
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
@@ -109,6 +128,7 @@ def login():
 @APP.route("/logout/")
 @login_required
 def logout():
+    """Logout"""
     try:
         logout_user()
         return redirect('/')
@@ -120,6 +140,7 @@ def logout():
 @APP.route('/')
 @ban
 def homepage():
+    """Homepage"""
     if current_user.is_authenticated:
         try:
             admin = User.query.filter_by(username=current_user.username).first().admin
@@ -128,7 +149,8 @@ def homepage():
         subjects = Subject.query.order_by(Subject.id.asc()).all()
         topics = Topic.query.order_by(Topic.id.asc()).all()
         notes = Note.query.order_by(Note.id.asc()).all()
-        return render_template('homepage.html', admin=admin, subjects=subjects, topics=topics, notes=notes)
+        return render_template('homepage.html', admin=admin, subjects=subjects,
+                               topics=topics, notes=notes)
     else:
         admin = False
     return render_template('homepage.html', admin=admin)
@@ -136,12 +158,14 @@ def homepage():
 
 @APP.route('/about/')
 def about():
+    """About"""
     return render_template('about.html')
 
 
 @APP.route("/admin/")
 @login_manager
 def admin():
+    """Admin"""
     try:
         admin = User.query.filter_by(username=current_user.username).first().admin
     except Exception:
@@ -155,9 +179,10 @@ def admin():
 @APP.route('/admin/delete/user/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_user(identifier):
+    """Delete user"""
     if not User.query.filter_by(id=identifier).first().superuser:
-        if identifier == User.query.filter_by(username=current_user.username).first().id or User.query.filter_by(
-                username=current_user.username).first().admin:
+        if identifier == User.query.filter_by(username=current_user.username).first().id \
+        or User.query.filter_by(username=current_user.username).first().admin:
             user = User.query.filter_by(id=identifier).first()
             if user:
                 if identifier == User.query.filter_by(username=current_user.username).first().id:
@@ -289,8 +314,9 @@ def user_list():
         admin = User.query.filter_by(username=current_user.username).first().admin
     except KeyError:
         admin = False
-    if User.query.filter_by(username=current_user.username).first().admin or User.query.filter_by(username=current_user.username).first().modderator:
-        users=User.query.order_by(User.id.asc()).all()
+    if User.query.filter_by(username=current_user.username).first().admin \
+    or User.query.filter_by(username=current_user.username).first().modderator:
+        users = User.query.order_by(User.id.asc()).all()
         admini = 0
         for user in users:
             if user.admin:
@@ -330,8 +356,9 @@ def unban(username):
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_admin(identifier):
-    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
-            id=identifier).first() and User.query.filter_by(id=identifier).first() != User.query.filter_by(
+    if User.query.filter_by(username=current_user.username).first().admin \
+    and User.query.filter_by(id=identifier).first() \
+    and User.query.filter_by(id=identifier).first() != User.query.filter_by(
             username=current_user.username).first():
         try:
             User.query.filter_by(id=identifier).first().admin = True
@@ -353,7 +380,8 @@ def give_admin(identifier):
 @APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_mod(identifier):
-    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=identifier).first():
+    if User.query.filter_by(username=current_user.username).first().admin \
+    and User.query.filter_by(id=identifier).first():
         try:
             User.query.filter_by(id=identifier).first().modderator = False
             DB.session.commit()
@@ -363,7 +391,7 @@ def take_mod(identifier):
                 return redirect(request.args.get('next'))
             return redirect('/')
         except Exception as error:
-            flash("Blad: "+str(error),'danger')
+            flash("Blad: " + str(error), 'danger')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -375,8 +403,9 @@ def take_mod(identifier):
 @APP.route('/admin/give-mod/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_mod(identifier):
-    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
-            id=identifier).first() and User.query.filter_by(id=identifier).first() != User.query.filter_by(
+    if User.query.filter_by(username=current_user.username).first().admin \
+    and User.query.filter_by(id=identifier).first() \
+    and User.query.filter_by(id=identifier).first() != User.query.filter_by(
             username=current_user.username).first():
         try:
             User.query.filter_by(id=identifier).first().modderator = True
@@ -395,7 +424,8 @@ def give_mod(identifier):
 @login_manager
 def take_admin(identifier):
     if not User.query.filter_by(id=identifier).first().superuser:
-        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=identifier).first():
+        if User.query.filter_by(username=current_user.username).first().admin \
+        and User.query.filter_by(id=identifier).first():
             try:
                 User.query.filter_by(id=identifier).first().admin = False
                 DB.session.commit()
@@ -429,15 +459,14 @@ def add():
                 flash('Nie wybrano pliku', 'warning')
                 return redirect(request.url)
             if request_file:
-                print("if1")
                 if allowed_file(request_file.filename):
-                    print("if2")
                     filename = secure_filename(request_file.filename)
-                    print("secure")
-                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'], form['topic'])):
-                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'], form['topic']))
-                        request_file.save(
-                            os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'], form['topic'], filename))
+                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'],
+                                                       form['subject'], form['topic'])):
+                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'],
+                                                 form['topic']))
+                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'],
+                                                       form['subject'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
@@ -452,7 +481,7 @@ def add():
             DB.session.commit()
             flash('Notatka zostala dodana!', 'success')
             if request.args.get('next'):
-                if request.args.get('next')=='/':
+                if request.args.get('next') == '/':
                     pass
                 else:
                     return redirect(request.args.get('next'))
@@ -472,9 +501,10 @@ def add():
 def admin_add():
     if current_user.admin or current_user.modderator:
         if request.method == 'POST':
-            if request.form['type']=='subject':
+            if request.form['type'] == 'subject':
                 try:
-                    if Subject.query.filter(func.lower(Subject.name) == func.lower(request.form['title'])).first():
+                    if Subject.query.filter(func.lower(Subject.name) == func.lower(
+                            request.form['title'])).first():
                         flash("Dany przedmiot juz istnieje", 'warning')
                     else:
                         subject = Subject()
@@ -489,7 +519,9 @@ def admin_add():
                 return redirect('/')
             elif request.form['type'] == 'topic':
                 try:
-                    if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(request.form['title']), Topic.subject_id == request.form['subject'])).first():
+                    if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(
+                            request.form['title']), Topic.subject_id == request.form['subject'])
+                                         ).first():
                         flash("Dany dzial juz istnieje", 'warning')
                     else:
                         topic = Topic()
@@ -563,14 +595,15 @@ def edit_note(identifier):
         Note.query.filter_by(id=identifier).first().subject_id = form['subject']
         Note.query.filter_by(id=identifier).first().topic_id = form['topic']
         if 'file' in request.files:
-            if not request.files['file'].filename == '' and allowed_file(request.files['file'].filename):
+            if not request.files['file'].filename == '' and allowed_file(
+                    request.files['file'].filename):
                 filename = secure_filename(request.files['file'].filename)
-                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(id=identifier).first().file))
+                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(
+                    id=identifier).first().file))
                 request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
                 Note.query.filter_by(id=identifier).first().file = str(filename)
         flash('Zapisano zmiany!', 'success')
         DB.session.commit()
-        print('commit')
         if request.args.get('next'):
             return redirect(request.args.get('next'))
         return redirect(request.path)
