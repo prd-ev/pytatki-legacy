@@ -33,7 +33,7 @@ def send_confirmation_email(user = current_user):
     print(user.email)
     token = ts.dumps(user.email, salt='email-confirm-key')
     msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[user.email])
-    msg.html = "Potwierdź adres email: <a href='" + str(request.host_url) + "user/confirm/" + token + "'>link</a>"
+    msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
 
