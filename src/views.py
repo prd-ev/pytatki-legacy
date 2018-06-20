@@ -23,51 +23,56 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'doc
 def validPassword(password):
     return re.search('[0-9]', password) and re.search('[A-Z]', password) and re.search('[a-z]',password)
 
+def validUsername(username):
+    return " " in username and username == username.lower()
+
 @APP.route('/register/', methods=["POST"])
 def register_post():
     """Function for registration a new user"""
+    #try:
     if not current_user.is_authenticated:
+        form = request.form
         try:
-            form = request.form
-            username = form['username']
-            if username == username.lower():
-                upper = False
+            if form['password'] == form['confirm'] and len(
+                    form['password']) >= 8 and validPassword(form['password']):
+                password = sha256_crypt.encrypt((str(form['password'])))
+                wrong_password = False
             else:
-                upper = True
-            email = form['email']
-            try:
-                if form['password']==form['confirm'] and len(
-                        form['password']) >= 8 and validPassword(form['password']):
-                    password = sha256_crypt.encrypt((str(form['password'])))
-                    wrong_password=False
-                else:
-                    wrong_password = True
-            except Exception as err:
-                print(err)
                 wrong_password = True
-            try:
-                accept = form['accept_tos']
-            except Exception:
-                accept = ''
-            used_username = User.query.filter_by(username=username).first()
-            if accept != 'checked' or used_username or "@" not in email or wrong_password or " " in username or upper:
-                return render_template('register.html', form=form, not_accept=bool(accept != 'checked'),
-                                        used_username=used_username, wrong_email=bool("@" not in email),
-                                        wrong_password=wrong_password, wrong_username=bool(" " in username), upper=upper)
-            user = User(username=username, password=password, email=email)
-            DB.session.add(user)
-            DB.session.commit()
-            flash("Zarejestrowano pomyslnie!", 'success')
-            send_confirmation_email(user)
-            return redirect(url_for('login', next=request.args.get('next'), username=username))
-        except Exception as error:
-            flash('Blad: '+str(error), 'danger')
-            return redirect('/')
+        except KeyError:
+            wrong_password = True
+        try:
+            accept = form['accept_tos']
+        except KeyError:
+            accept = ''
+        used_username = User.query.filter_by(username=form['username']).first()
+        if accept != 'checked' or used_username or '@' not in form['email'] \
+            or wrong_password or validUsername(form['username']):
+            return render_template(
+                'register.html',
+                form=form,
+                not_accept=bool(accept != 'checked'),
+                used_username=used_username,
+                wrong_email=bool('@' not in form['email']),
+                wrong_password=wrong_password,
+                wrong_username=bool(' ' in form['username']),
+                upper=bool(not form['username'] == form['username'].lower()),
+                )
+        user = User(username=form['username'], password=password,
+                    email=form['email'])
+        DB.session.add(user)
+        DB.session.commit()
+        flash("Zarejestrowano pomyslnie!", 'success')
+        send_confirmation_email(user)
+        return redirect(url_for('login', next=request.args.get('next'), username=username))
     else:
         flash("Jestes juz zalogowany!", 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
+    #except Exception as error:
+    #    flash('Blad: '+str(error), 'danger')
+    #    return redirect('/')
 
 
 @APP.route('/register/', methods=["GET"])
