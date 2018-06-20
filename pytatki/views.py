@@ -10,8 +10,7 @@ from flask_login import login_user, logout_user, current_user
 from main import APP, DB
 from config import CONFIG
 from src.models import User, Subject, Topic, Note
-from src.user import send_confirmation_email
-from src.view_manager import ban, login_required, login_manager, nocache
+from src.view_manager import ban, login_manager, nocache
 
 
 __author__ = 'Patryk Niedzwiedzinski'
