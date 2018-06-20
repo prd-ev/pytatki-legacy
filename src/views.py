@@ -28,30 +28,43 @@ def register():
     if not current_user.is_authenticated:
         try:
             if request.method == "POST":
-                form = request.form
-                username = form['username']
+                username = request.form['username']
                 if username == username.lower():
                     upper = False
                 else:
                     upper = True
-                email = form['email']
+                email = request.form['email']
                 try:
-                    if form['password']==form['confirm'] and len(form['password']) >= 8 and re.search('[0-9]', form['password']) and re.search(
-                            '[A-Z]', form['password'])  and re.search('[a-z]',form['password']):
-                        password = sha256_crypt.encrypt((str(form['password'])))
+                    if request.form['password']==request.form['confirm'] and not request.form['password']=='' and len(
+                            request.form['password']) >= 8 and re.search('[0-9]', request.form['password']) and re.search(
+                            '[A-Z]', request.form['password'])  and re.search('[a-z]',request.form['password']):
+                        password = sha256_crypt.encrypt((str(request.form['password'])))
                         wrong_password=False
                     else:
                         wrong_password = True
-                except Exception as err:
-                    print(err)
+                except Exception:
                     wrong_password = True
                 try:
-                    accept = form['accept_tos']
+                    if not request.form['accept_tos'] == 'checked':
+                        not_accept=True
+                    else:
+                        not_accept=False
                 except Exception:
-                    accept = ''
-                used_username = User.query.filter_by(username=username).first()
-                if accept != 'checked' or used_username or "@" not in email or wrong_password or " " in username or upper:
-                    return render_template('register.html', form=form, not_accept=not_accept,
+                    not_accept=True
+                if User.query.filter_by(username=username).first():
+                    used_username=True
+                else:
+                    used_username=False
+                if " " in username:
+                    wrong_username = True
+                else:
+                    wrong_username = False
+                if "@" not in email:
+                    wrong_email=True
+                else:
+                    wrong_email=False
+                if not_accept or used_username or wrong_email or wrong_password or wrong_username or upper:
+                    return render_template('register.html', form=request.form, not_accept=not_accept,
                                            used_username=used_username, wrong_email=wrong_email,
                                            wrong_password=wrong_password, wrong_username=wrong_username, upper=upper)
                 user = User(username=username, password=password, email=email)
