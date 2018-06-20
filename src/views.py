@@ -159,11 +159,7 @@ def about():
 @login_manager
 def admin():
     """Admin"""
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except Exception:
-        admin = False
-    if admin or User.query.filter_by(username=current_user.username).first().modderator:
+    if current_user.admin or current_user.modderator:
         return render_template('admin.html', admin=admin)
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
@@ -174,21 +170,17 @@ def admin():
 def delete_user(identifier):
     """Delete user"""
     if not User.query.filter_by(id=identifier).first().superuser:
-        if identifier == User.query.filter_by(username=current_user.username).first().id \
-        or User.query.filter_by(username=current_user.username).first().admin:
+        if identifier == current_user.id or current_user.admin:
             user = User.query.filter_by(id=identifier).first()
             if user:
-                if identifier == User.query.filter_by(username=current_user.username).first().id:
-                    try:
-                        logout_user()
-                        DB.session.delete(user)
-                        DB.session.commit()
-                        gc.collect()
-                        session.clear()
-                        gc.collect()
-                        flash('Twoje konto zostalo usuniete', 'success')
-                    except Exception as error:
-                        flash('Blad: '+str(error), 'danger')
+                if identifier == current_user.id:
+                    logout_user()
+                    DB.session.delete(user)
+                    DB.session.commit()
+                    gc.collect()
+                    session.clear()
+                    gc.collect()
+                    flash('Twoje konto zostalo usuniete', 'success')
                 else:
                     DB.session.delete(user)
                     DB.session.commit()
@@ -278,18 +270,13 @@ def delete_topic(identifier):
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except KeyError:
-        admin = False
-    if User.query.filter_by(username=current_user.username).first().admin \
-    or User.query.filter_by(username=current_user.username).first().modderator:
+    if current_user.admin or current_user.modderator:
         users = User.query.order_by(User.id.asc()).all()
         admini = 0
         for user in users:
             if user.admin:
                 admini += 1
-        return render_template('user_list.html', users=users, admini=admini, admin=admin)
+        return render_template('user_list.html', users=users, admini=admini)
     flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
@@ -327,10 +314,8 @@ def unban(username):
 @login_manager
 def give_admin(identifier):
     """Give admin"""
-    if User.query.filter_by(username=current_user.username).first().admin \
-    and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != User.query.filter_by(
-            username=current_user.username).first():
+    if current_user.admin and User.query.filter_by(id=identifier).first() \
+    and User.query.filter_by(id=identifier).first() != current_user:
         try:
             User.query.filter_by(id=identifier).first().admin = True
             DB.session.commit()
@@ -352,8 +337,7 @@ def give_admin(identifier):
 @login_manager
 def take_mod(identifier):
     """Take mod"""
-    if User.query.filter_by(username=current_user.username).first().admin \
-    and User.query.filter_by(id=identifier).first():
+    if current_user.admin and User.query.filter_by(id=identifier).first():
         try:
             User.query.filter_by(id=identifier).first().modderator = False
             DB.session.commit()
@@ -376,10 +360,8 @@ def take_mod(identifier):
 @login_manager
 def give_mod(identifier):
     """Give mod"""
-    if User.query.filter_by(username=current_user.username).first().admin \
-    and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != User.query.filter_by(
-            username=current_user.username).first():
+    if current_user.admin and User.query.filter_by(id=identifier).first() \
+    and User.query.filter_by(id=identifier).first() != current_user:
         try:
             User.query.filter_by(id=identifier).first().modderator = True
             DB.session.commit()
@@ -398,8 +380,7 @@ def give_mod(identifier):
 def take_admin(identifier):
     """take admin"""
     if not User.query.filter_by(id=identifier).first().superuser:
-        if User.query.filter_by(username=current_user.username).first().admin \
-        and User.query.filter_by(id=identifier).first():
+        if current_user.admin and User.query.filter_by(id=identifier).first():
             try:
                 User.query.filter_by(id=identifier).first().admin = False
                 DB.session.commit()
@@ -418,7 +399,8 @@ def take_admin(identifier):
 def allowed_file(filename):
     """Check if file has valid name and allowed extension"""
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS \
+           and not filename == ''
 
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
@@ -555,43 +537,49 @@ def edit_subject(identifier):
     return render_template('edit.html', subject=subject)
 
 
-@APP.route('/admin/topic/<identifier>/edit/', methods=['GET', 'POST'])
-def edit_topic(identifier):
+@APP.route('/admin/topic/<identifier>/edit/', methods=['POST'])
+def edit_topic_post(identifier):
     """Edit topic"""
-    if request.method == 'POST':
-        form = request.form
-        Topic.query.filter_by(id=identifier).first().name = form['name']
-        Topic.query.filter_by(id=identifier).first().subject_id = form['subject']
-        DB.session.commit()
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect(request.path)
+    Topic.query.filter_by(id=identifier).first().name = request.form['name']
+    Topic.query.filter_by(id=identifier).first().subject_id = request.form['subject']
+    DB.session.commit()
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect(request.path)
+    
+
+
+@APP.route('/admin/topic/<identifier>/edit/', methods=['GET'])
+def edit_topic_get(identifier):
+    """Edit topic"""
     topic = Topic.query.filter_by(id=identifier).first()
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     return render_template('edit_t.html', topic=topic, subjects=subjects)
 
-
-@APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
-def edit_note(identifier):
+@APP.route('/admin/note/<identifier>/edit/', methods=['POST'])
+def edit_note_post(identifier):
     """Edit note"""
-    if request.method == 'POST':
-        form = request.form
-        Note.query.filter_by(id=identifier).first().name = form['name']
-        Note.query.filter_by(id=identifier).first().subject_id = form['subject']
-        Note.query.filter_by(id=identifier).first().topic_id = form['topic']
-        if 'file' in request.files:
-            if not request.files['file'].filename == '' and allowed_file(
-                    request.files['file'].filename):
-                filename = secure_filename(request.files['file'].filename)
-                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(
-                    id=identifier).first().file))
-                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-                Note.query.filter_by(id=identifier).first().file = str(filename)
-        flash('Zapisano zmiany!', 'success')
-        DB.session.commit()
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect(request.path)
+    Note.query.filter_by(id=identifier).first().name = request.form['name']
+    Note.query.filter_by(id=identifier).first().subject_id = request.form['subject']
+    Note.query.filter_by(id=identifier).first().topic_id = request.form['topic']
+    if 'file' in request.files:
+        if allowed_file(request.files['file'].filename):
+            filename = secure_filename(request.files['file'].filename)
+            os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(
+                id=identifier).first().file))
+            request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+            Note.query.filter_by(id=identifier).first().file = str(filename)
+    flash('Zapisano zmiany!', 'success')
+    DB.session.commit()
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect(request.path)
+    
+
+
+@APP.route('/admin/note/<identifier>/edit/', methods=['GET'])
+def edit_note_get(identifier):
+    """Edit note"""
     note = Note.query.filter_by(id=identifier).first()
     topics = Topic.query.order_by(Topic.id.asc()).all()
     subjects = Subject.query.order_by(Subject.id.asc()).all()
