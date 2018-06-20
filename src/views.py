@@ -472,7 +472,6 @@ def edit_note_post(identifier):
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect(request.path)
-    
 
 
 @APP.route('/admin/note/<identifier>/edit/', methods=['GET'])
