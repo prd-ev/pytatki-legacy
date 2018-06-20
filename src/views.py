@@ -104,26 +104,25 @@ def register_get():
         return redirect(request.args.get('next'))
     return redirect('/')
 
-@APP.route('/login/', methods=["GET", "POST"])
-def login():
+@APP.route('/login/', methods=["POST"])
+def login_post():
     """Login"""
     if current_user.is_authenticated:
         flash('Juz jestes zalogowany!', 'warning')
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect('/')
     if request.method == "POST":
         user = User.query.filter_by(username=request.form['username']).first()
-        if user and user.check_password(request.form['password']):
-            login_user(user, remember=bool(request.form['remember']))
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        return render_template('login.html', form=request.form, wrong=True)
-    else:
-        return render_template('login.html')
+        if not user or not user.check_password(request.form['password']):
+            return render_template('login.html', form=request.form, wrong=True)
+        login_user(user, remember=bool(request.form['remember']))
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
 
 
+@APP.route('/login/', methods=["GET"])
+def login_get():
+    """Login"""
+    return render_template('login.html')
 
 @APP.route("/logout/")
 @login_required
