@@ -1,155 +1,63 @@
 """Widoki aplikacji"""
+import os
+import gc
+from datetime import datetime
 from sqlalchemy import func, and_
-from main import APP
-from pytatki.database import DB
-from config import CONFIG
-from flask import render_template, redirect, request, session, flash, url_for, send_from_directory
+from flask import render_template, redirect, request, session, flash, send_file
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
-from pytatki.models import User, Subject, Topic, Note
-import gc
 from flask_login import login_user, logout_user, current_user
-from datetime import datetime
-import os
-from pytatki.user import send_confirmation_email
-from pytatki.view_manager import ban, login_required, login_manager, nocache
-import re
+from main import APP, DB
+from config import CONFIG
+from src.models import User, Subject, Topic, Note
+from src.view_manager import ban, login_manager, nocache
 
 
 __author__ = 'Patryk Niedzwiedzinski'
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf', 'cpp'])
-
-
-@APP.route('/register/', methods=["GET", "POST"])
-def register():
-    next_url = request.args.get('next')
-    if not current_user.is_authenticated:
-        try:
-            if request.method == "POST":
-                form = request.form
-                username = form['username']
-                if username == username.lower():
-                    upper = False
-                else:
-                    upper = True
-                email = form['email']
-                try:
-                    if form['password']==form['confirm'] and not form['password']=='' and len(
-                            form['password']) >= 8 and re.search('[0-9]', form['password']) and re.search(
-                            '[A-Z]', form['password'])  and re.search('[a-z]',form['password']):
-                        password = sha256_crypt.encrypt((str(form['password'])))
-                        wrong_password=False
-                    else:
-                        wrong_password = True
-                except Exception:
-                    wrong_password = True
-                try:
-                    accept = form['accept_tos']
-                    if not accept == 'checked':
-                        not_accept=True
-                    else:
-                        not_accept=False
-                except Exception:
-                    not_accept=True
-                used_username = User.query.filter_by(username=username).first()
-                if used_username:
-                    used_username=True
-                else:
-                    used_username=False
-                if " " in username:
-                    wrong_username = True
-                else:
-                    wrong_username = False
-                if "@" not in email:
-                    wrong_email=True
-                else:
-                    wrong_email=False
-                if not_accept or used_username or wrong_email or wrong_password or wrong_username or upper:
-                    return render_template('register.html', form=form, not_accept=not_accept,
-                                           used_username=used_username, wrong_email=wrong_email,
-                                           wrong_password=wrong_password, wrong_username=wrong_username, upper=upper)
-                user = User(username=username, password=password, email=email)
-                DB.session.add(user)
-                DB.session.commit()
-                flash("Zarejestrowano pomyslnie!", 'success')
-                send_confirmation_email(user)
-                return redirect(url_for('login', next=next_url, username=username))
-            else:
-                return render_template('register.html')
-        except Exception as error:
-            flash('Blad: '+str(error), 'danger')
-            return redirect('/')
-    else:
-        flash("Jestes juz zalogowany!", 'warning')
-        return redirect(next_url)
-
-
-@APP.route('/login/', methods=["GET", "POST"])
-def login():
-    if current_user.is_authenticated:
-        flash('Juz jestes zalogowany!', 'warning')
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect('/')
-    if request.method == "POST":
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and user.check_password(request.form['password']):
-            try:
-                login_user(user, remember=bool(request.form['remember']))
-            except Exception as err:
-                print(err)
-                login_user(user)
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        return render_template('login.html', form=request.form, wrong=True)
-    else:
-        return render_template('login.html')
-
-
-
-@APP.route("/logout/")
-@login_required
-def logout():
-    try:
-        logout_user()
-        return redirect('/')
-    except Exception as e:
-        flash('Blad: '+str(e), 'danger')
-        return redirect('/')
+ALLOWED_EXTENSIONS = set([
+    'txt',
+    'pdf',
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'doc',
+    'docx',
+    'ppt',
+    'pptx',
+    'xslx',
+    'xsl',
+    'odt',
+    'rtf',
+    'cpp',
+    ])
 
 
 @APP.route('/')
 @ban
 def homepage():
+    """Homepage"""
     if current_user.is_authenticated:
-        try:
-            admin = User.query.filter_by(username=current_user.username).first().admin
-        except Exception:
-            admin = False
         subjects = Subject.query.order_by(Subject.id.asc()).all()
         topics = Topic.query.order_by(Topic.id.asc()).all()
         notes = Note.query.order_by(Note.id.asc()).all()
-        return render_template('homepage.html', admin=admin, subjects=subjects, topics=topics, notes=notes)
-    else:
-        admin = False
-    return render_template('homepage.html', admin=admin)
+        return render_template('homepage.html', subjects=subjects,
+                               topics=topics, notes=notes)
+    return render_template('homepage.html')
 
 
 @APP.route('/about/')
 def about():
+    """About"""
     return render_template('about.html')
 
 
 @APP.route("/admin/")
 @login_manager
 def admin():
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except Exception:
-        admin = False
-    if admin or User.query.filter_by(username=current_user.username).first().modderator:
+    """Admin"""
+    if current_user.admin or current_user.modderator:
         return render_template('admin.html', admin=admin)
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
@@ -158,37 +66,27 @@ def admin():
 @APP.route('/admin/delete/user/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_user(identifier):
+    """Delete user"""
     if not User.query.filter_by(id=identifier).first().superuser:
-        if identifier == User.query.filter_by(username=current_user.username).first().id or User.query.filter_by(
-                username=current_user.username).first().admin:
+        if identifier == current_user.id or current_user.admin:
             user = User.query.filter_by(id=identifier).first()
             if user:
-                if identifier == User.query.filter_by(username=current_user.username).first().id:
-                    try:
-                        logout_user()
-                        DB.session.delete(user)
-                        DB.session.commit()
-                        gc.collect()
-                        session.clear()
-                        gc.collect()
-                        flash('Twoje konto zostalo usuniete', 'success')
-                        return redirect('/')
-                    except Exception as e:
-                        flash('Blad: '+str(e), 'danger')
-                        return redirect('/')
+                if identifier == current_user.id:
+                    logout_user()
+                    DB.session.delete(user)
+                    DB.session.commit()
+                    gc.collect()
+                    session.clear()
+                    gc.collect()
+                    flash('Twoje konto zostalo usuniete', 'success')
                 else:
                     DB.session.delete(user)
                     DB.session.commit()
                     flash('Uzytkownik zostal usuniety', 'success')
-                    if request.args.get('next'):
-                        return redirect(request.args.get('next'))
-                    return redirect('/')
             else:
                 flash('Nie ma takiego uzytkownika', 'warning')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -196,6 +94,7 @@ def delete_user(identifier):
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_note(identifier):
+    """Delete note"""
     if current_user.admin or current_user.modderator:
         note = Note.query.filter_by(id=identifier).first()
         if note:
@@ -204,19 +103,12 @@ def delete_note(identifier):
                 DB.session.delete(note)
                 DB.session.commit()
                 flash('Notatka zostala usunieta!', 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-                return redirect('/')
-
+            except Exception as error:
+                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiej notatki', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -224,6 +116,7 @@ def delete_note(identifier):
 @APP.route('/admin/delete/subject/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_subject(identifier):
+    """Delete subject"""
     if current_user.admin or current_user.modderator:
         subject = Subject.query.filter_by(id=identifier).first()
         if subject:
@@ -237,19 +130,12 @@ def delete_subject(identifier):
                         DB.session.delete(note)
                 DB.session.commit()
                 flash('Przedmiot zostal usuniety!', 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-                return redirect('/')
-
+            except Exception as error:
+                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiego przedmiotu', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -257,6 +143,7 @@ def delete_subject(identifier):
 @APP.route('/admin/delete/topic/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_topic(identifier):
+    """Delete topic"""
     if current_user.admin or current_user.modderator:
         topic = Topic.query.filter_by(id=identifier).first()
         if topic:
@@ -267,19 +154,12 @@ def delete_topic(identifier):
                         DB.session.delete(note)
                 DB.session.commit()
                 flash('Dzial zostal usuniety!', 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-                return redirect('/')
-
+            except Exception as error:
+                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiego dzialu', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -288,23 +168,20 @@ def delete_topic(identifier):
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    try:
-        admin = User.query.filter_by(username=current_user.username).first().admin
-    except KeyError:
-        admin = False
-    if User.query.filter_by(username=current_user.username).first().admin or User.query.filter_by(username=current_user.username).first().modderator:
-        users=User.query.order_by(User.id.asc()).all()
+    if current_user.admin or current_user.modderator:
+        users = User.query.order_by(User.id.asc()).all()
         admini = 0
         for user in users:
             if user.admin:
                 admini += 1
-        return render_template('user_list.html', users=users, admini=admini, admin=admin)
+        return render_template('user_list.html', users=users, admini=admini)
     flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
 @APP.route('/admin/ban/<username>/', methods=["GET"])
 @login_manager
 def ban_user(username):
+    """Ban user"""
     user = User.query.filter_by(username=username).first()
     if user:
         user.ban = True
@@ -319,6 +196,7 @@ def ban_user(username):
 @APP.route('/admin/unban/<username>/', methods=["GET"])
 @login_manager
 def unban(username):
+    """Unban user"""
     user = User.query.filter_by(username=username).first()
     if user:
         user.ban = False
@@ -333,9 +211,9 @@ def unban(username):
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_admin(identifier):
-    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
-            id=identifier).first() and User.query.filter_by(id=identifier).first() != User.query.filter_by(
-            username=current_user.username).first():
+    """Give admin"""
+    if current_user.admin and User.query.filter_by(id=identifier).first() \
+    and User.query.filter_by(id=identifier).first() != current_user:
         try:
             User.query.filter_by(id=identifier).first().admin = True
             DB.session.commit()
@@ -356,7 +234,8 @@ def give_admin(identifier):
 @APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_mod(identifier):
-    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=identifier).first():
+    """Take mod"""
+    if current_user.admin and User.query.filter_by(id=identifier).first():
         try:
             User.query.filter_by(id=identifier).first().modderator = False
             DB.session.commit()
@@ -366,7 +245,7 @@ def take_mod(identifier):
                 return redirect(request.args.get('next'))
             return redirect('/')
         except Exception as error:
-            flash("Blad: "+str(error),'danger')
+            flash("Blad: " + str(error), 'danger')
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
@@ -378,9 +257,9 @@ def take_mod(identifier):
 @APP.route('/admin/give-mod/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_mod(identifier):
-    if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(
-            id=identifier).first() and User.query.filter_by(id=identifier).first() != User.query.filter_by(
-            username=current_user.username).first():
+    """Give mod"""
+    if current_user.admin and User.query.filter_by(id=identifier).first() \
+    and User.query.filter_by(id=identifier).first() != current_user:
         try:
             User.query.filter_by(id=identifier).first().modderator = True
             DB.session.commit()
@@ -397,8 +276,9 @@ def give_mod(identifier):
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_admin(identifier):
+    """take admin"""
     if not User.query.filter_by(id=identifier).first().superuser:
-        if User.query.filter_by(username=current_user.username).first().admin and User.query.filter_by(id=identifier).first():
+        if current_user.admin and User.query.filter_by(id=identifier).first():
             try:
                 User.query.filter_by(id=identifier).first().admin = False
                 DB.session.commit()
@@ -415,12 +295,15 @@ def take_admin(identifier):
     return redirect('/')
 
 def allowed_file(filename):
+    """Check if file has valid name and allowed extension"""
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS \
+           and not filename == ''
 
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
 def add():
+    """Add new note"""
     if request.method == 'POST':
         try:
             form = request.form
@@ -432,12 +315,14 @@ def add():
                 flash('Nie wybrano pliku', 'warning')
                 return redirect(request.url)
             if request_file:
-                print("if1")
                 if allowed_file(request_file.filename):
-                    print("if2")
                     filename = secure_filename(request_file.filename)
-                    print("secure")
-                    request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'],
+                                                       form['subject'], form['topic'])):
+                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'],
+                                                 form['topic']))
+                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'],
+                                                       form['subject'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
@@ -446,13 +331,13 @@ def add():
             note.author_id = current_user.id
             note.subject_id = form['subject']
             note.topic_id = form['topic']
-            note.file = str(filename)
+            note.file = os.path.join(form['subject'], form['topic'], filename)
             note.date = datetime.now()
             DB.session.add(note)
             DB.session.commit()
             flash('Notatka zostala dodana!', 'success')
             if request.args.get('next'):
-                if request.args.get('next')=='/':
+                if request.args.get('next') == '/':
                     pass
                 else:
                     return redirect(request.args.get('next'))
@@ -467,61 +352,70 @@ def add():
         topics = Topic.query.order_by(Topic.id.asc()).all()
         return render_template('add.html', subjects=subjects, topics=topics)
 
-@APP.route('/admin/add/', methods=["GET", "POST"])
+@APP.route('/admin/add/', methods=["POST"])
 @login_manager
-def admin_add():
+def admin_add_post():
+    """Admin add"""
     if current_user.admin or current_user.modderator:
-        if request.method == 'POST':
-            if request.form['type']=='subject':
-                try:
-                    if Subject.query.filter(func.lower(Subject.name) == func.lower(request.form['title'])).first():
-                        flash("Dany przedmiot juz istnieje", 'warning')
-                    else:
-                        subject = Subject()
-                        subject.name = request.form['title']
-                        DB.session.add(subject)
-                        DB.session.commit()
-                        flash('Dodano przedmiot!', 'success')
-                except Exception as e:
-                    flash('Blad: '+str(e), 'danger')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            elif request.form['type'] == 'topic':
-                try:
-                    if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(request.form['title']), Topic.subject_id == request.form['subject'])).first():
-                        flash("Dany dzial juz istnieje", 'warning')
-                    else:
-                        topic = Topic()
-                        topic.name = request.form['title']
-                        topic.subject_id = request.form['subject']
-                        DB.session.add(topic)
-                        DB.session.commit()
-                        flash('Dodano dzial!', 'success')
-                except Exception as e:
-                    flash('Blad: '+str(e), 'danger')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-        else:
-            subjects = Subject.query.order_by(Subject.id.asc()).all()
-            topics = Topic.query.order_by(Topic.id.asc()).all()
-            return render_template('admin_add.html', subjects=subjects, topics=topics)
+        if request.form['type'] == 'subject':
+            try:
+                if Subject.query.filter(func.lower(Subject.name) == func.lower(
+                        request.form['title'])).first():
+                    flash("Dany przedmiot juz istnieje", 'warning')
+                else:
+                    subject = Subject()
+                    subject.name = request.form['title']
+                    DB.session.add(subject)
+                    DB.session.commit()
+                    flash('Dodano przedmiot!', 'success')
+            except Exception as e:
+                flash('Blad: '+str(e), 'danger')
+        elif request.form['type'] == 'topic':
+            try:
+                if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(
+                        request.form['title']), Topic.subject_id == request.form['subject'])
+                                     ).first():
+                    flash("Dany dzial juz istnieje", 'warning')
+                else:
+                    topic = Topic()
+                    topic.name = request.form['title']
+                    topic.subject_id = request.form['subject']
+                    DB.session.add(topic)
+                    DB.session.commit()
+                    flash('Dodano dzial!', 'success')
+            except Exception as e:
+                flash('Blad: '+str(e), 'danger')
     else:
         flash('Nie mozesz tego zrobic', 'warning')
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect('/')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
+
+@APP.route('/admin/add/', methods=["GET"])
+@login_manager
+def admin_add_get():
+    """Admin add"""
+    if current_user.admin or current_user.modderator:
+        subjects = Subject.query.order_by(Subject.id.asc()).all()
+        topics = Topic.query.order_by(Topic.id.asc()).all()
+        return render_template('admin_add.html', subjects=subjects, topics=topics)
+    else:
+        flash("Nie masz uprawnien", 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
 
 @APP.route('/admin/notes/')
 @login_manager
 def notes():
+    """List of notes"""
     notes = Note.query.order_by(Note.id.asc()).all()
     return render_template('notes.html', notes=notes)
 
 @APP.route('/admin/subjects/')
 @login_manager
 def subjects():
+    """List of subjects"""
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     topics = Topic.query.order_by(Topic.id.asc()).all()
     return render_template('subjects.html', subjects=subjects, topics=topics)
@@ -529,6 +423,7 @@ def subjects():
 
 @APP.route('/admin/subject/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_subject(identifier):
+    """Edit subject"""
     if request.method == 'POST':
         form = request.form
         Subject.query.filter_by(id=identifier).first().name = form['name']
@@ -540,52 +435,61 @@ def edit_subject(identifier):
     return render_template('edit.html', subject=subject)
 
 
-@APP.route('/admin/topic/<identifier>/edit/', methods=['GET', 'POST'])
-def edit_topic(identifier):
-    if request.method == 'POST':
-        form = request.form
-        Topic.query.filter_by(id=identifier).first().name = form['name']
-        Topic.query.filter_by(id=identifier).first().subject_id = form['subject']
-        DB.session.commit()
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect(request.path)
+@APP.route('/admin/topic/<identifier>/edit/', methods=['POST'])
+def edit_topic_post(identifier):
+    """Edit topic"""
+    Topic.query.filter_by(id=identifier).first().name = request.form['name']
+    Topic.query.filter_by(id=identifier).first().subject_id = request.form['subject']
+    DB.session.commit()
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect(request.path)
+
+
+@APP.route('/admin/topic/<identifier>/edit/', methods=['GET'])
+def edit_topic_get(identifier):
+    """Edit topic"""
     topic = Topic.query.filter_by(id=identifier).first()
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     return render_template('edit_t.html', topic=topic, subjects=subjects)
 
+@APP.route('/admin/note/<identifier>/edit/', methods=['POST'])
+def edit_note_post(identifier):
+    """Edit note"""
+    Note.query.filter_by(id=identifier).first().name = request.form['name']
+    Note.query.filter_by(id=identifier).first().subject_id = request.form['subject']
+    Note.query.filter_by(id=identifier).first().topic_id = request.form['topic']
+    if 'file' in request.files:
+        if allowed_file(request.files['file'].filename):
+            filename = secure_filename(request.files['file'].filename)
+            os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(
+                id=identifier).first().file))
+            request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+            Note.query.filter_by(id=identifier).first().file = str(filename)
+    flash('Zapisano zmiany!', 'success')
+    DB.session.commit()
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect(request.path)
 
-@APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
-def edit_note(identifier):
-    if request.method == 'POST':
-        form = request.form
-        Note.query.filter_by(id=identifier).first().name = form['name']
-        Note.query.filter_by(id=identifier).first().subject_id = form['subject']
-        Note.query.filter_by(id=identifier).first().topic_id = form['topic']
-        if 'file' in request.files:
-            if not request.files['file'].filename == '' and allowed_file(request.files['file'].filename):
-                filename = secure_filename(request.files['file'].filename)
-                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(id=identifier).first().file))
-                request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-                Note.query.filter_by(id=identifier).first().file = str(filename)
-        flash('Zapisano zmiany!', 'success')
-        DB.session.commit()
-        print('commit')
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect(request.path)
+
+@APP.route('/admin/note/<identifier>/edit/', methods=['GET'])
+def edit_note_get(identifier):
+    """Edit note"""
     note = Note.query.filter_by(id=identifier).first()
     topics = Topic.query.order_by(Topic.id.asc()).all()
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     return render_template('edit_n.html', note=note, topics=topics, subjects=subjects)
 
 
-@APP.route('/download/<filename>/')
+@APP.route('/download/<identifier>/')
 @login_manager
 @nocache
-def download(filename):
+def download(identifier):
+    """Download file"""
     if current_user.is_authenticated:
-        return send_from_directory(APP.config['UPLOAD_FOLDER'], filename)
+        note = Note.query.filter_by(id=identifier).first()
+        return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
