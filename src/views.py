@@ -1,18 +1,18 @@
 """Widoki aplikacji"""
+import os
+import re
+import gc
+from datetime import datetime
 from sqlalchemy import func, and_
-from main import APP, DB
-from config import CONFIG
 from flask import render_template, redirect, request, session, flash, url_for, send_file
 from werkzeug.utils import secure_filename
 from passlib.hash import sha256_crypt
-from src.models import User, Subject, Topic, Note
-import gc
 from flask_login import login_user, logout_user, current_user
-from datetime import datetime
-import os
+from main import APP, DB
+from config import CONFIG
+from src.models import User, Subject, Topic, Note
 from src.user import send_confirmation_email
 from src.view_manager import ban, login_required, login_manager, nocache
-import re
 
 
 __author__ = 'Patryk Niedzwiedzinski'
@@ -132,8 +132,8 @@ def logout():
     try:
         logout_user()
         return redirect('/')
-    except Exception as e:
-        flash('Blad: '+str(e), 'danger')
+    except Exception as error:
+        flash('Blad: '+str(error), 'danger')
         return redirect('/')
 
 
@@ -142,18 +142,12 @@ def logout():
 def homepage():
     """Homepage"""
     if current_user.is_authenticated:
-        try:
-            admin = User.query.filter_by(username=current_user.username).first().admin
-        except Exception:
-            admin = False
         subjects = Subject.query.order_by(Subject.id.asc()).all()
         topics = Topic.query.order_by(Topic.id.asc()).all()
         notes = Note.query.order_by(Note.id.asc()).all()
-        return render_template('homepage.html', admin=admin, subjects=subjects,
+        return render_template('homepage.html', subjects=subjects,
                                topics=topics, notes=notes)
-    else:
-        admin = False
-    return render_template('homepage.html', admin=admin)
+    return render_template('homepage.html')
 
 
 @APP.route('/about/')
@@ -194,23 +188,16 @@ def delete_user(identifier):
                         session.clear()
                         gc.collect()
                         flash('Twoje konto zostalo usuniete', 'success')
-                        return redirect('/')
-                    except Exception as e:
-                        flash('Blad: '+str(e), 'danger')
-                        return redirect('/')
+                    except Exception as error:
+                        flash('Blad: '+str(error), 'danger')
                 else:
                     DB.session.delete(user)
                     DB.session.commit()
                     flash('Uzytkownik zostal usuniety', 'success')
-                    if request.args.get('next'):
-                        return redirect(request.args.get('next'))
-                    return redirect('/')
             else:
                 flash('Nie ma takiego uzytkownika', 'warning')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -218,6 +205,7 @@ def delete_user(identifier):
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_note(identifier):
+    """Delete note"""
     if current_user.admin or current_user.modderator:
         note = Note.query.filter_by(id=identifier).first()
         if note:
@@ -226,19 +214,12 @@ def delete_note(identifier):
                 DB.session.delete(note)
                 DB.session.commit()
                 flash('Notatka zostala usunieta!', 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-                return redirect('/')
-
+            except Exception as error:
+                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiej notatki', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -246,6 +227,7 @@ def delete_note(identifier):
 @APP.route('/admin/delete/subject/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_subject(identifier):
+    """Delete subject"""
     if current_user.admin or current_user.modderator:
         subject = Subject.query.filter_by(id=identifier).first()
         if subject:
@@ -259,19 +241,12 @@ def delete_subject(identifier):
                         DB.session.delete(note)
                 DB.session.commit()
                 flash('Przedmiot zostal usuniety!', 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-                return redirect('/')
-
+            except Exception as error:
+                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiego przedmiotu', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -279,6 +254,7 @@ def delete_subject(identifier):
 @APP.route('/admin/delete/topic/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_topic(identifier):
+    """Delete topic"""
     if current_user.admin or current_user.modderator:
         topic = Topic.query.filter_by(id=identifier).first()
         if topic:
@@ -289,19 +265,12 @@ def delete_topic(identifier):
                         DB.session.delete(note)
                 DB.session.commit()
                 flash('Dzial zostal usuniety!', 'success')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-                return redirect('/')
-
+            except Exception as error:
+                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiego dzialu', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash('Nie mozesz tego zrobic!', 'warning')
+    else:
+        flash('Nie mozesz tego zrobic!', 'warning')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -328,6 +297,7 @@ def user_list():
 @APP.route('/admin/ban/<username>/', methods=["GET"])
 @login_manager
 def ban_user(username):
+    """Ban user"""
     user = User.query.filter_by(username=username).first()
     if user:
         user.ban = True
@@ -342,6 +312,7 @@ def ban_user(username):
 @APP.route('/admin/unban/<username>/', methods=["GET"])
 @login_manager
 def unban(username):
+    """Unban user"""
     user = User.query.filter_by(username=username).first()
     if user:
         user.ban = False
@@ -356,6 +327,7 @@ def unban(username):
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_admin(identifier):
+    """Give admin"""
     if User.query.filter_by(username=current_user.username).first().admin \
     and User.query.filter_by(id=identifier).first() \
     and User.query.filter_by(id=identifier).first() != User.query.filter_by(
@@ -380,6 +352,7 @@ def give_admin(identifier):
 @APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_mod(identifier):
+    """Take mod"""
     if User.query.filter_by(username=current_user.username).first().admin \
     and User.query.filter_by(id=identifier).first():
         try:
@@ -403,6 +376,7 @@ def take_mod(identifier):
 @APP.route('/admin/give-mod/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_mod(identifier):
+    """Give mod"""
     if User.query.filter_by(username=current_user.username).first().admin \
     and User.query.filter_by(id=identifier).first() \
     and User.query.filter_by(id=identifier).first() != User.query.filter_by(
@@ -423,6 +397,7 @@ def give_mod(identifier):
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_admin(identifier):
+    """take admin"""
     if not User.query.filter_by(id=identifier).first().superuser:
         if User.query.filter_by(username=current_user.username).first().admin \
         and User.query.filter_by(id=identifier).first():
@@ -442,12 +417,14 @@ def take_admin(identifier):
     return redirect('/')
 
 def allowed_file(filename):
+    """Check if file has valid name and allowed extension"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
 def add():
+    """Add new note"""
     if request.method == 'POST':
         try:
             form = request.form
@@ -496,64 +473,70 @@ def add():
         topics = Topic.query.order_by(Topic.id.asc()).all()
         return render_template('add.html', subjects=subjects, topics=topics)
 
-@APP.route('/admin/add/', methods=["GET", "POST"])
+@APP.route('/admin/add/', methods=["POST"])
 @login_manager
-def admin_add():
+def admin_add_post():
+    """Admin add"""
     if current_user.admin or current_user.modderator:
-        if request.method == 'POST':
-            if request.form['type'] == 'subject':
-                try:
-                    if Subject.query.filter(func.lower(Subject.name) == func.lower(
-                            request.form['title'])).first():
-                        flash("Dany przedmiot juz istnieje", 'warning')
-                    else:
-                        subject = Subject()
-                        subject.name = request.form['title']
-                        DB.session.add(subject)
-                        DB.session.commit()
-                        flash('Dodano przedmiot!', 'success')
-                except Exception as e:
-                    flash('Blad: '+str(e), 'danger')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-            elif request.form['type'] == 'topic':
-                try:
-                    if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(
-                            request.form['title']), Topic.subject_id == request.form['subject'])
-                                         ).first():
-                        flash("Dany dzial juz istnieje", 'warning')
-                    else:
-                        topic = Topic()
-                        topic.name = request.form['title']
-                        topic.subject_id = request.form['subject']
-                        DB.session.add(topic)
-                        DB.session.commit()
-                        flash('Dodano dzial!', 'success')
-                except Exception as e:
-                    flash('Blad: '+str(e), 'danger')
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/')
-        else:
-            subjects = Subject.query.order_by(Subject.id.asc()).all()
-            topics = Topic.query.order_by(Topic.id.asc()).all()
-            return render_template('admin_add.html', subjects=subjects, topics=topics)
+        if request.form['type'] == 'subject':
+            try:
+                if Subject.query.filter(func.lower(Subject.name) == func.lower(
+                        request.form['title'])).first():
+                    flash("Dany przedmiot juz istnieje", 'warning')
+                else:
+                    subject = Subject()
+                    subject.name = request.form['title']
+                    DB.session.add(subject)
+                    DB.session.commit()
+                    flash('Dodano przedmiot!', 'success')
+            except Exception as e:
+                flash('Blad: '+str(e), 'danger')
+        elif request.form['type'] == 'topic':
+            try:
+                if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(
+                        request.form['title']), Topic.subject_id == request.form['subject'])
+                                     ).first():
+                    flash("Dany dzial juz istnieje", 'warning')
+                else:
+                    topic = Topic()
+                    topic.name = request.form['title']
+                    topic.subject_id = request.form['subject']
+                    DB.session.add(topic)
+                    DB.session.commit()
+                    flash('Dodano dzial!', 'success')
+            except Exception as e:
+                flash('Blad: '+str(e), 'danger')
     else:
         flash('Nie mozesz tego zrobic', 'warning')
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect('/')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
+
+@APP.route('/admin/add/', methods=["GET"])
+@login_manager
+def admin_add_get():
+    """Admin add"""
+    if current_user.admin or current_user.modderator:
+        subjects = Subject.query.order_by(Subject.id.asc()).all()
+        topics = Topic.query.order_by(Topic.id.asc()).all()
+        return render_template('admin_add.html', subjects=subjects, topics=topics)
+    else:
+        flash("Nie masz uprawnien", 'warning')
+    if request.args.get('next'):
+        return redirect(request.args.get('next'))
+    return redirect('/')
 
 @APP.route('/admin/notes/')
 @login_manager
 def notes():
+    """List of notes"""
     notes = Note.query.order_by(Note.id.asc()).all()
     return render_template('notes.html', notes=notes)
 
 @APP.route('/admin/subjects/')
 @login_manager
 def subjects():
+    """List of subjects"""
     subjects = Subject.query.order_by(Subject.id.asc()).all()
     topics = Topic.query.order_by(Topic.id.asc()).all()
     return render_template('subjects.html', subjects=subjects, topics=topics)
@@ -561,6 +544,7 @@ def subjects():
 
 @APP.route('/admin/subject/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_subject(identifier):
+    """Edit subject"""
     if request.method == 'POST':
         form = request.form
         Subject.query.filter_by(id=identifier).first().name = form['name']
@@ -574,6 +558,7 @@ def edit_subject(identifier):
 
 @APP.route('/admin/topic/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_topic(identifier):
+    """Edit topic"""
     if request.method == 'POST':
         form = request.form
         Topic.query.filter_by(id=identifier).first().name = form['name']
@@ -589,6 +574,7 @@ def edit_topic(identifier):
 
 @APP.route('/admin/note/<identifier>/edit/', methods=['GET', 'POST'])
 def edit_note(identifier):
+    """Edit note"""
     if request.method == 'POST':
         form = request.form
         Note.query.filter_by(id=identifier).first().name = form['name']
@@ -617,6 +603,7 @@ def edit_note(identifier):
 @login_manager
 @nocache
 def download(identifier):
+    """Download file"""
     if current_user.is_authenticated:
         note = Note.query.filter_by(id=identifier).first()
         return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
