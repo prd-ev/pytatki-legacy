@@ -2,19 +2,25 @@
 
 import os
 from config import CONFIG
-from flask import Flask
+from pytatki.database import DB
 from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
+from flask import Flask
 
 __author__ = 'Patryk Niedzwiedzinski'
 
-def create_app():
+def create_app(test_config=None):
     APP = Flask(__name__)
     APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
     APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     APP.static_path = os.path.join(os.path.abspath(__file__), 'static')
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        APP.config.from_pyfile('config.py', silent=True)
+    else:
+        # load the test config if passed in
+        APP.config.update(test_config)
     return APP
 
 APP = create_app()
@@ -25,7 +31,6 @@ APP.config.update(
     MAIL_USERNAME=CONFIG.EMAIL,
     MAIL_PASSWORD=CONFIG.EMAIL_PASSWORD
 )
-DB = SQLAlchemy()
 DB.app = APP
 DB.init_app(APP)
 LM = LoginManager()
