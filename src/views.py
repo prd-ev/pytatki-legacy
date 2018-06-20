@@ -52,9 +52,9 @@ def register():
                     accept = ''
                 used_username = User.query.filter_by(username=username).first()
                 if accept != 'checked' or used_username or "@" not in email or wrong_password or " " in username or upper:
-                    return render_template('register.html', form=form, not_accept=not_accept,
-                                           used_username=used_username, wrong_email=wrong_email,
-                                           wrong_password=wrong_password, wrong_username=wrong_username, upper=upper)
+                    return render_template('register.html', form=form, not_accept=bool(accept != 'checked'),
+                                           used_username=used_username, wrong_email=bool("@" not in email),
+                                           wrong_password=wrong_password, wrong_username=bool(" " in username), upper=upper)
                 user = User(username=username, password=password, email=email)
                 DB.session.add(user)
                 DB.session.commit()
