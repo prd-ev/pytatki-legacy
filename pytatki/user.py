@@ -5,7 +5,7 @@ __author__ = "Patryk Niedzwiedzinski"
 
 
 import re
-from passlib.hash import hex_sha1, sha256_crypt
+from passlib.hash import sha256_crypt
 from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
