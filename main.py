@@ -2,7 +2,7 @@
 
 import os
 from config import CONFIG
-from src.database import DB
+from pytatki.database import DB
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail

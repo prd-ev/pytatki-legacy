@@ -8,7 +8,7 @@
     </div>
     <div class="col-lg-4 bg-white m-2 rounded" style="padding:15px;">
       <h3>Rejestracja</h3>
-		<form id="form" method=post action="{{url_for('register', next=request.args.get('next'))}}">
+		<form id="form" method=post action="{{url_for('register_post', next=request.args.get('next'))}}">
             <div class="form-group">
                 <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{% endif %}" autofocus placeholder="Nazwa użytkownika">
                 {% if used_username %}
