@@ -13,6 +13,10 @@ from passlib.hash import hex_sha1
 from flask_mail import Message
 from passlib.hash import sha256_crypt
 from pytatki.view_manager import login_manager
+from itsdangerous import URLSafeTimedSerializer
+
+
+ts = URLSafeTimedSerializer(CONFIG.secret_key)
 
 
 @APP.route('/user/<username>/')
@@ -26,9 +30,10 @@ def user_info(username):
 
 
 def send_confirmation_email(user = current_user):
-    token = hex_sha1.hash(user.email)
+    print(user.email)
+    token = ts.dumps(user.email, salt='email-confirm-key')
     msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[user.email])
-    msg.html = "Potwierdź adres email: <a href='" + str(request.host_url) + "user/confirm/" + token + "'>link</a>"
+    msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
 
@@ -40,12 +45,16 @@ def send_confirmation_view():
 
 
 @APP.route('/user/confirm/<token>')
-def confirm_mail(token):
-    for user in User.query.order_by(User.id.asc()).all():
-        if hex_sha1.verify(user.email, token):
-            user.confirm_mail = True
-            DB.session.commit()
-            flash('Potwierdzono adres email!', 'success')
+def confirm_email(token):
+    try:
+        email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+        user = User.query.filter_by(email=email).first_or_404()
+        user.confirm_mail = True
+        DB.session.add(user)
+        DB.session.commit()
+        flash("Adres email zweryfikowany!", 'success')
+    except Exception as error:
+        flash("Blad" + str(error), 'danger')
     return redirect('/')
 
 
