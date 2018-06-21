@@ -48,12 +48,13 @@ def send_confirmation_view():
 def confirm_email(token):
     try:
         email = ts.loads(token, salt="email-confirm-key", max_age=86400)
-    except:
-        abort(404) 
-    user = User.query.filter_by(email=email).first_or_404() 
-    user.confirm_mail = True
-    DB.session.add(user)
-    DB.session.commit()
+        user = User.query.filter_by(email=email).first_or_404() 
+        user.confirm_mail = True
+        DB.session.add(user)
+        DB.session.commit()
+        flash("Adres email zweryfikowany!", 'success')
+    except Exception as error:
+        flash("Blad" + str(error), 'danger')  
     return redirect('/')
 
 
