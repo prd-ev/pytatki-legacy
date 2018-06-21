@@ -3,14 +3,15 @@ import os
 import gc
 from datetime import datetime
 from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, send_file
+from flask import render_template, redirect, request, session, flash, send_file, g
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
 from main import APP, DB
 from config import CONFIG
-from src.models import User, Subject, Topic, Note
-from src.view_manager import ban, login_manager, nocache
+from pytatki.models import User, Subject, Topic, Note
+from pytatki.view_manager import ban, login_manager, nocache
+from pytatki import __version__
 
 
 __author__ = 'Patryk Niedzwiedzinski'
@@ -50,6 +51,7 @@ def homepage():
 @APP.route('/about/')
 def about():
     """About"""
+    g.version = __version__
     return render_template('about.html')
 
 
