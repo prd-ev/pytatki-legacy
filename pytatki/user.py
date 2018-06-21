@@ -7,7 +7,7 @@ from main import APP, MAIL
 from pytatki.database import DB
 from config import CONFIG
 from pytatki.models import User
-from flask import render_template, redirect, flash, request, abort
+from flask import render_template, redirect, flash, request
 from flask_login import current_user
 from passlib.hash import hex_sha1
 from flask_mail import Message
@@ -48,13 +48,13 @@ def send_confirmation_view():
 def confirm_email(token):
     try:
         email = ts.loads(token, salt="email-confirm-key", max_age=86400)
-        user = User.query.filter_by(email=email).first_or_404() 
+        user = User.query.filter_by(email=email).first_or_404()
         user.confirm_mail = True
         DB.session.add(user)
         DB.session.commit()
         flash("Adres email zweryfikowany!", 'success')
     except Exception as error:
-        flash("Blad" + str(error), 'danger')  
+        flash("Blad" + str(error), 'danger')
     return redirect('/')
 
 
