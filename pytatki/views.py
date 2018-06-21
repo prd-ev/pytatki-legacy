@@ -4,7 +4,7 @@ import gc
 from datetime import datetime
 from sqlalchemy import func, and_
 from flask import render_template, redirect, request, session, flash, send_file
-from werkzeug.utils import secure_filenam
+from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
 from main import APP, DB
