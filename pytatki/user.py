@@ -3,16 +3,16 @@
 
 __author__ = "Patryk Niedzwiedzinski"
 
-from main import APP, MAIL
-from pytatki.database import DB
+
+import re
+from passlib.hash import hex_sha1, sha256_crypt
+from flask_mail import Message
+from flask import render_template, redirect, flash, request, url_for
+from flask_login import login_user, logout_user, current_user
+from main import APP, DB, MAIL
 from config import CONFIG
 from pytatki.models import User
-from flask import render_template, redirect, flash, request
-from flask_login import current_user
-from passlib.hash import hex_sha1
-from flask_mail import Message
-from passlib.hash import sha256_crypt
-from pytatki.view_manager import login_manager
+from pytatki.view_manager import login_manager, login_required
 from itsdangerous import URLSafeTimedSerializer
 
 
@@ -173,7 +173,12 @@ def login_post():
         user = User.query.filter_by(username=request.form['username']).first()
         if not user or not user.check_password(request.form['password']):
             return render_template('login.html', form=request.form, wrong=True)
-        login_user(user, remember=bool(request.form['remember']))
+        try:
+            remember = request.form['remember']
+        except Exception as err:
+            print(err)
+            remember = False
+            login_user(user, remember=remember)
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
