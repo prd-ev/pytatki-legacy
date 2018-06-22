@@ -12,7 +12,7 @@
             <li class="list-group-item active" href=""><h4>Notatki<span class="float-right badge badge-light badge-pill">{{notes|length}}</span></h4></li>
             {% for note in notes %}
             <li class="list-group-item">
-                <a class="btn m-1" href="#"><h5>{{note.name}}</h5></a>
+                <a class="m-1" href="#"><h5>{{note.name}}</h5></a>
                 <a class="float-right btn btn-danger m-1" href="/admin/delete/note/{{note.id}}/?next=%2Fadmin%2Fnotes%2F">Usuń</a>
                 <a class="float-right btn btn-info m-1" href="/admin/note/{{note.id}}/edit/">Edytuj</a>
             </li>

@@ -16,7 +16,7 @@
             <li class="list-group-item active" href=""><h4>Użytkownicy<span class="float-right badge badge-light badge-pill">{{users|length - 1}}</span></h4></li>
             {%for a in users%}
             <li class="list-group-item">
-                <a class="btn m-1" href="/user/{{a.username}}"><h5>{{a.username}}{%if a.username==current_user.username%}<span class="ml-3 badge badge-secondary">TO TY!</span>{%endif%}{% if a.ban %}<span class="ml-3 badge badge-danger">BAN</span>{%else%}{% if a.admin %}<span class="ml-3 badge badge-primary">ADMIN</span>{% endif %}{% if a.modderator %}<span class="ml-3 badge badge-warning">MOD</span>{% endif %}{% if a.superuser %}<span class="ml-3 badge badge-dark">SU</span>{% endif %}{% endif %}</h5></a>
+                <a class="m-1" href="/user/{{a.username}}"><h5 class="ml-2">{{a.username}}{%if a.username==current_user.username%}<span class="ml-3 badge badge-secondary" style="display: inline-block">TO TY!</span>{%endif%}{% if a.ban %}<span class="ml-3 badge badge-danger" style="display: inline-block">BAN</span>{%else%}{% if a.admin %}<span class="ml-3 badge badge-primary" style="display: inline-block">ADMIN</span>{% endif %}{% if a.modderator %}<span class="ml-3 badge badge-warning" style="display: inline-block">MOD</span>{% endif %}{% if a.superuser %}<span class="ml-3 badge badge-dark" style="display: inline-block">SU</span>{% endif %}{% endif %}</h5></a>
                 {% if not a.superuser %}
                 {% if current_user.admin %}<a class="float-right btn btn-danger m-1" href="/admin/delete/user/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Usuń</a>{%endif%}
                 {% if not a.modderator and not a.admin and not current_user.username == a.username%}
