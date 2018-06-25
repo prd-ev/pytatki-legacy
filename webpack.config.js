@@ -1,7 +1,7 @@
-var webpack = require('webpack');  
-module.exports = {  
+var webpack = require('webpack');
+module.exports = {
   entry: [
-    "./js/app.js"
+    "./js/index.js"
   ],
   output: {
     path: __dirname + '/static',
@@ -10,12 +10,12 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.js?$/,
+        test: /\.(js|jsx)$/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015', 'react']
+          presets: ['es2015', 'react'],
+          plugins: ['transform-class-properties']
         },
-        exclude: /node_modules/
       }
     ]
   },
