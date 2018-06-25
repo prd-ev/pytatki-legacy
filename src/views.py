@@ -587,8 +587,9 @@ def download(filename):
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
-@APP.route('/react/')
-def hello_world():
+@APP.route('/notatki/')
+def react_timetable():
+
 	return render_template('index.html')
 
 APP.secret_key = CONFIG.secret_key

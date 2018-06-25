@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "watch": "webpack --watch",
+    "dev_start": "python3 wsgi.py",
     "start": "uwsgi --ini uwsgi.ini"
   },
   "author": "Filip Wachowiak",
@@ -14,6 +15,7 @@
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^6.4.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "webpack": "^2.7.0",
