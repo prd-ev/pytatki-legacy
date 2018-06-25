@@ -6,14 +6,25 @@ class AddNote extends React.Component {
   }
 
   handleSubmit = e => {
-    for (let value of this.props.notatki) {
+    let updated_notes = this.props.notatki;
+    for (let value of updated_notes) {
       if (document.getElementById("subject").value === value["subject"]) {
-        if (value["topic"] === document.getElementById("topic")) {
-          if (value["name"] !== document.getElementById("note")) {
+        if (value["topic"] === document.getElementById("topic").value) {
+          if (value["name"] !== document.getElementById("note").value) {
+            updated_notes = [
+              ...updated_notes,
+              {
+                name: document.getElementById("note").value,
+                dir: "lalala",
+                subject: document.getElementById("subject").value,
+                topic: document.getElementById("topic").value
+              }
+            ];
           }
         }
       }
     }
+    console.log(updated_notes);
     e.preventDefault();
     this.props.update(updated_notes);
   };
@@ -21,7 +32,7 @@ class AddNote extends React.Component {
   packNotes = () => {
     let notatki = [];
     for (let value of this.props.notatki) {
-      notatki.push(<h3 key={value["subject"]}>{value["subject"]}</h3>);
+      notatki.push(<h3 key={value["name"]}>{value["name"]}</h3>);
     }
     return notatki;
   };
@@ -30,7 +41,7 @@ class AddNote extends React.Component {
     let topic_options = [];
     for (let value of this.props.notatki) {
       topic_options.push(
-        <option key={value["topic"]}>{value["topic"]}</option>
+        <option key={value["name"]}>{value["topic"]}</option>
       );
     }
     return topic_options;
@@ -40,7 +51,7 @@ class AddNote extends React.Component {
     let subject_options = [];
     for (let value of this.props.notatki) {
       subject_options.push(
-        <option key={value["subject"]}>{value["subject"]}</option>
+        <option key={value["name"]}>{value["subject"]}</option>
       );
     }
     return subject_options;
