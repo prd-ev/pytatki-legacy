@@ -1,4 +1,4 @@
-import Notatki from "./notatki.jsx";
+import Notatki from "./Notatki.jsx";
 import React from "react";
 import ReactDOM from "react-dom";
 
