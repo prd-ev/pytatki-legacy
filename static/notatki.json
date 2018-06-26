@@ -3,4 +3,24 @@
   "dir": "/docs",
   "subject": "Fizyka",
   "topic": "Fizyka atomowa"
+}, {
+  "name": "test izyka",
+  "dir": "/docs3",
+  "subject": "Fizyka",
+  "topic": "izyka atomowa"
+}, {
+  "name": "test fizyka2",
+  "dir": "/docs2",
+  "subject": "Fizyka",
+  "topic": "Fizyka atomowa"
+}, {
+  "name": "liniowe",
+  "dir": "/docs33",
+  "subject": "Matematyka",
+  "topic": "funkcje"
+}, {
+  "name": "koło",
+  "dir": "/docs23",
+  "subject": "Matematyka",
+  "topic": "geometria"
 }]

@@ -3,6 +3,9 @@ import React from "react";
 class AddNote extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      current_topics: []
+    };
   }
 
   handleSubmit = e => {
@@ -37,22 +40,42 @@ class AddNote extends React.Component {
     return notatki;
   };
 
-  packTopicOptions = () => {
+  packTopicOptions =()=>{
+    let topic_options_temp = [];
     let topic_options = [];
-    for (let value of this.props.notatki) {
-      topic_options.push(
-        <option key={value["name"]}>{value["topic"]}</option>
-      );
+    for (let temp_value of this.props.notatki) {
+      if (
+        topic_options_temp.indexOf(temp_value["topic"]) < 0 &&
+        document.getElementById("subject").value == temp_value["subject"]
+      ) {
+        topic_options_temp.push(temp_value["topic"]);
+      }
     }
-    return topic_options;
-  };
+    for (let value of topic_options_temp) {
+      topic_options.push(<option key={value}>{value}</option>);
+    }
+    if (this.state.current_topics !== topic_options) {
+      this.setState({
+        current_topics: topic_options
+      });
+    }
+  }
+
+  componentDidMount() {
+    this.packTopicOptions()
+  }
+
 
   packSubjectOptions = () => {
+    let subject_options_temp = [];
     let subject_options = [];
-    for (let value of this.props.notatki) {
-      subject_options.push(
-        <option key={value["name"]}>{value["subject"]}</option>
-      );
+    for (let temp_value of this.props.notatki) {
+      if (subject_options_temp.indexOf(temp_value["subject"]) < 0) {
+        subject_options_temp.push(temp_value["subject"]);
+      }
+    }
+    for (let value of subject_options_temp) {
+      subject_options.push(<option key={value}>{value}</option>);
     }
     return subject_options;
   };
@@ -64,7 +87,7 @@ class AddNote extends React.Component {
           Przedmiot
           <select id="subject">{this.packSubjectOptions()}</select>
           Dział
-          <select id="topic">{this.packTopicOptions()}</select>
+          <select id="topic">{this.state.current_topics}</select>
           Nazwa notatki <input type="text" id="note" />
           <input type="submit" value="Dodaj notatkę" />
         </form>
