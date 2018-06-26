@@ -1,24 +1,21 @@
-var webpack = require('webpack');
+var webpack = require("webpack");
 module.exports = {
-  entry: [
-    "./js/index.js"
-  ],
+  entry: ["./js/index.js"],
   output: {
-    path: __dirname + '/static',
+    path: __dirname + "/static",
     filename: "bundle.js"
   },
   module: {
     loaders: [
       {
         test: /\.(js|jsx)$/,
-        loader: 'babel-loader',
+        loader: "babel-loader",
         query: {
-          presets: ['es2015', 'react', 'stage-2'],
-          plugins: ['transform-class-properties']
-        },
+          presets: ["es2015", "react", "stage-2"],
+          plugins: ["transform-class-properties"]
+        }
       }
     ]
   },
-  plugins: [
-  ]
+  plugins: [],
 };

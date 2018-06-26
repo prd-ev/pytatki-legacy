@@ -10,7 +10,7 @@ class Notatki extends React.Component {
     };
   }
 
-  updateNotes = (updated_notes) => {
+  updateNotes = updated_notes => {
     this.setState((prevState, props) => ({
       notatki: updated_notes
     }));
