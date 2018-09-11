@@ -40,11 +40,7 @@ ALLOWED_EXTENSIONS = set([
 def homepage():
     """Homepage"""
     if current_user.is_authenticated:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        notes = Note.query.order_by(Note.id.asc()).all()
-        return render_template('homepage.html', subjects=subjects,
-                               topics=topics, notes=notes)
+        return render_template('homepage.html')
     return render_template('homepage.html')
 
 

@@ -175,31 +175,41 @@ def register_get():
 
 @APP.route('/login/', methods=["POST"])
 def login_post():
-    """Login"""
+    #try:
     if current_user.is_authenticated:
-        flash('Juz jestes zalogowany!', 'warning')
+        flash('Już jesteś zalogowany!', 'warning')
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
+        return redirect('/')
     if request.method == "POST":
         con, conn = connection()
-        con.execute("SELECT * FROM user WHERE login = (%s)",
-                    escape_string(request.form['username']))
+        con.execute("SELECT * FROM user WHERE email = %s OR login = %s",
+                    (escape_string(request.form['username']), escape_string(request.form['username'])))
         user_dict = con.fetchone()
         user = User()
-        if user_dict:
+        if user_dict is not None:
             user.update(user_dict)
         con.close()
         conn.close()
         gc.collect()
-        if not user or not user.check_password(request.form['password']):
-            return render_template('login.html', form=request.form, wrong=True)
-        try:
-            remember = request.form['remember']
-        except Exception as err:
-            print(err)
-            remember = False
-            login_user(user, remember=remember)
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+        if user and sha256_crypt.verify(request.form['password'], user['password']):
+            remember_me = request.form['remember'] if 'remember' in request.form else False
+            login_user(user, remember=remember_me)
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect('/app/')
+        return render_template('login.html', form=request.form, wrong=True)
+    return render_template('login.html')
+    '''except Exception as error:
+        flash('Błąd: ' + str(error), 'danger')
+        return redirect('/')'''
+
+@APP.route('/app/')
+def app_view():
+    print(current_user)
+    if current_user.is_authenticated:
+        flash("Jej")
+    return render_template("_base.html")
 
 
 @APP.route('/login/', methods=["GET"])

@@ -32,7 +32,7 @@ APP.config.update(
 )
 LM = LoginManager()
 LM.init_app(APP)
-LM.login_view = 'login'
+LM.login_view = 'login_get'
 BCRYPT = Bcrypt()
 MAIL = Mail(APP)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')

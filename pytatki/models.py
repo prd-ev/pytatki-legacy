@@ -15,7 +15,7 @@ import gc
 def user_load(user_id):
     try:
         con, conn = connection()
-        con.execute("SELECT * FROM user WHERE id_user = (%s)",
+        con.execute("SELECT * FROM user WHERE iduser = %s",
                     escape_string(str(user_id)))
         user_dict = con.fetchone()
         user = User()
@@ -26,7 +26,6 @@ def user_load(user_id):
         return user
     except:
         return None
-
 
 class User(dict):
 
@@ -95,4 +94,4 @@ class User(dict):
         return False
 
     def get_id(self):
-        return unicode(self['id'])
+        return unicode(self['iduser'])

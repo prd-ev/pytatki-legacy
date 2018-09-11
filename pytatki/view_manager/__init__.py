@@ -8,10 +8,7 @@ def ban(func):
     @wraps(func)
     def wrap(*args, **kwargs):
         if current_user.is_authenticated:
-            if current_user.ban:
-                flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-                return redirect('/logout/')
-            elif not current_user.confirm_mail:
+            if not current_user['email_confirm']:
                 flash('Potwierdź adres email. <a href="/user/send-confirmation-mail/">Wyślij ponownie</a>', 'warning')
         return func(*args, **kwargs)
     return wrap
@@ -51,6 +48,6 @@ def login_required(func):
         if not current_user.is_authenticated:
             flash("Musisz być zalogowany", 'warning')
             next_url = request.url
-            return redirect(url_for('login', next=next_url))
+            return redirect(url_for('login_get', next=next_url))
         return func(*args, **kwargs)
     return wrap
