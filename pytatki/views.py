@@ -7,7 +7,7 @@ from flask import render_template, redirect, request, session, flash, send_file,
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
-from main import APP, DB
+from main import APP
 from config import CONFIG
 from pytatki.models import User
 from pytatki.view_manager import ban, login_manager, nocache

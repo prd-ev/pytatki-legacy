@@ -12,7 +12,7 @@ from passlib.hash import sha256_crypt
 from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
-from main import APP, DB, MAIL
+from main import APP, MAIL
 from config import CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, login_required
@@ -142,7 +142,7 @@ def register_post():
                 upper=bool(not form['username'] == form['username'].lower()),
             )
         con.execute("INSERT INTO user (login, password, email, status_id) VALUES "
-                        "(%s, %s, %s, 1)", (escape_string(form['username']), escape_string(form['password']),
+                        "(%s, %s, %s, 1)", (escape_string(form['username']), sha256_crypt.encrypt(escape_string(form['password'])),
                                              escape_string(form['email'])))
         conn.commit()
         flash("Zarejestrowano pomyslnie!", 'success')
@@ -179,7 +179,16 @@ def login_post():
     if current_user.is_authenticated:
         flash('Juz jestes zalogowany!', 'warning')
     if request.method == "POST":
-        user = User.query.filter_by(username=request.form['username']).first()
+        con, conn = connection()
+        con.execute("SELECT * FROM user WHERE login = (%s)",
+                    escape_string(request.form['username']))
+        user_dict = con.fetchone()
+        user = User()
+        if user_dict:
+            user.update(user_dict)
+        con.close()
+        conn.close()
+        gc.collect()
         if not user or not user.check_password(request.form['password']):
             return render_template('login.html', form=request.form, wrong=True)
         try:

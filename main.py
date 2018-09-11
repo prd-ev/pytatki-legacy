@@ -2,7 +2,6 @@
 
 import os
 from config import CONFIG
-from pytatki.database import DB
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
@@ -31,8 +30,6 @@ APP.config.update(
     MAIL_USERNAME=CONFIG.EMAIL,
     MAIL_PASSWORD=CONFIG.EMAIL_PASSWORD
 )
-DB.app = APP
-DB.init_app(APP)
 LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login'
