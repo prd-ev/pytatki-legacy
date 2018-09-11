@@ -1,7 +1,7 @@
 # pytatki
 [![CodeFactor](https://www.codefactor.io/repository/github/PRD-ev/pytatki/badge)](https://www.codefactor.io/repository/github/PRD-ev/pytatki)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=butterfly-pn/pytatki&amp;utm_campaign=Badge_Grade)
-[![CircleCI](https://circleci.com/gh/butterfly-pn/pytatki.svg?style=svg)](https://circleci.com/gh/butterfly-pn/pytatki)
+[![CircleCI](https://circleci.com/gh/PRD-ev/pytatki/tree/master.svg?style=svg)](https://circleci.com/gh/PRD-ev/pytatki/tree/master)
 
 Notatki we flasku
 
