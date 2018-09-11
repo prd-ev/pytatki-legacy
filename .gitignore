@@ -10,3 +10,4 @@ venv
 .DS_Store
 src/.DS_Store
 .vscode
+docs/database-schema.mwb.bak
