@@ -4,7 +4,10 @@
 __author__ = "Patryk Niedzwiedzinski"
 
 
+from dbconnect import connection
+from pymysql import escape_string
 import re
+import gc
 from passlib.hash import sha256_crypt
 from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
@@ -110,6 +113,7 @@ def register_post():
     if not current_user.is_authenticated:
         form = request.form
         try:
+            con, conn = connection()
             if form['password'] == form['confirm'] and len(
                     form['password']) >= 8 and valid_password(form['password']):
                 password = sha256_crypt.encrypt((str(form['password'])))
@@ -122,7 +126,9 @@ def register_post():
             accept = form['accept_tos']
         except KeyError:
             accept = ''
-        used_username = User.query.filter_by(username=form['username']).first()
+        con.execute("SELECT * FROM user WHERE login = (%s)",
+                                    (escape_string(form['username'])))
+        used_username = con.fetchone()
         if accept != 'checked' or used_username or '@' not in form['email'] \
                 or wrong_password or valid_username(form['username']):
             return render_template(
@@ -135,13 +141,16 @@ def register_post():
                 wrong_username=bool(' ' in form['username']),
                 upper=bool(not form['username'] == form['username'].lower()),
             )
-        user = User(username=form['username'], password=password,
-                    email=form['email'])
-        DB.session.add(user)
-        DB.session.commit()
+        con.execute("INSERT INTO user (login, password, email, status_id) VALUES "
+                        "(%s, %s, %s, 1)", (escape_string(form['username']), escape_string(form['password']),
+                                             escape_string(form['email'])))
+        conn.commit()
         flash("Zarejestrowano pomyslnie!", 'success')
-        send_confirmation_email(user)
-        return redirect(url_for('login', next=request.args.get('next'), username=form['username']))
+        con.close()
+        conn.close()
+        gc.collect()
+        #send_confirmation_email(user)
+        return redirect(url_for('login_get', next=request.args.get('next'), username=form['username']))
     else:
         flash("Jestes juz zalogowany!", 'warning')
     if request.args.get('next'):

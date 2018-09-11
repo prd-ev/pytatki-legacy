@@ -4,10 +4,10 @@ import pymysql
 __author__ = "Filip Wachowiak"
 
 def connection():
-    conn = pymysql.connect(host=DB_HOST,
-                            user=DB_USER,
-                            password=DB_PASSWORD,
-                            db=DB_NAME,
+    conn = pymysql.connect(host=CONFIG.DB_HOST,
+                            user=CONFIG.DB_USER,
+                            password=CONFIG.DB_PASSWORD,
+                            db=CONFIG.DB_NAME,
                             charset='utf8mb4',
                             cursorclass=pymysql.cursors.DictCursor)
     c = conn.cursor()
