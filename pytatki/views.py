@@ -9,7 +9,6 @@ from werkzeug.utils import secure_filename
 from flask_login import logout_user, current_user
 from main import APP, DB
 from config import CONFIG
-from pytatki.models import User, Subject, Topic, Note
 from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
 
