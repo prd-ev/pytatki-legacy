@@ -11,6 +11,7 @@ class AddNote extends React.Component {
   }
 
   handleSubmit = e => {
+    e.preventDefault();
     let updated_notes = this.props.notatki;
     let topic_notes_list = [];
     for (let value of updated_notes) {
@@ -28,18 +29,18 @@ class AddNote extends React.Component {
     }
 
     if (!topic_notes_list.includes(document.getElementById("note").value)) {
+      var new_note = "/"
+        if (document.getElementById("subject").value === "--Dodaj nowy przedmiot--") {
+          new_note += document.getElementById("new-subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
+        }else if (document.getElementById("topic").value === "--Dodaj nowy dział--") {
+          new_note += document.getElementById("subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
+        }else{
+        new_note += document.getElementById("subject").value + "/" + document.getElementById("topic").value + "/" + document.getElementById("note").value;
+      }
       updated_notes = [
-        ...updated_notes,
-
-        "/" +
-          document.getElementById("subject").value +
-          "/" +
-          document.getElementById("topic").value +
-          "/" +
-          document.getElementById("note").value
+        ...updated_notes, new_note
       ];
     }
-    e.preventDefault();
     this.props.update(updated_notes);
   };
 
@@ -128,7 +129,7 @@ class AddNote extends React.Component {
         subject_input: false
       });
     }
-    
+
   };
 
   topicChange = () => {
@@ -145,13 +146,13 @@ class AddNote extends React.Component {
 
   newSubjectInput = () => {
     if (this.state.subject_input) {
-      return <input type="text" name="new-subject" />;
+      return <input type="text" id="new-subject" />;
     }
   };
 
   newTopicInput = () => {
     if (this.state.topic_input) {
-      return <input type="text" name="new-topic" />;
+      return <input type="text" id="new-topic" />;
     }
   };
 
