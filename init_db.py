@@ -25,8 +25,7 @@ def db_start():
                 username = input("Insert your admin login: ")
                 email = input("Insert your admin email: ")
                 password = input("Insert your admin password: ")
-                con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, " + str(
-                    status['idstatus']) + ")", (escape_string(username), escape_string(sha256_crypt.encrypt(str(password))), escape_string(email)))
+                con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (escape_string(username), escape_string(sha256_crypt.encrypt(str(password))), escape_string(email), escape_string(str(status['idstatus']))))
                 conn.commit()
             else:
                 print(error)
