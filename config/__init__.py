@@ -10,6 +10,11 @@ class Config():
     EMAIL = ""
     EMAIL_PASSWORD = ""
 
+    DB_HOST = 'localhost'
+    DB_USER = ''
+    DB_PASSWORD = ''
+    DB_NAME = ''
+
     def __init__(self, secret):
         self.secret_key = secret
 
