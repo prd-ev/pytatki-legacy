@@ -1,5 +1,8 @@
 import React from "react";
 
+var new_topic_message = "--Dodaj nowy dział--";
+var new_subject_message = "--Dodaj nowy przedmiot--";
+
 class AddNote extends React.Component {
   constructor(props) {
     super(props);
@@ -30,9 +33,9 @@ class AddNote extends React.Component {
 
     if (!topic_notes_list.includes(document.getElementById("note").value)) {
       var new_note = "/"
-        if (document.getElementById("subject").value === "--Dodaj nowy przedmiot--") {
+        if (document.getElementById("subject").value === new_subject_message) {
           new_note += document.getElementById("new-subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
-        }else if (document.getElementById("topic").value === "--Dodaj nowy dział--") {
+        }else if (document.getElementById("topic").value === new_topic_message) {
           new_note += document.getElementById("subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
         }else{
         new_note += document.getElementById("subject").value + "/" + document.getElementById("topic").value + "/" + document.getElementById("note").value;
@@ -73,7 +76,7 @@ class AddNote extends React.Component {
       topic_options.push(<option key={value}>{value}</option>);
     }
     topic_options.push(
-      <option key="--Dodaj nowy dział--">--Dodaj nowy dział--</option>
+      <option key={new_topic_message}>{new_topic_message}</option>
     );
     if (this.state.current_topics !== topic_options) {
       this.setState({
@@ -106,7 +109,7 @@ class AddNote extends React.Component {
       subject_options.push(<option key={value}>{value}</option>);
     }
     subject_options.push(
-      <option key="--Dodaj nowy przedmiot--">--Dodaj nowy przedmiot--</option>
+      <option key={new_subject_message}>{new_subject_message}</option>
     );
     return subject_options;
   };
@@ -118,7 +121,7 @@ class AddNote extends React.Component {
   subjectChange = () => {
     this.packTopicOptions();
     if (
-      document.getElementById("subject").value === "--Dodaj nowy przedmiot--"
+      document.getElementById("subject").value === new_subject_message
     ) {
       this.setState({
         subject_input: true,
@@ -133,7 +136,7 @@ class AddNote extends React.Component {
   };
 
   topicChange = () => {
-    if (document.getElementById("topic").value === "--Dodaj nowy dział--") {
+    if (document.getElementById("topic").value === new_topic_message) {
       this.setState({
         topic_input: true
       });
