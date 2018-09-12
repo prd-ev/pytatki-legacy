@@ -11,3 +11,4 @@ venv
 src/.DS_Store
 node_modules
 static/bundle.js
+.vscode

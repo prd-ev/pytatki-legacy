@@ -27,10 +27,16 @@ class AddNote extends React.Component {
 
     if (!topic_notes_list.includes(document.getElementById("note").value)) {
       var new_note = "/"
-      if (document.getElementById("subject").value === new_subject_message) {
+      if (document.getElementById("subject").value === new_subject_message &&
+        document.getElementById("new-subject").value != "" &&
+        document.getElementById("new-topic").value != "") {
+
         new_note += document.getElementById("new-subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
-      } else if (document.getElementById("topic").value === new_topic_message) {
+      } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic").value != "") {
         new_note += document.getElementById("subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
+      } else if (document.getElementById("new-topic").value == "" || document.getElementById("new-subject").value == "") {
+        // handle no input
+        new_note = null;
       } else {
         new_note += document.getElementById("subject").value + "/" + document.getElementById("topic").value + "/" + document.getElementById("note").value;
       }
@@ -38,6 +44,7 @@ class AddNote extends React.Component {
         ...updated_notes,
         new_note
       ];
+      document.getElementById("note").value = "";
     }
     this.props.update(updated_notes);
   };
@@ -55,7 +62,7 @@ class AddNote extends React.Component {
     }
     topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
     if (this.state.current_topics !== topic_options) {
-      this.setState({current_topics: topic_options});
+      this.setState({ current_topics: topic_options });
     }
   };
 
@@ -81,37 +88,37 @@ class AddNote extends React.Component {
   subjectChange = () => {
     this.packTopicOptions();
     if (document.getElementById("subject").value === new_subject_message) {
-      this.setState({subject_input: true, topic_input: true});
+      this.setState({ subject_input: true, topic_input: true });
     } else {
-      this.setState({subject_input: false});
+      this.setState({ subject_input: false, topic_input: true });
     }
 
   };
 
   topicChange = () => {
     if (document.getElementById("topic").value === new_topic_message) {
-      this.setState({topic_input: true});
+      this.setState({ topic_input: true });
     } else {
-      this.setState({topic_input: false});
+      this.setState({ topic_input: false });
     }
   };
 
   newSubjectInput = () => {
     if (this.state.subject_input) {
-      return <input type="text" id="new-subject"/>;
+      return <input type="text" id="new-subject" />;
     }
   };
 
   newTopicInput = () => {
     if (this.state.topic_input) {
-      return <input type="text" id="new-topic"/>;
+      return <input type="text" id="new-topic" />;
     }
   };
 
   render() {
     return (<div style={{
-        marginTop: "100px"
-      }}>
+      marginTop: "100px"
+    }}>
       <form onSubmit={this.handleSubmit}>
         Przedmiot
         <select id="subject" onChange={this.subjectChange}>
@@ -124,10 +131,10 @@ class AddNote extends React.Component {
         </select>
         {this.newTopicInput()}
         Nazwa notatki
-        <input type="text" id="note"/>
+        <input type="text" id="note" />
         Dodaj plik
-        <input type="file" required="required"/>
-        <input type="submit" value="Dodaj notatkę"/>
+        <input type="file" required="required" />
+        <input type="submit" value="Dodaj notatkę" />
       </form>
     </div>);
   }
