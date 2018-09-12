@@ -141,9 +141,11 @@ def register_post():
                 wrong_username=bool(' ' in form['username']),
                 upper=bool(not form['username'] == form['username'].lower()),
             )
+        con.execute("SELECT idstatus FROM status WHERE name = \"active\"")
+        active = con.fetchone()
         con.execute("INSERT INTO user (login, password, email, status_id) VALUES "
-                        "(%s, %s, %s, 1)", (escape_string(form['username']), sha256_crypt.encrypt(escape_string(form['password'])),
-                                             escape_string(form['email'])))
+                        "(%s, %s, %s, %s)", (escape_string(form['username']), sha256_crypt.encrypt(escape_string(form['password'])),
+                                             escape_string(form['email']), escape_string(str(active['idstatus']))))
         conn.commit()
         flash("Zarejestrowano pomyslnie!", 'success')
         con.close()
