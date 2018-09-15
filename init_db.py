@@ -1,7 +1,6 @@
 __author__ = "Patryk Niedźwiedziński"
 """Skrypt tworzenia bazy danych"""
 
-from sqlalchemy import create_engine
 from dbconnect import connection
 from pymysql import escape_string
 from passlib.hash import sha256_crypt

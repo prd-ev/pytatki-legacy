@@ -37,9 +37,9 @@ def valid_username(username):
 @login_manager
 def user_info(username):
     """User info"""
-    user=User.query.filter_by(username=username).first()
-    if user:
-        return render_template('user.html', user=user)
+    #user=User.query.filter_by(username=username).first()
+    #if user:
+        #return render_template('user.html', user=user)
     flash('Nie ma takiego użytkownika', 'warning')
     return redirect('/')
 
@@ -63,11 +63,11 @@ def send_confirmation_view():
 @APP.route('/user/confirm/<token>')
 def confirm_email(token):
     try:
-        email = ts.loads(token, salt="email-confirm-key", max_age=86400)
-        user = User.query.filter_by(email=email).first_or_404()
-        user.confirm_mail = True
-        DB.session.add(user)
-        DB.session.commit()
+        #email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+        #user = User.query.filter_by(email=email).first_or_404()
+        #user.confirm_mail = True
+        #DB.session.add(user)
+        #DB.session.commit()
         flash("Adres email zweryfikowany!", 'success')
     except Exception as error:
         flash("Blad" + str(error), 'danger')
@@ -78,11 +78,11 @@ def confirm_email(token):
 def update_email():
     try:
         if not current_user.email == request.form['email']:
-            user = User.query.filter_by(id=current_user.id).first()
-            form = request.form
-            user.email = form['email']
-            user.confirm_mail = False
-            DB.session.commit()
+            #user = User.query.filter_by(id=current_user.id).first()
+            #form = request.form
+            #user.email = form['email']
+            #user.confirm_mail = False
+            #DB.session.commit()
             send_confirmation_email(current_user)
     except Exception as e:
         flash('Blad: ' + str(e), 'danger')
@@ -94,13 +94,13 @@ def update_email():
 @APP.route('/user/update-password/', methods=['POST'])
 @login_manager
 def update_password():
-    try:
-        user = User.query.filter_by(id=current_user.id).first()
-        if user.check_password(request.form['password']):
-            user.password = sha256_crypt.encrypt((str(request.form['new-password'])))
-            DB.session.commit()
-    except Exception as e:
-        flash('Blad: ' + str(e), 'danger')
+    #try:
+        #user = User.query.filter_by(id=current_user.id).first()
+        #if user.check_password(request.form['password']):
+            #user.password = sha256_crypt.encrypt((str(request.form['new-password'])))
+            #DB.session.commit()
+    #except Exception as e:
+        #flash('Blad: ' + str(e), 'danger')
     if request.args.get('next'):
         return redirect(request.args.get('next'))
     return redirect('/')
@@ -116,7 +116,6 @@ def register_post():
             con, conn = connection()
             if form['password'] == form['confirm'] and len(
                     form['password']) >= 8 and valid_password(form['password']):
-                password = sha256_crypt.encrypt((str(form['password'])))
                 wrong_password = False
             else:
                 wrong_password = True
