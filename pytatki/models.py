@@ -9,6 +9,7 @@ from dbconnect import connection
 from pymysql import escape_string
 from collections.abc import Mapping
 import gc
+from config import Config as CONFIG
 
 
 @LM.user_loader
@@ -91,6 +92,13 @@ class User(dict):
         return True
 
     def is_anonymous(self):
+        return False
+
+    def is_admin(self):
+        con, conn = connection()
+        query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(self['userid']), escape_string(CONFIG.admin_id)))
+        if query:
+            return True
         return False
 
     def get_id(self):
