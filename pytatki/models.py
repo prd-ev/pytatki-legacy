@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """Database tables models"""
 from flask_login._compat import unicode
-from sqlalchemy import Column
-from sqlalchemy.types import Integer, String, Boolean, Date, Text
 from passlib.hash import sha256_crypt
 from main import LM
 from dbconnect import connection
 from pymysql import escape_string
-from collections.abc import Mapping
 import gc
 from config import Config as CONFIG
 
@@ -70,7 +67,7 @@ class User(dict):
         return self.__dict__.pop(*args)
 
     def __cmp__(self, dict_):
-        return self.__cmp__(self.__dict__, dict_)
+        return self.__cmp__(self.__dict__)
 
     def __contains__(self, item):
         return item in self.__dict__

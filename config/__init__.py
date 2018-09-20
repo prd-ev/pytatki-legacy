@@ -32,9 +32,8 @@ class Config():
         if result==0:
             sock.close()
             return False
-        else:
-            sock.close()
-            return True
+        sock.close()
+        return True
 
 
 CONFIG = Config("sekretny_klucz")
