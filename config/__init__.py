@@ -1,5 +1,6 @@
 """Plik konfiguracyjny"""
 __author__ = 'Patryk Niedzwiedzinski'
+import json
 
 class Config():
     """Config class"""
@@ -14,6 +15,11 @@ class Config():
     DB_USER = ''
     DB_PASSWORD = ''
     DB_NAME = ''
+
+    def admin_id(self):
+        with open("config/config.json", "r") as f:
+            parsed_json = json.loads(f.read())
+        return parsed_json['admin_id']
 
     def __init__(self, secret):
         self.secret_key = secret
