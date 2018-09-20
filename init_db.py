@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from dbconnect import connection
 from pymysql import escape_string
 from passlib.hash import sha256_crypt
-
+import json
 
 def db_start():
     error = "There was an error while setting up database"
@@ -16,6 +16,7 @@ def db_start():
     query = con.execute("INSERT INTO usergroup (name, description) VALUES (\"admins\", \"group of admins\")")
     if not query == 0:
         conn.commit()
+        admin_id = con.lastrowid
         query = con.execute("INSERT INTO status (name, description) VALUES (\"active\", \"Record is ative\")")
         if not query == 0:
             conn.commit()
@@ -35,6 +36,8 @@ def db_start():
         print(error)
     con.close()
     conn.close()
+    with open("config/config.json", "r+") as f:
+        json.dump({'admin_id': admin_id}, f)
 
 
 if __name__ == '__main__':
