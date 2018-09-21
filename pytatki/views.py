@@ -130,58 +130,22 @@ def user_list():
     flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
-@APP.route('/admin/ban/<username>/', methods=["GET"])
-@login_manager
-def ban_user(username):
-    """Ban user"""
-    user = User.query.filter_by(username=username).first()
-    if user:
-        user.ban = True
-        DB.session.commit()
-        flash('Uzytkownik '+user.username+' zostal zbanowany', 'success')
-    else:
-        flash('Nie ma takiego uzytkownika', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/unban/<username>/', methods=["GET"])
-@login_manager
-def unban(username):
-    """Unban user"""
-    user = User.query.filter_by(username=username).first()
-    if user:
-        user.ban = False
-        DB.session.commit()
-        flash('Uzytkownik '+user.username+' zostal odbanowany', 'success')
-    else:
-        flash('Nie ma takiego uzytkownika', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_admin(identifier):
     """Give admin"""
-    if current_user.admin and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != current_user:
+    con, conn = connection()
+    con.execute("SELECT * FROM user WHERE iduser = %s", escape_string(identifier))
+    user = con.fetchone()
+    if current_user.is_admin and user and user['iduser'] != current_user:
         try:
-            User.query.filter_by(id=identifier).first().admin = True
-            DB.session.commit()
+            con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(user['iduser']), CONFIG.admin_id))
+            conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
+                user['login']), 'success')
         except Exception as error:
             flash("Blad: "+str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    if rreturn redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
 @login_manager
