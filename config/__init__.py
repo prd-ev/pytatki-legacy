@@ -21,6 +21,16 @@ class Config():
             parsed_json = json.loads(f.read())
         return parsed_json['admin_id']
 
+    def active(self):
+        with open("config/config.json", "r") as f:
+            parsed_json = json.loads(f.read())
+        return parsed_json['statuses']['active_id']
+    
+    def removed(self):
+        with open("config/config.json", "r") as f:
+            parsed_json = json.loads(f.read())
+        return parsed_json['statuses']['removed_id']
+
     def __init__(self, secret):
         self.secret_key = secret
 
