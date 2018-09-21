@@ -203,31 +203,27 @@ def add():
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
-            note = Note()
-            note.name = form['title']
-            note.author_id = current_user.id
-            note.subject_id = form['subject']
-            note.topic_id = form['topic']
-            note.file = os.path.join(form['subject'], form['topic'], filename)
-            note.date = datetime.now()
-            DB.session.add(note)
-            DB.session.commit()
+            con, conn = connection()
+            con.execute("INSERT INTO note (value, title, note_type_id, user_id, usergroup_id) VALUES (%s, %s, %s, %s, %s)",
+                        (escape_string(str(os.path.join(form['subject'], form['topic'], filename))), escape_string(form['title']), escape_string(CONFIG.json['note_types']['file_id']), escape_string(int(current_user['iduser'])), escape_string(form['topic'])))
+            conn.commit()
+            note_id = con.lastrowid
+            con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (escape_string(int(current_user['iduser'])), escape_string(int(note_id)), escape_string(datetime.now())))
+            conn.commit()
+            con.close()
+            conn.close()
             flash('Notatka zostala dodana!', 'success')
-            if request.args.get('next'):
-                if request.args.get('next') == '/':
-                    pass
-                else:
-                    return redirect(request.args.get('next'))
-            return redirect('/#'+str(form['subject'])+'#'+str(form['topic']))
+            return redirect(request.args.get('next') if 'next' in request.args else '/#'+str(form['subject'])+'#'+str(form['topic']))
         except Exception as error:
             flash("Blad: " + str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
+            return redirect(request.args.get('next') if 'next' in request.args else '/')
     else:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        return render_template('add.html', subjects=subjects, topics=topics)
+        con, conn = connection()
+        con.execute("SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE b.parent_id = a.idusergroup) AND a.iduser = %s", escape_string(int(current_user['iduser'])))
+        topics = con.fetchall()
+        con.close()
+        conn.close()
+        return render_template('add.html', topics=topics)
 
 @APP.route('/admin/add/', methods=["POST"])
 @login_manager
