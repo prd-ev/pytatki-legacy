@@ -102,7 +102,7 @@ def delete_note(identifier):
         if query:
             con.execute("UPDATE note SET status_id = %s WHERE idnote = %s")
             conn.commit()
-                flash('Notatka zostala usunieta!', 'success')
+            flash('Notatka zostala usunieta!', 'success')
         else:
             flash('Nie ma takiej notatki', 'warning')
     else:
