@@ -4,9 +4,10 @@ from main import APP
 from dbconnect import connection
 from pymysql import escape_string
 import gc
+import json
 
 from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLNonNull, GraphQLObjectType
-from graphql.type.scalars import GraphQLString
+from graphql.type.scalars import GraphQLString, GraphQLInt
 from graphql.type.schema import GraphQLSchema
 
 
@@ -25,11 +26,6 @@ def user(query):
 QueryRootType = GraphQLObjectType(
     name='QueryRoot',
     fields={
-        'thrower': GraphQLField(GraphQLNonNull(GraphQLString), resolver=resolve_raises),
-        'request': GraphQLField(GraphQLNonNull(GraphQLString),
-                                resolver=lambda obj, info: info.context.args.get('q')),
-        'context': GraphQLField(GraphQLNonNull(GraphQLString),
-                                resolver=lambda obj, info: info.context),
         'test': GraphQLField(
             type=GraphQLString,
             args={
@@ -37,9 +33,12 @@ QueryRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, who='World': 'Hello %s' % who
         ),
-        'sayHello': GraphQLField(
+        'getUser': GraphQLField(
             type=GraphQLString,
-            resolver=lambda obj, info: user("SELECT * FROM user")
+            args={
+                'ident': GraphQLArgument(GraphQLInt)
+            },
+            resolver=lambda obj, info, ident: user("SELECT * FROM user WHERE iduser = %i" % ident)
         )
     }
 )
