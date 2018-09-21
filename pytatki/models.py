@@ -94,6 +94,8 @@ class User(dict):
     def is_admin(self):
         con, conn = connection()
         query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(self['userid']), escape_string(CONFIG.admin_id)))
+        con.close()
+        conn.close()
         if query:
             return True
         return False
