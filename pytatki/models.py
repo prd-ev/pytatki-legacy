@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 """Database tables models"""
 from flask_login._compat import unicode
-from sqlalchemy import Column
-from sqlalchemy.types import Integer, String, Boolean, Date, Text
 from passlib.hash import sha256_crypt
 from main import LM
 from dbconnect import connection
 from pymysql import escape_string
-from collections.abc import Mapping
 import gc
+from config import Config as CONFIG
 
 
 @LM.user_loader
@@ -69,7 +67,7 @@ class User(dict):
         return self.__dict__.pop(*args)
 
     def __cmp__(self, dict_):
-        return self.__cmp__(self.__dict__, dict_)
+        return self.__cmp__(self.__dict__)
 
     def __contains__(self, item):
         return item in self.__dict__
@@ -91,6 +89,13 @@ class User(dict):
         return True
 
     def is_anonymous(self):
+        return False
+
+    def is_admin(self):
+        con, conn = connection()
+        query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(self['userid']), escape_string(CONFIG.admin_id)))
+        if query:
+            return True
         return False
 
     def get_id(self):
