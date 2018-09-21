@@ -38,4 +38,3 @@ class Config():
 
 
 CONFIG = Config("sekretny_klucz")
-CONFIG_JSON = CONFIG.json

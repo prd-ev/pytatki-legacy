@@ -194,26 +194,23 @@ def add():
             if request_file:
                 if allowed_file(request_file.filename):
                     filename = secure_filename(request_file.filename)
-                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'],
-                                                       form['subject'], form['topic'])):
-                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'],
-                                                 form['topic']))
-                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'],
-                                                       form['subject'], form['topic'], filename))
+                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
+                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
+                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
             con, conn = connection()
-            con.execute("INSERT INTO note (value, title, note_type_id, user_id, usergroup_id) VALUES (%s, %s, %s, %s, %s)",
-                        (escape_string(str(os.path.join(form['subject'], form['topic'], filename))), escape_string(form['title']), escape_string(CONFIG.json['note_types']['file_id']), escape_string(str(current_user['iduser'])), escape_string(form['topic'])))
+            con.execute("INSERT INTO note (value, title, note_type_id, user_id, usergroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (escape_string(str(os.path.join(form['topic'], filename))), escape_string(form['title']), escape_string(str(CONFIG.json()['note_types']['file_id'])), escape_string(str(current_user['iduser'])), escape_string(form['topic']), escape_string(str(CONFIG.json()['statuses']['active_id']))))
             conn.commit()
             note_id = con.lastrowid
-            con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(note_id)), escape_string(datetime.now())))
+            con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(note_id)), escape_string(str(datetime.now()))))
             conn.commit()
             con.close()
             conn.close()
             flash('Notatka zostala dodana!', 'success')
-            return redirect(request.args.get('next') if 'next' in request.args else '/#'+str(form['subject'])+'#'+str(form['topic']))
+            return redirect(request.args.get('next') if 'next' in request.args else '/#'+str(form['topic']))
         except Exception as error:
             flash("Blad: " + str(error), 'danger')
             return redirect(request.args.get('next') if 'next' in request.args else '/')
