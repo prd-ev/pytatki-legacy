@@ -43,7 +43,7 @@
                 <label for="subject">Wybierz przedmiot</label>
                 <select class="custom-select" id="subject" name="subject" onchange="select_check()">
                     <option value="" selected>-- Wybierz --</option>
-                    {%for subject in subjects%}<option value="{{subject.id}}">{{subject.name}}</option>{%endfor%}
+                    {%for topic in topics%}<option value="{{topic['idusergroup']}}">{{topic['name']}}</option>{%endfor%}
                 </select>
             </div>
             <div id="topic-group" class="form-group">

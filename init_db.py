@@ -40,6 +40,7 @@ def db_start():
             conn.commit()
             admin_id = con.lastrowid
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(admin_id)), escape_string(str(admin_group_id))))
+            conn.commit()
             else:
                 print(error)
         else:
