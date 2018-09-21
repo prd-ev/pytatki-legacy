@@ -24,16 +24,19 @@ def db_start():
                 "INSERT INTO status (name, description) VALUES (\"removed\", \"Record is removed\")")
             conn.commit()
             removed_id = con.lastrowid
-            con.execute("SELECT idstatus FROM status WHERE name=\"active\"")
-            if not query == 0:
-                status = con.fetchone()
-                username = input("Insert your admin login: ")
-                email = input("Insert your admin email: ")
-                password = input("Insert your admin password: ")
-                con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (escape_string(username), escape_string(sha256_crypt.encrypt(str(password))), escape_string(email), escape_string(str(status['idstatus']))))
-                conn.commit()
-                admin_id = con.lastrowid
-                con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(admin_id)), escape_string(str(admin_group_id))))
+            con.execute("INSERT INTO note_type (name, description) VALUES(\"file\", \"A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp\")")
+            conn.commit()
+            con.execute("INSERT INTO note_type (name, description) VALUES(\"text\", \"Just plain non-formated text\")")
+            conn.commit()
+            con.execute("INSERT INTO note_type (name, description) VALUES(\"url\", \"An URL link to another resource\")")
+            conn.commit()
+            username = input("Insert your admin login: ")
+            email = input("Insert your admin email: ")
+            password = input("Insert your admin password: ")
+            con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (escape_string(username), escape_string(sha256_crypt.encrypt(str(password))), escape_string(email), escape_string(str(active_id))))
+            conn.commit()
+            admin_id = con.lastrowid
+            con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(admin_id)), escape_string(str(admin_group_id))))
             else:
                 print(error)
         else:
