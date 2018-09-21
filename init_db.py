@@ -26,10 +26,13 @@ def db_start():
             removed_id = con.lastrowid
             con.execute("INSERT INTO note_type (name, description) VALUES(\"file\", \"A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp\")")
             conn.commit()
+            file_id = con.lastrowid
             con.execute("INSERT INTO note_type (name, description) VALUES(\"text\", \"Just plain non-formated text\")")
             conn.commit()
+            text_id = con.lastrowid
             con.execute("INSERT INTO note_type (name, description) VALUES(\"url\", \"An URL link to another resource\")")
             conn.commit()
+            url_id = con.lastrowid
             username = input("Insert your admin login: ")
             email = input("Insert your admin email: ")
             password = input("Insert your admin password: ")
@@ -46,7 +49,7 @@ def db_start():
     con.close()
     conn.close()
     with open("config/config.json", "r+") as f:
-        json.dump({'admin_group_id': admin_group_id, 'admin_id': admin_id, 'statuses': {'active_id': active_id, 'removed_id': removed_id}}, f)
+        json.dump({'admin_group_id': admin_group_id, 'admin_id': admin_id, 'statuses': {'active_id': active_id, 'removed_id': removed_id}, 'note_types': {'file_id': file_id, 'text_id': text_id, 'url_id': url_id}}, f)
 
 
 if __name__ == '__main__':
