@@ -100,7 +100,7 @@ def delete_note(identifier):
         query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
         note = con.fetchone()
         if query:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.removed)), escape_string(identifier)))
+            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.json['statuses']['removed_id'])), escape_string(identifier)))
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
@@ -139,34 +139,37 @@ def give_admin(identifier):
     user = con.fetchone()
     if current_user.is_admin and user and user['iduser'] != current_user:
         try:
-            con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(user['iduser']), CONFIG.admin_id))
+            con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(user['iduser']), CONFIG.json['admin_group_id']))
             conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 user['login']), 'success')
         except Exception as error:
             flash("Blad: "+str(error), 'danger')
-    if return redirect(request.args.get('next') if 'next' in request.args else '/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if not User.query.filter_by(id=identifier).first().superuser:
-        if current_user.admin and User.query.filter_by(id=identifier).first():
+    if int(identifier) != int(CONFIG.json['admin_id']):
+        con, conn = connection()
+        query = con.execute(
+            "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
+        user = con.fetchone()
+        if current_user.is_admin and query:
             try:
-                User.query.filter_by(id=identifier).first().admin = False
-                DB.session.commit()
-                flash('Odebrano uprawnienia administratora uzytkownikowi ' + str(
-                    User.query.filter_by(id=identifier).first().username), 'success')
+                con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(identifier), escape_string(int(CONFIG.json['admin_group_id']))))
+                conn.commit()
+                flash('Odebrano uprawnienia administratora uzytkownikowi ' + user['login'], 'success')
             except Exception as error:
                 flash("Blad: " + str(error), 'danger')
         else:
             flash("Nie mozesz tego zrobic", 'warning')
+        con.close()
+        conn.close()
     else:
         flash("Nie mozesz tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 def allowed_file(filename):
     """Check if file has valid name and allowed extension"""
