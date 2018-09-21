@@ -227,7 +227,7 @@ SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image
 DROP TABLE IF EXISTS `pytatki`.`note_view`;
 USE `pytatki`;
 CREATE  OR REPLACE VIEW `note_view` AS
-SELECT a.idnote, a.value, a.title, b.name AS 'note_type', a.user_id AS 'creator_id',  c.login AS 'creator_login', a.usergroup_id, d.name AS 'usergroup_name' FROM note a, note_type b, user c, usergroup d WHERE a.note_type_id = b.idnote_type AND a.user_id = c.iduser AND a.usergroup_id = d.idusergroup;
+SELECT a.idnote, a.value, a.title, b.name AS 'note_type', a.user_id AS 'creator_id',  c.login AS 'creator_login', a.usergroup_id AS 'parent_id', d.name AS 'parent_name' FROM note a, note_type b, user c, usergroup d WHERE a.note_type_id = b.idnote_type AND a.user_id = c.iduser AND a.usergroup_id = d.idusergroup;
 
 -- -----------------------------------------------------
 -- View `pytatki`.`action_view`
