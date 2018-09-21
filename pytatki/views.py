@@ -205,10 +205,10 @@ def add():
                     return redirect(request.url)
             con, conn = connection()
             con.execute("INSERT INTO note (value, title, note_type_id, user_id, usergroup_id) VALUES (%s, %s, %s, %s, %s)",
-                        (escape_string(str(os.path.join(form['subject'], form['topic'], filename))), escape_string(form['title']), escape_string(CONFIG.json['note_types']['file_id']), escape_string(int(current_user['iduser'])), escape_string(form['topic'])))
+                        (escape_string(str(os.path.join(form['subject'], form['topic'], filename))), escape_string(form['title']), escape_string(CONFIG.json['note_types']['file_id']), escape_string(str(current_user['iduser'])), escape_string(form['topic'])))
             conn.commit()
             note_id = con.lastrowid
-            con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (escape_string(int(current_user['iduser'])), escape_string(int(note_id)), escape_string(datetime.now())))
+            con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(note_id)), escape_string(datetime.now())))
             conn.commit()
             con.close()
             conn.close()
@@ -219,7 +219,7 @@ def add():
             return redirect(request.args.get('next') if 'next' in request.args else '/')
     else:
         con, conn = connection()
-        con.execute("SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE b.parent_id = a.idusergroup) AND a.iduser = %s", escape_string(int(current_user['iduser'])))
+        con.execute("SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE b.parent_id = a.idusergroup) AND a.iduser = %s", escape_string(str(current_user['iduser'])))
         topics = con.fetchall()
         con.close()
         conn.close()
