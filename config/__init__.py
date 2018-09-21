@@ -1,5 +1,6 @@
 """Plik konfiguracyjny"""
 __author__ = 'Patryk Niedzwiedzinski'
+import json
 
 class Config():
     """Config class"""
@@ -9,6 +10,16 @@ class Config():
     PORT = 5000
     EMAIL = ""
     EMAIL_PASSWORD = ""
+
+    DB_HOST = 'localhost'
+    DB_USER = ''
+    DB_PASSWORD = ''
+    DB_NAME = ''
+
+    def admin_id(self):
+        with open("config/config.json", "r") as f:
+            parsed_json = json.loads(f.read())
+        return parsed_json['admin_id']
 
     def __init__(self, secret):
         self.secret_key = secret
@@ -21,9 +32,8 @@ class Config():
         if result==0:
             sock.close()
             return False
-        else:
-            sock.close()
-            return True
+        sock.close()
+        return True
 
 
 CONFIG = Config("sekretny_klucz")
