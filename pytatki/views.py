@@ -145,49 +145,7 @@ def give_admin(identifier):
                 user['login']), 'success')
         except Exception as error:
             flash("Blad: "+str(error), 'danger')
-    if rreturn redirect(request.args.get('next') if 'next' in request.args else '/')
-
-@APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
-@login_manager
-def take_mod(identifier):
-    """Take mod"""
-    if current_user.admin and User.query.filter_by(id=identifier).first():
-        try:
-            User.query.filter_by(id=identifier).first().modderator = False
-            DB.session.commit()
-            flash('Odebrano uprawnienia moderatora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        except Exception as error:
-            flash("Blad: " + str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash("Nie mozna tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/give-mod/<int:identifier>/', methods=["GET"])
-@login_manager
-def give_mod(identifier):
-    """Give mod"""
-    if current_user.admin and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != current_user:
-        try:
-            User.query.filter_by(id=identifier).first().modderator = True
-            DB.session.commit()
-            flash('Przekazano uprawnienia moderatora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-        except Exception as error:
-            flash("Blad: "+str(error), 'danger')
-    else:
-        flash("Nie mozesz tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    if return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
 @login_manager
