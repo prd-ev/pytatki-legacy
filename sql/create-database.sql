@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS `pytatki`.`note_tags` (`idnote` INT, `tag_id` INT, `'
 DROP TABLE IF EXISTS `pytatki`.`usergroup_membership`;
 USE `pytatki`;
 CREATE  OR REPLACE VIEW `usergroup_membership` AS
-SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image_path FROM user a, usergroup b, user_membership c WHERE a.id_user = c.user_id AND b.idusergroup = c.usergroup_id;
+SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image_path FROM user a, usergroup b, user_membership c WHERE a.iduser = c.user_id AND b.idusergroup = c.usergroup_id;
 
 -- -----------------------------------------------------
 -- View `pytatki`.`note_view`
