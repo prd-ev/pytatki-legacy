@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS `pytatki`.`note` (
   `note_type_id` INT NOT NULL,
   `user_id` INT NOT NULL,
   `usergroup_id` INT NOT NULL,
+  `status_id` INT NOT NULL,
   PRIMARY KEY (`idnote`),
   INDEX `fk_note_note_type1_idx` (`note_type_id` ASC),
   INDEX `fk_note_user1_idx` (`user_id` ASC),

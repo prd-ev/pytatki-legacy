@@ -32,11 +32,8 @@ def login_manager(func):
         if not current_user.is_authenticated:
             flash("Musisz być zalogowany", 'warning')
             next_url = request.path
-            return redirect(url_for('login', next=next_url))
-        elif current_user.is_authenticated and current_user.ban:
-            flash("Twoje konto zostało zbanowane na czas nieokreślony", 'danger')
-            return redirect('/logout/')
-        elif not current_user.confirm_mail:
+            return redirect(url_for('login_get', next=next_url))
+        elif not current_user['email_confirm']:
             flash('Potwierdź adres email. <a href="/user/send-confirmation-mail/">Wyślij ponownie</a>', 'warning')
             return func(*args, **kwargs)
         return func(*args, **kwargs)

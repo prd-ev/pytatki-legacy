@@ -12,6 +12,8 @@ from config import CONFIG
 from pytatki.models import User
 from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
+from dbconnect import connection
+from pymysql import escape_string
 
 
 __author__ = 'Patryk Niedzwiedzinski'
@@ -55,8 +57,8 @@ def about():
 @login_manager
 def admin():
     """Admin"""
-    if current_user.admin or current_user.modderator:
-        return render_template('admin.html', admin=admin)
+    if current_user.is_admin:
+        return render_template('admin.html')
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
 
@@ -93,86 +95,38 @@ def delete_user(identifier):
 @login_manager
 def delete_note(identifier):
     """Delete note"""
-    if current_user.admin or current_user.modderator:
-        note = Note.query.filter_by(id=identifier).first()
-        if note:
-            try:
-                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
-                DB.session.delete(note)
-                DB.session.commit()
+    if current_user.is_admin:
+        con, conn = connection()
+        query = con.execute("SELECT * FROM note_view WHERE idnote = %s")
+        note = con.fetchone()
+        if query:
+            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s")
+            conn.commit()
                 flash('Notatka zostala usunieta!', 'success')
-            except Exception as error:
-                flash('Blad: '+str(error), 'danger')
         else:
             flash('Nie ma takiej notatki', 'warning')
     else:
         flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/delete/subject/<int:identifier>/', methods=["GET"])
-@login_manager
-def delete_subject(identifier):
-    """Delete subject"""
-    if current_user.admin or current_user.modderator:
-        subject = Subject.query.filter_by(id=identifier).first()
-        if subject:
-            try:
-                DB.session.delete(subject)
-                for topic in Topic.query.order_by(Topic.id.asc()).all():
-                    if topic.subject_id == identifier:
-                        DB.session.delete(topic)
-                for note in Note.query.order_by(Note.id.asc()).all():
-                    if note.subject_id == identifier:
-                        DB.session.delete(note)
-                DB.session.commit()
-                flash('Przedmiot zostal usuniety!', 'success')
-            except Exception as error:
-                flash('Blad: '+str(error), 'danger')
-        else:
-            flash('Nie ma takiego przedmiotu', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/delete/topic/<int:identifier>/', methods=["GET"])
-@login_manager
-def delete_topic(identifier):
-    """Delete topic"""
-    if current_user.admin or current_user.modderator:
-        topic = Topic.query.filter_by(id=identifier).first()
-        if topic:
-            try:
-                DB.session.delete(topic)
-                for note in Note.query.order_by(Note.id.asc()).all():
-                    if note.topic_id == identifier:
-                        DB.session.delete(note)
-                DB.session.commit()
-                flash('Dzial zostal usuniety!', 'success')
-            except Exception as error:
-                flash('Blad: '+str(error), 'danger')
-        else:
-            flash('Nie ma takiego dzialu', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    con.close()
+    conn.close()
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route("/admin/user-list/")
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    if current_user.admin or current_user.modderator:
-        users = User.query.order_by(User.id.asc()).all()
-        admini = 0
-        for user in users:
-            if user.admin:
-                admini += 1
-        return render_template('user_list.html', users=users, admini=admini)
+    if current_user.is_admin:
+        con, conn = connection()
+        con.execute("SELECT * FROM user")
+        users_raw = con.fetchall()
+        con.close()
+        conn.close()
+        users=[]
+        for user_dict in users_raw:
+            user = User()
+            user.update(user_dict)
+            users.append(user)
+        return render_template('user_list.html', users=users)
     flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
