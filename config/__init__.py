@@ -1,5 +1,6 @@
 """Plik konfiguracyjny"""
 __author__ = 'Patryk Niedzwiedzinski'
+
 import json
 
 class Config():
