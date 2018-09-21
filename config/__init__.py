@@ -19,7 +19,7 @@ class Config():
     def admin_id(self):
         with open("config/config.json", "r") as f:
             parsed_json = json.loads(f.read())
-        return parsed_json['admin_id']
+        return parsed_json['admin_group_id']
 
     def active(self):
         with open("config/config.json", "r") as f:
