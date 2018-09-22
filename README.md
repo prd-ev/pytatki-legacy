@@ -9,45 +9,54 @@ Notatki we flasku
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Wymagania
-
-Aby uruchomić aplikację potrzebne są odpowiednie moduły python'a. Można je pobrać za pomocą pip'a wpisując następujące komendy:
-
-```
-pip install -r requirements/common.txt
-```
-
 ### Instalacja
 
 Sklonuj to repozytorium na komputer, na którym chcesz uruchomić aplikację
 ```
 git clone https://github.com/PRD-ev/pytatki.git
 ```
-Następnie otwórz plik config/\_\_init\_\_.py. Pytatki pozwalają zapisać dwa presety ustawień `Localhost` i `Server`. Dzięki temu możesz testować aplikację lokalnie, a gdy wszystko będzie gotowe wystarczy zmienić tylko jedną linijką, żeby udostępnić światu aplikację :).
+### Dependencies
+
+Aby uruchomić aplikację potrzebne są odpowiednie moduły python'a. Można je pobrać za pomocą pip'a wpisując następujące komendy:
+
+```
+pip install -r requirements/common.txt
+```
+### Konfiguracja
+Następnie otwórz plik config/\_\_init\_\_.py. Uzupełnij plik konfiguracyjny.
 
 
 ```
-class Localhost:
-    '''Do testowania na komputerze lokalnym'''
+class Config():
+    """Config class"""
     secret_key = str()
     DEBUG = True #True oznacza, że aplikacja będzie sprawdzać zmiany w plikach
     HOST = "127.0.0.1" #Tutaj wpisujemy adres, na którym chcemy postawić stronę
     PORT = 5000 #Tutaj wpisujemy port, na którym ma działać aplikacja
     EMAIL = "twoj@email" #Z tego maila wysyłane będą powiadomienia do użytkowników
     EMAIL_PASSWORD = "haslo_do_twojego_maila" #Hasło do maila
+
+    DB_HOST = '127.0.0.1' #DB configuration
+    DB_USER = 'webapp'
+    DB_PASSWORD = '12345'
+    DB_NAME = 'pytatki' 
     
     (...)
     
-CONFIG = Localhost("sekretny_klucz") #W nawiasie wpisujemy klucz do szyfrowania haseł w bazie danych
-# NIE ZATRZYMUJ WARTOŚCI DOMYŚLNEJ!
+CONFIG = Config("sekretny_klucz") #W nawiasie wpisujemy klucz do szyfrowania haseł w bazie danych
+# NIE ZATRZYMUJ WARTOŚCI DOMYŚLNEJ!!!
 ```
 
 Żeby uruchomić aplikację wpisz:
 
+- za pomocą pythona (lokalnie, nie na serwerze)
 ```
-python main.py
+python3 wsgi.py
 ```
-
+- za pomocą wsgi (skonfiguruj najpierw plik uwsgi.ini)
+```
+uwsgi -ini uwsgi.ini
+```
 
 ## Testowanie
 ### 
