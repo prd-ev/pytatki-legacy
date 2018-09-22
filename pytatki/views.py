@@ -178,7 +178,7 @@ def give_admin(identifier):
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if int(identifier) != int(CONFIG.json['admin_id']):
+    if int(identifier) != int(CONFIG.json()['admin_id']):
         con, conn = connection()
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
