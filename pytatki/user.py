@@ -163,9 +163,7 @@ def register_post():
         return redirect(url_for('login_get', next=request.args.get('next'), username=form['username']))
     else:
         flash("Jestes juz zalogowany!", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
     #except Exception as error:
     #    flash('Blad: '+str(error), 'danger')
     #    return redirect('/')
@@ -176,11 +174,8 @@ def register_get():
     """Registration a new user"""
     if not current_user.is_authenticated:
         return render_template('register.html')
-    else:
-        flash("Jestes juz zalogowany!", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    flash("Jestes juz zalogowany!", 'warning')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
 @APP.route('/login/', methods=["POST"])
@@ -191,35 +186,24 @@ def login_post():
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect('/')
-        if request.method == "POST":
-            con, conn = connection()
-            con.execute("SELECT * FROM user WHERE email = %s OR login = %s",
-                        (escape_string(request.form['username']), escape_string(request.form['username'])))
-            user_dict = con.fetchone()
-            user = User()
-            if user_dict is not None:
-                user.update(user_dict)
-            con.close()
-            conn.close()
-            gc.collect()
-            if user and sha256_crypt.verify(request.form['password'], user['password']):
-                remember_me = request.form['remember'] if 'remember' in request.form else False
-                login_user(user, remember=remember_me)
-                if request.args.get('next'):
-                    return redirect(request.args.get('next'))
-                return redirect('/app/')
-            return render_template('login.html', form=request.form, wrong=True)
+        con, conn = connection()
+        con.execute("SELECT * FROM user WHERE email = %s OR login = %s",
+                    (escape_string(request.form['username']), escape_string(request.form['username'])))
+        user_dict = con.fetchone()
+        user = User()
+        if user_dict is not None:
+            user.update(user_dict)
+        con.close()
+        conn.close()
+        gc.collect()
+        if user and sha256_crypt.verify(request.form['password'], user['password']):
+            remember_me = request.form['remember'] if 'remember' in request.form else False
+            login_user(user, remember=remember_me)
+            return redirect(request.args.get('next') if 'next' in request.args else '/app/')
         return render_template('login.html')
     except Exception as error:
         flash('Błąd: ' + str(error), 'danger')
         return redirect('/')
-
-@APP.route('/app/')
-def app_view():
-    print(current_user)
-    if current_user.is_authenticated:
-        flash("Jej")
-    return render_template("_base.html")
 
 
 @APP.route('/login/', methods=["GET"])

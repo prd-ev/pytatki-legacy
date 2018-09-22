@@ -64,14 +64,14 @@ def find_usergroup_children(id_usergroup, id_user):
     return dict({"childrens": childrens})
 
 @APP.route('/')
-@ban
 def homepage():
-    """Homepage"""
-    if current_user.is_authenticated:
-        #return jsonify(find_usergroup_children(1, current_user['iduser']))
-        return render_template('homepage.html')
     return render_template('homepage.html')
 
+
+@APP.route('/app/')
+@login_manager
+def app_view():
+    return render_template("_base.html")
 
 @APP.route('/about/')
 def about():
