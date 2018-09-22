@@ -90,18 +90,14 @@ def confirm_email(token):
 @APP.route('/user/update-email/', methods=['POST'])
 def update_email():
     try:
-        if not current_user.email == request.form['email']:
-            #user = User.query.filter_by(id=current_user.id).first()
-            #form = request.form
-            #user.email = form['email']
-            #user.confirm_mail = False
-            #DB.session.commit()
-            send_confirmation_email(current_user)
+        if not current_user['email'] == request.form['email']:
+            con, conn = connection()
+            con.execute("UPDATE user SET email_confirm = 0, email = %s WHERE iduser = %s", (escape_string(str(request.form['email'])), escape_string(str(current_user['iduser']))))
+            conn.commit()
+            send_confirmation_email(request.form['email'])
     except Exception as e:
         flash('Blad: ' + str(e), 'danger')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
 @APP.route('/user/update-password/', methods=['POST'])
