@@ -26,7 +26,7 @@
 <body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}" {%if current_user.is_authenticated and page_id=='homepage'
     %}onhashchange="check_hash()" onload="check_hash()" {%endif%}>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
-        <a class="navbar-brand" href="/" style="height: 45px">
+        <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
             <span class="align-middle">Pytatki</span>
             <span class="align-middle badge" style="border-color:#ffc107; color:#ffc107; border: 1px solid">alpha</span>
         </a>
@@ -39,7 +39,7 @@
             <ul class="navbar-nav mr-auto">
                 {% if current_user.is_authenticated%}
                 <li class="nav-item {% if page_id == 'user' %}active{% endif %}">
-                    <a class="nav-link" href="/user/{{current_user.username}}">{{current_user.username}}</a>
+                    <a class="nav-link" href="/user/{{current_user['login']}}">{{current_user['login']}}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">Wyloguj się</a>
@@ -67,15 +67,10 @@
                         Zgłoś błąd!
                     </a>
                 </li>
-                {% if current_user.is_authenticated %} {% if current_user.admin%}
+                {% if current_user.is_authenticated %} {% if current_user.is_admin%}
                 <hr>
                 <li class="nav-item  md-m-0 mx-1 {% if page_id == 'admin' %} active{% endif %}">
                     <a class="btn btn-warning btn-block" href="/admin">Funkcje administratora</a>
-                </li>
-                {% elif current_user.modderator%}
-                <hr>
-                <li class="nav-item  md-m-0 mx-1 {% if page_id == 'admin' %} active{% endif %}">
-                    <a class="btn btn-warning btn-block" href="/admin">Funkcje moderatora</a>
                 </li>
                 {% endif %} {% endif %}
             </ul>
@@ -84,7 +79,7 @@
                 <hr>
                 <li class="nav-item">
                     <div class="dropdown" role="group">
-                        {% if current_user.admin or current_user.modderator%}
+                        {% if current_user.is_admin %}
                         <button id="btnGroupDrop1" type="button" class="btn btn-block btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false">
                             Dodaj

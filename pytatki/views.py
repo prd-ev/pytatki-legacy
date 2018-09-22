@@ -65,13 +65,18 @@ def find_usergroup_children(id_usergroup, id_user):
 
 @APP.route('/')
 def homepage():
-    return render_template('homepage.html')
+    if current_user.is_authenticated:
+        return redirect('/app/')
+    return render_template('landing_page.html')
 
 
 @APP.route('/app/')
-@login_manager
 def app_view():
-    return render_template("_base.html")
+    if current_user.is_authenticated:
+        content = str(find_usergroup_children(1, current_user['iduser']))
+        print(content)
+        return render_template("homepage.html", subject=None, topics=None, notes=None)
+    return redirect('/')
 
 @APP.route('/about/')
 def about():
