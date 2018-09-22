@@ -1,5 +1,6 @@
 """Plik konfiguracyjny"""
 __author__ = 'Patryk Niedzwiedzinski'
+
 import json
 
 class Config():
@@ -16,20 +17,10 @@ class Config():
     DB_PASSWORD = ''
     DB_NAME = ''
 
-    def admin_id(self):
+    def json(self):
         with open("config/config.json", "r") as f:
             parsed_json = json.loads(f.read())
-        return parsed_json['admin_group_id']
-
-    def active(self):
-        with open("config/config.json", "r") as f:
-            parsed_json = json.loads(f.read())
-        return parsed_json['statuses']['active_id']
-    
-    def removed(self):
-        with open("config/config.json", "r") as f:
-            parsed_json = json.loads(f.read())
-        return parsed_json['statuses']['removed_id']
+        return parsed_json
 
     def __init__(self, secret):
         self.secret_key = secret

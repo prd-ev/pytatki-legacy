@@ -1,8 +1,1 @@
-{
-    "admin_group_id": null, 
-    "admin_id": null, 
-    "statuses": {
-        "active_id": null, 
-        "removed_id": null
-    }
-}
+{"admin_group_id": null, "admin_id": null, "statuses": {"active_id": null, "removed_id": null}, "note_types": {"file_id": null, "text_id": null, "url_id": null}}

@@ -3,7 +3,7 @@ import os
 import gc
 from datetime import datetime
 from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, send_file, g
+from flask import render_template, redirect, request, session, flash, send_file, g, jsonify
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
@@ -36,13 +36,40 @@ ALLOWED_EXTENSIONS = set([
     'cpp',
     ])
 
+def find_usergroup_children(id_usergroup, id_user):
+    """Generate dict with recurent children of usergroup"""
+    con, conn = connection()
+    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+    user_in_group = con.fetchone()
+    con.close()
+    conn.close()
+    childrens = []
+    if user_in_group:
+        con, conn = connection()
+        con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        usergroups = con.fetchall()
+        con.execute("SELECT * FROM note_view WHERE parent_id = %s",
+                    escape_string(str(id_usergroup)))
+        notes = con.fetchall()
+        con.close()
+        conn.close()
+        if usergroups:
+            for usergroup in usergroups:
+                usergroup.update(find_usergroup_children(
+                    usergroup['idusergroup'], id_user))
+                childrens.append(usergroup)
+        if notes:
+            for note in notes:
+                childrens.append(note)
+    return dict({"childrens": childrens})
 
 @APP.route('/')
 @ban
 def homepage():
     """Homepage"""
     if current_user.is_authenticated:
-        return render_template('homepage.html')
+        return jsonify(find_usergroup_children(1, current_user['iduser']))
+        #return render_template('homepage.html')
     return render_template('homepage.html')
 
 
@@ -100,7 +127,7 @@ def delete_note(identifier):
         query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
         note = con.fetchone()
         if query:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.removed)), escape_string(identifier)))
+            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.json()['statuses']['removed_id'])), escape_string(identifier)))
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
@@ -130,121 +157,46 @@ def user_list():
     flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
-@APP.route('/admin/ban/<username>/', methods=["GET"])
-@login_manager
-def ban_user(username):
-    """Ban user"""
-    user = User.query.filter_by(username=username).first()
-    if user:
-        user.ban = True
-        DB.session.commit()
-        flash('Uzytkownik '+user.username+' zostal zbanowany', 'success')
-    else:
-        flash('Nie ma takiego uzytkownika', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/unban/<username>/', methods=["GET"])
-@login_manager
-def unban(username):
-    """Unban user"""
-    user = User.query.filter_by(username=username).first()
-    if user:
-        user.ban = False
-        DB.session.commit()
-        flash('Uzytkownik '+user.username+' zostal odbanowany', 'success')
-    else:
-        flash('Nie ma takiego uzytkownika', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_admin(identifier):
     """Give admin"""
-    if current_user.admin and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != current_user:
+    con, conn = connection()
+    con.execute("SELECT * FROM user WHERE iduser = %s", escape_string(identifier))
+    user = con.fetchone()
+    if current_user.is_admin and user and user['iduser'] != current_user:
         try:
-            User.query.filter_by(id=identifier).first().admin = True
-            DB.session.commit()
+            con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(user['iduser']), CONFIG.json['admin_group_id']))
+            conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
+                user['login']), 'success')
         except Exception as error:
             flash("Blad: "+str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
-@login_manager
-def take_mod(identifier):
-    """Take mod"""
-    if current_user.admin and User.query.filter_by(id=identifier).first():
-        try:
-            User.query.filter_by(id=identifier).first().modderator = False
-            DB.session.commit()
-            flash('Odebrano uprawnienia moderatora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        except Exception as error:
-            flash("Blad: " + str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash("Nie mozna tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/give-mod/<int:identifier>/', methods=["GET"])
-@login_manager
-def give_mod(identifier):
-    """Give mod"""
-    if current_user.admin and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != current_user:
-        try:
-            User.query.filter_by(id=identifier).first().modderator = True
-            DB.session.commit()
-            flash('Przekazano uprawnienia moderatora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-        except Exception as error:
-            flash("Blad: "+str(error), 'danger')
-    else:
-        flash("Nie mozesz tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if not User.query.filter_by(id=identifier).first().superuser:
-        if current_user.admin and User.query.filter_by(id=identifier).first():
+    if int(identifier) != int(CONFIG.json()['admin_id']):
+        con, conn = connection()
+        query = con.execute(
+            "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
+        user = con.fetchone()
+        if current_user.is_admin and query:
             try:
-                User.query.filter_by(id=identifier).first().admin = False
-                DB.session.commit()
-                flash('Odebrano uprawnienia administratora uzytkownikowi ' + str(
-                    User.query.filter_by(id=identifier).first().username), 'success')
+                con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(identifier), escape_string(int(CONFIG.json['admin_group_id']))))
+                conn.commit()
+                flash('Odebrano uprawnienia administratora uzytkownikowi ' + user['login'], 'success')
             except Exception as error:
                 flash("Blad: " + str(error), 'danger')
         else:
             flash("Nie mozesz tego zrobic", 'warning')
+        con.close()
+        conn.close()
     else:
         flash("Nie mozesz tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 def allowed_file(filename):
     """Check if file has valid name and allowed extension"""
@@ -269,40 +221,33 @@ def add():
             if request_file:
                 if allowed_file(request_file.filename):
                     filename = secure_filename(request_file.filename)
-                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'],
-                                                       form['subject'], form['topic'])):
-                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'],
-                                                 form['topic']))
-                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'],
-                                                       form['subject'], form['topic'], filename))
+                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
+                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
+                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
-            note = Note()
-            note.name = form['title']
-            note.author_id = current_user.id
-            note.subject_id = form['subject']
-            note.topic_id = form['topic']
-            note.file = os.path.join(form['subject'], form['topic'], filename)
-            note.date = datetime.now()
-            DB.session.add(note)
-            DB.session.commit()
+            con, conn = connection()
+            con.execute("INSERT INTO note (value, title, note_type_id, user_id, usergroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (escape_string(str(os.path.join(form['topic'], filename))), escape_string(form['title']), escape_string(str(CONFIG.json()['note_types']['file_id'])), escape_string(str(current_user['iduser'])), escape_string(form['topic']), escape_string(str(CONFIG.json()['statuses']['active_id']))))
+            conn.commit()
+            note_id = con.lastrowid
+            con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(note_id)), escape_string(str(datetime.now()))))
+            conn.commit()
+            con.close()
+            conn.close()
             flash('Notatka zostala dodana!', 'success')
-            if request.args.get('next'):
-                if request.args.get('next') == '/':
-                    pass
-                else:
-                    return redirect(request.args.get('next'))
-            return redirect('/#'+str(form['subject'])+'#'+str(form['topic']))
+            return redirect(request.args.get('next') if 'next' in request.args else '/#'+str(form['topic']))
         except Exception as error:
             flash("Blad: " + str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
+            return redirect(request.args.get('next') if 'next' in request.args else '/')
     else:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        return render_template('add.html', subjects=subjects, topics=topics)
+        con, conn = connection()
+        con.execute("SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE b.parent_id = a.idusergroup) AND a.iduser = %s", escape_string(str(current_user['iduser'])))
+        topics = con.fetchall()
+        con.close()
+        conn.close()
+        return render_template('add.html', topics=topics)
 
 @APP.route('/admin/add/', methods=["POST"])
 @login_manager
