@@ -127,7 +127,7 @@ def delete_note(identifier):
         query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
         note = con.fetchone()
         if query:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.json['statuses']['removed_id'])), escape_string(identifier)))
+            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.json()['statuses']['removed_id'])), escape_string(identifier)))
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
