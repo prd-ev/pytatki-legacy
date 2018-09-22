@@ -291,82 +291,15 @@ def admin_add_get():
         flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
-@APP.route('/admin/notes/')
-@login_manager
-def notes():
-    """List of notes"""
-    notes = Note.query.order_by(Note.id.asc()).all()
-    return render_template('notes.html', notes=notes)
-
-@APP.route('/admin/subjects/')
-@login_manager
-def subjects():
-    """List of subjects"""
-    subjects = Subject.query.order_by(Subject.id.asc()).all()
-    topics = Topic.query.order_by(Topic.id.asc()).all()
-    return render_template('subjects.html', subjects=subjects, topics=topics)
-
-
-@APP.route('/admin/subject/<identifier>/edit/', methods=['GET', 'POST'])
-def edit_subject(identifier):
-    """Edit subject"""
-    if request.method == 'POST':
-        form = request.form
-        Subject.query.filter_by(id=identifier).first().name = form['name']
-        DB.session.commit()
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect(request.path)
-    subject = Subject.query.filter_by(id=identifier).first()
-    return render_template('edit.html', subject=subject)
-
-
-@APP.route('/admin/topic/<identifier>/edit/', methods=['POST'])
-def edit_topic_post(identifier):
-    """Edit topic"""
-    Topic.query.filter_by(id=identifier).first().name = request.form['name']
-    Topic.query.filter_by(id=identifier).first().subject_id = request.form['subject']
-    DB.session.commit()
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect(request.path)
-
-
-@APP.route('/admin/topic/<identifier>/edit/', methods=['GET'])
-def edit_topic_get(identifier):
-    """Edit topic"""
-    topic = Topic.query.filter_by(id=identifier).first()
-    subjects = Subject.query.order_by(Subject.id.asc()).all()
-    return render_template('edit_t.html', topic=topic, subjects=subjects)
-
-@APP.route('/admin/note/<identifier>/edit/', methods=['POST'])
-def edit_note_post(identifier):
-    """Edit note"""
-    Note.query.filter_by(id=identifier).first().name = request.form['name']
-    Note.query.filter_by(id=identifier).first().subject_id = request.form['subject']
-    Note.query.filter_by(id=identifier).first().topic_id = request.form['topic']
-    if 'file' in request.files:
-        if allowed_file(request.files['file'].filename):
-            filename = secure_filename(request.files['file'].filename)
-            os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(
-                id=identifier).first().file))
-            request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-            Note.query.filter_by(id=identifier).first().file = str(filename)
-    flash('Zapisano zmiany!', 'success')
-    DB.session.commit()
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect(request.path)
-
-
-@APP.route('/admin/note/<identifier>/edit/', methods=['GET'])
-def edit_note_get(identifier):
-    """Edit note"""
-    note = Note.query.filter_by(id=identifier).first()
-    topics = Topic.query.order_by(Topic.id.asc()).all()
-    subjects = Subject.query.order_by(Subject.id.asc()).all()
-    return render_template('edit_n.html', note=note, topics=topics, subjects=subjects)
-
+def has_access_to_note(id_note, id_user):
+    """Check if user has access to note"""
+    con, conn = connection()
+    con.execute("SELECT usergroup_id FROM note WHERE idnote = %s", escape_string(str(id_note)))
+    note = con.fetchone()
+    con.execute("SELECT 1 FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(note['usergroup_id']))))
+    if con.fetchone():
+        return True
+    return False
 
 @APP.route('/download/<identifier>/')
 @login_manager
@@ -374,8 +307,14 @@ def edit_note_get(identifier):
 def download(identifier):
     """Download file"""
     if current_user.is_authenticated:
-        note = Note.query.filter_by(id=identifier).first()
-        return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
+        if has_access_to_note(identifier, current_user['iduser']):
+            con, conn = connection()
+            con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
+            note = con.fetchone()
+            if note['note_type'] == "file":
+                return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
+            else:
+                return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
