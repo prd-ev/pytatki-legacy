@@ -3,7 +3,7 @@ import os
 import gc
 from datetime import datetime
 from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, send_file, g
+from flask import render_template, redirect, request, session, flash, send_file, g, jsonify
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
@@ -36,13 +36,40 @@ ALLOWED_EXTENSIONS = set([
     'cpp',
     ])
 
+def find_usergroup_children(id_usergroup, id_user):
+    """Generate dict with recurent children of usergroup"""
+    con, conn = connection()
+    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+    user_in_group = con.fetchone()
+    con.close()
+    conn.close()
+    childrens = []
+    if user_in_group:
+        con, conn = connection()
+        con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        usergroups = con.fetchall()
+        con.execute("SELECT * FROM note_view WHERE parent_id = %s",
+                    escape_string(str(id_usergroup)))
+        notes = con.fetchall()
+        con.close()
+        conn.close()
+        if usergroups:
+            for usergroup in usergroups:
+                usergroup.update(find_usergroup_children(
+                    usergroup['idusergroup'], id_user))
+                childrens.append(usergroup)
+        if notes:
+            for note in notes:
+                childrens.append(note)
+    return dict({"childrens": childrens})
 
 @APP.route('/')
 @ban
 def homepage():
     """Homepage"""
     if current_user.is_authenticated:
-        return render_template('homepage.html')
+        return jsonify(find_usergroup_children(1, current_user['iduser']))
+        #return render_template('homepage.html')
     return render_template('homepage.html')
 
 
