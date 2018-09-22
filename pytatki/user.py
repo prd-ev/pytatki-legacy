@@ -37,16 +37,26 @@ def valid_username(username):
 @login_manager
 def user_info(username):
     """User info"""
-    #user=User.query.filter_by(username=username).first()
-    #if user:
-        #return render_template('user.html', user=user)
+    con, conn = connection()
+    con.execute("SELECT iduser, login FROM user WHERE login = %s", escape_string(username))
+    user = con.fetchone()
+    con.close()
+    conn.close()
+    if user:
+        con, conn = connection()
+        con.execute("SELECT idnote, title, note_type FROM note_view WHERE creator_id = %s", escape_string(str(user['iduser'])))
+        notes = con.fetchall()
+        con.execute("SELECT idusergroup, name FROM usergroup_membership WHERE iduser = %s", escape_string(str(user['iduser'])))
+        groups = con.fetchall()
+        con.close()
+        conn.close()
+        return render_template('user.html', user=user, notes=notes, groups=groups)
     flash('Nie ma takiego użytkownika', 'warning')
     return redirect('/')
 
 
-def send_confirmation_email(user = current_user):
-    print(user.email)
-    token = ts.dumps(user.email, salt='email-confirm-key')
+def send_confirmation_email(email):
+    token = ts.dumps(email, salt='email-confirm-key')
     msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[user.email])
     msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
@@ -55,7 +65,7 @@ def send_confirmation_email(user = current_user):
 @APP.route('/user/send-confirmation-mail/')
 def send_confirmation_view():
     """Send confirmation email"""
-    send_confirmation_email()
+    send_confirmation_email(current_user['email'])
     flash("Wysłano ponownie wiadomość!", 'success')
     return redirect("/")
 
@@ -63,12 +73,15 @@ def send_confirmation_view():
 @APP.route('/user/confirm/<token>')
 def confirm_email(token):
     try:
-        #email = ts.loads(token, salt="email-confirm-key", max_age=86400)
-        #user = User.query.filter_by(email=email).first_or_404()
-        #user.confirm_mail = True
-        #DB.session.add(user)
-        #DB.session.commit()
+        email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+        con, conn = connection()
+        user = con.execute(
+            "UPDATE user SET email_confirm = 1 WHERE email = (%s)", escape_string(email))
+        conn.commit()
         flash("Adres email zweryfikowany!", 'success')
+        con.close()
+        conn.close()
+        gc.collect()
     except Exception as error:
         flash("Blad" + str(error), 'danger')
     return redirect('/')
