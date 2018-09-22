@@ -68,8 +68,8 @@ def find_usergroup_children(id_usergroup, id_user):
 def homepage():
     """Homepage"""
     if current_user.is_authenticated:
-        return jsonify(find_usergroup_children(1, current_user['iduser']))
-        #return render_template('homepage.html')
+        #return jsonify(find_usergroup_children(1, current_user['iduser']))
+        return render_template('homepage.html')
     return render_template('homepage.html')
 
 
@@ -253,54 +253,43 @@ def add():
 @login_manager
 def admin_add_post():
     """Admin add"""
-    if current_user.admin or current_user.modderator:
-        if request.form['type'] == 'subject':
+    if current_user.is_admin:
             try:
-                if Subject.query.filter(func.lower(Subject.name) == func.lower(
-                        request.form['title'])).first():
+                con, conn = connection()
+                con.execute("SELECT idusergroup FROM usergroup WHERE lower(name) = lower(%s)", escape_string(request.form['title']))
+                if con.fetchone():
                     flash("Dany przedmiot juz istnieje", 'warning')
                 else:
-                    subject = Subject()
-                    subject.name = request.form['title']
-                    DB.session.add(subject)
-                    DB.session.commit()
-                    flash('Dodano przedmiot!', 'success')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-        elif request.form['type'] == 'topic':
-            try:
-                if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(
-                        request.form['title']), Topic.subject_id == request.form['subject'])
-                                     ).first():
-                    flash("Dany dzial juz istnieje", 'warning')
-                else:
-                    topic = Topic()
-                    topic.name = request.form['title']
-                    topic.subject_id = request.form['subject']
-                    DB.session.add(topic)
-                    DB.session.commit()
-                    flash('Dodano dzial!', 'success')
+                    print(request.form['parent_id'])
+                    con.execute("SELECT idusergroup FROM usergroup_membership WHERE iduser = %s AND idusergroup = %s", (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
+                    group = con.fetchone()
+                    if group or request.form['parent_id']==0:
+                        con.execute("INSERT INTO usergroup (name, description, parent_id) VALUES (%s, %s, %s)", (escape_string(request.form['title']), escape_string(request.form['title']), escape_string(request.form['parent_id'] if 'parent_id' in request.form else 0)))
+                        conn.commit()
+                        con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(con.lastrowid))))
+                        flash('Dodano przedmiot!', 'success')
+                    else:
+                        flash("Wystąpił błąd w zapytaniu", 'warning')
+                con.close()
+                conn.close()
             except Exception as e:
                 flash('Blad: '+str(e), 'danger')
     else:
         flash('Nie mozesz tego zrobic', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route('/admin/add/', methods=["GET"])
 @login_manager
 def admin_add_get():
     """Admin add"""
-    if current_user.admin or current_user.modderator:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        return render_template('admin_add.html', subjects=subjects, topics=topics)
+    if current_user.is_admin:
+        con, conn = connection()
+        con.execute("SELECT idusergroup, name, parent_id FROM usergroup_membership WHERE iduser = %s", escape_string(str(current_user['iduser'])))
+        subjects = con.fetchall()
+        return render_template('admin_add.html', subjects=subjects)
     else:
         flash("Nie masz uprawnien", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 @APP.route('/admin/notes/')
 @login_manager
