@@ -14,7 +14,12 @@ from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
 from dbconnect import connection
 from pymysql import escape_string
+from sentry_sdk import last_event_id
 
+
+@APP.errorhandler(500)
+def server_error_handler(error):
+    return render_template("500.html", sentry_event_id=last_event_id()), 500
 
 __author__ = 'Patryk Niedzwiedzinski'
 
