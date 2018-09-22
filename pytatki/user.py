@@ -94,6 +94,8 @@ def update_email():
             con, conn = connection()
             con.execute("UPDATE user SET email_confirm = 0, email = %s WHERE iduser = %s", (escape_string(str(request.form['email'])), escape_string(str(current_user['iduser']))))
             conn.commit()
+            con.close()
+            conn.close()
             send_confirmation_email(request.form['email'])
     except Exception as e:
         flash('Blad: ' + str(e), 'danger')
@@ -103,16 +105,14 @@ def update_email():
 @APP.route('/user/update-password/', methods=['POST'])
 @login_manager
 def update_password():
-    #try:
-        #user = User.query.filter_by(id=current_user.id).first()
-        #if user.check_password(request.form['password']):
-            #user.password = sha256_crypt.encrypt((str(request.form['new-password'])))
-            #DB.session.commit()
-    #except Exception as e:
-        #flash('Blad: ' + str(e), 'danger')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    if current_user.check_password(request.form['password']):
+        con, conn = connection()
+        password = sha256_crypt.encrypt((str(request.form['new-password'])))
+        con.execute("UPDATE user SET password = %s WHERE iduser = %s", (escape_string(password), escape_string(str(current_user['iduser']))))
+        conn.commit()
+        con.close()
+        conn.close()
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
 @APP.route('/register/', methods=["POST"])
@@ -159,7 +159,7 @@ def register_post():
         con.close()
         conn.close()
         gc.collect()
-        #send_confirmation_email(user)
+        send_confirmation_email(form['email'])
         return redirect(url_for('login_get', next=request.args.get('next'), username=form['username']))
     else:
         flash("Jestes juz zalogowany!", 'warning')
