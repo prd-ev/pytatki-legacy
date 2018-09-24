@@ -1,17 +1,29 @@
 import React from "react";
-import data from "../static/notatki.json";
 import AddNote from "./AddNote.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      notatki: data,
+      notatki: null,
       subjects: null,
       current_subject: null,
       current_topic: null
     };
   }
+
+componentWillMount(){
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if(xhttp.status === 200) {
+      console.log(xhttp.responseText);
+    }
+    return 0;
+  };
+  xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getRootFolders(id_usergroup:1,id_user:1)}');
+  xhttp.send();
+}
+
 
   updateNotes = updated_notes => {
     this.setState((prevState, props) => ({ notatki: updated_notes }));
@@ -26,16 +38,7 @@ class Notatki extends React.Component {
   };
 
   packSubjects = () => {
-    let subjects = [];
-    let subjects_temp = [];
-    for (let temp_value of this.state.notatki) {
-      if (temp_value != null) {
-        if (subjects_temp.indexOf(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) < 0) {
-          subjects_temp.push(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)));
-        }
-      }
-    }
-    for (let value of subjects_temp) {
+    for (let value of this.state.subjects) {
       subjects.push(<h1 className={value} onClick={this.changeCurrentSubject} key={value}>
         {value}
       </h1>);
