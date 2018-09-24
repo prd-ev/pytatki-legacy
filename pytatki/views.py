@@ -234,10 +234,8 @@ def add():
                 print(filename)
                 if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename)):
                     if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
-                        print("create dir")
                         os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
-                    print("dir created")
-                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
+                    request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
