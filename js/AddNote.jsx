@@ -18,9 +18,11 @@ class AddNote extends React.Component {
     let updated_notes = this.props.notatki;
     let topic_notes_list = [];
     for (let value of updated_notes) {
-      if (document.getElementById("subject").value === value.substring(value.indexOf("/") + 1, value.indexOf("/", 1))) {
-        if (document.getElementById("topic").value === value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/"))) {
-          topic_notes_list.push(value.substring(value.lastIndexOf("/") + 1));
+      if (value != null) {      
+        if (document.getElementById("subject").value === value.substring(value.indexOf("/") + 1, value.indexOf("/", 1))) {
+          if (document.getElementById("topic").value === value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/"))) {
+            topic_notes_list.push(value.substring(value.lastIndexOf("/") + 1));
+          }
         }
       }
     }
@@ -32,11 +34,11 @@ class AddNote extends React.Component {
         document.getElementById("new-topic").value != "") {
 
         new_note += document.getElementById("new-subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
-      } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic").value != "") {
+      } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") != null) {
         new_note += document.getElementById("subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
-      } else if (document.getElementById("new-topic").value == "" || document.getElementById("new-subject").value == "") {
+      } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") == null || document.getElementById("subject").value === new_subject_message && document.getElementById("new-subject") == null) {
         // handle no input
-        new_note = null;
+        return 0;
       } else {
         new_note += document.getElementById("subject").value + "/" + document.getElementById("topic").value + "/" + document.getElementById("note").value;
       }
@@ -70,8 +72,10 @@ class AddNote extends React.Component {
     let subject_options_temp = [];
     let subject_options = [];
     for (let temp_value of this.props.notatki) {
-      if (subject_options_temp.indexOf(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) < 0) {
-        subject_options_temp.push(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)));
+      if (temp_value != null) {
+        if (subject_options_temp.indexOf(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) < 0) {
+          subject_options_temp.push(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)));
+        }
       }
     }
     for (let value of subject_options_temp) {

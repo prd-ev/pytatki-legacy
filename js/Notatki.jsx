@@ -14,23 +14,25 @@ class Notatki extends React.Component {
   }
 
   updateNotes = updated_notes => {
-    this.setState((prevState, props) => ({notatki: updated_notes}));
+    this.setState((prevState, props) => ({ notatki: updated_notes }));
   };
 
   changeCurrentSubject = e => {
-    this.setState({current_subject: e.target.className, current_topic: null});
+    this.setState({ current_subject: e.target.className, current_topic: null });
   };
 
   changeCurrentTopic = e => {
-    this.setState({current_topic: e.target.className});
+    this.setState({ current_topic: e.target.className });
   };
 
   packSubjects = () => {
     let subjects = [];
     let subjects_temp = [];
     for (let temp_value of this.state.notatki) {
-      if (subjects_temp.indexOf(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) < 0) {
-        subjects_temp.push(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)));
+      if (temp_value != null) {
+        if (subjects_temp.indexOf(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) < 0) {
+          subjects_temp.push(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)));
+        }
       }
     }
     for (let value of subjects_temp) {
@@ -45,8 +47,10 @@ class Notatki extends React.Component {
     let topics_temp = [];
     let topics = [];
     for (let temp_value of this.state.notatki) {
-      if (topics_temp.indexOf(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/"))) < 0 && temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)) === this.state.current_subject) {
-        topics_temp.push(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/")));
+      if (temp_value != null) {
+        if (topics_temp.indexOf(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/"))) < 0 && temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)) === this.state.current_subject) {
+          topics_temp.push(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/")));
+        }
       }
     }
     for (let value of topics_temp) {
@@ -60,8 +64,10 @@ class Notatki extends React.Component {
   packNotes = () => {
     let notatki = [];
     for (let value of this.state.notatki) {
-      if (value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/")) === this.state.current_topic) {
-        notatki.push(<h3 key={value}>{value.substring(value.lastIndexOf("/") + 1)}</h3>);
+      if (value != null) {
+        if (value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/")) === this.state.current_topic) {
+          notatki.push(<h3 key={value}>{value.substring(value.lastIndexOf("/") + 1)}</h3>);
+        }
       }
     }
     return notatki;
@@ -69,7 +75,7 @@ class Notatki extends React.Component {
 
   render() {
     return (<div>
-      <AddNote notatki={this.state.notatki} update={this.updateNotes}/> {this.packSubjects()}
+      <AddNote notatki={this.state.notatki} update={this.updateNotes} /> {this.packSubjects()}
       {this.packTopics()}
       {this.packNotes()}
     </div>);
