@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS `pytatki`.`note` (
   `note_type_id` INT NOT NULL,
   `user_id` INT NOT NULL,
   `usergroup_id` INT NOT NULL,
+  `status_id` INT NOT NULL,
   PRIMARY KEY (`idnote`),
   INDEX `fk_note_note_type1_idx` (`note_type_id` ASC),
   INDEX `fk_note_user1_idx` (`user_id` ASC),
@@ -218,7 +219,7 @@ CREATE TABLE IF NOT EXISTS `pytatki`.`note_tags` (`idnote` INT, `tag_id` INT, `'
 DROP TABLE IF EXISTS `pytatki`.`usergroup_membership`;
 USE `pytatki`;
 CREATE  OR REPLACE VIEW `usergroup_membership` AS
-SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image_path FROM user a, usergroup b, user_membership c WHERE a.id_user = c.user_id AND b.idusergroup = c.usergroup_id;
+SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image_path, b.parent_id FROM user a, usergroup b, user_membership c WHERE a.iduser = c.user_id AND b.idusergroup = c.usergroup_id;
 
 -- -----------------------------------------------------
 -- View `pytatki`.`note_view`
@@ -226,7 +227,7 @@ SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image
 DROP TABLE IF EXISTS `pytatki`.`note_view`;
 USE `pytatki`;
 CREATE  OR REPLACE VIEW `note_view` AS
-SELECT a.idnote, a.value, a.title, b.name AS 'note_type', a.user_id AS 'creator_id',  c.login AS 'creator_login', a.usergroup_id, d.name AS 'usergroup_name' FROM note a, note_type b, user c, usergroup d WHERE a.note_type_id = b.idnote_type AND a.user_id = c.iduser AND a.usergroup_id = d.idusergroup;
+SELECT a.idnote, a.value, a.title, b.name AS 'note_type', a.user_id AS 'creator_id',  c.login AS 'creator_login', a.usergroup_id AS 'parent_id', d.name AS 'parent_name' FROM note a, note_type b, user c, usergroup d WHERE a.note_type_id = b.idnote_type AND a.user_id = c.iduser AND a.usergroup_id = d.idusergroup;
 
 -- -----------------------------------------------------
 -- View `pytatki`.`action_view`

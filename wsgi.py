@@ -1,6 +1,7 @@
 #!./venv/bin python3
 from pytatki.views import *
 from pytatki.user import *
+from pytatki.api.graphql import *
 from main import APP
 import time
 
