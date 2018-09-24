@@ -6,7 +6,7 @@
 <script>
     function select_check(){
         if (document.getElementById('topic-type').selected){
-            var $html = $('<select class="custom-select" id="subject" name="subject">{%for subject in subjects%}<option value="{{subject.id}}">{{subject.name}}</option>{%endfor%}</select>');
+            var $html = $('<select class="custom-select" id="parent_id" name="parent_id">{%for subject in subjects%}<option value="{{subject["idusergroup"]}}">{{subject.name}}</option>{%endfor%}</select>');
             str = $html.prop('outerHTML');
             document.getElementById('choose-subject').innerHTML = str;
         }
@@ -27,8 +27,8 @@
             <div class="form-group">
                 <label for="type">Wybierz kategorię</label>
                 <select form="add-form" class="custom-select" id="type" name="type" onchange="select_check()">
-                  <option id="subject-type" value="subject">Przedmiot</option>
-                  <option id='topic-type' value="topic">Dział</option>
+                  <option id="subject-type" value="subject">New Parent</option>
+                  <option id='topic-type' value="topic">New Child</option>
                 </select>
             </div>
             <div class="form-group" id="choose-subject">
