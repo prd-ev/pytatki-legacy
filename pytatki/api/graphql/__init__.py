@@ -68,3 +68,4 @@ MutationRootType = GraphQLObjectType(
 schema = GraphQLSchema(QueryRootType, MutationRootType)
 
 APP.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema))
+APP.add_url_rule('/graphiql', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))

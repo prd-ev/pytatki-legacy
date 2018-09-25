@@ -3,7 +3,7 @@ import os
 import gc
 from datetime import datetime
 from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, send_file, g, jsonify
+from flask import render_template, redirect, request, session, flash, send_file, g
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
@@ -14,7 +14,12 @@ from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
 from dbconnect import connection
 from pymysql import escape_string
+from sentry_sdk import last_event_id
 
+
+@APP.errorhandler(500)
+def server_error_handler(error):
+    return render_template("500.html", sentry_event_id=last_event_id()), 500
 
 __author__ = 'Patryk Niedzwiedzinski'
 
@@ -36,32 +41,90 @@ ALLOWED_EXTENSIONS = set([
     'cpp',
     ])
 
-def find_usergroup_children(id_usergroup, id_user):
-    """Generate dict with recurent children of usergroup"""
+def has_access_to_notegroup(id_notegroup, id_user):
+    """Returns true if user has access to notegroup, else false"""
     con, conn = connection()
-    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-    user_in_group = con.fetchone()
+    con.execute("SELECT iduser FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (escape_string(str(id_user)), escape_string(str(id_notegroup))))
+    returnValue =  con.fetchone()
     con.close()
     conn.close()
+    if returnValue:
+        return True
+    False
+
+def has_access_to_usergroup(id_usergroup, id_user):
+    """Returns true if user has access to usergroup, else false"""
+    con, conn = connection()
+    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+    returnValue =  con.fetchone()
+    con.close()
+    conn.close()
+    if returnValue:
+        return True
+    False
+
+def find_notegroup_children(id_notegroup, id_user):
+    """Generate dict with recurent children of usergroup"""
+    if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
+        return "ID must be a valid positive integer"
     childrens = []
-    if user_in_group:
+    if has_access_to_notegroup(id_notegroup, id_user):
         con, conn = connection()
-        con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        con.execute("SELECT idnotegroup, name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_notegroup))))
         usergroups = con.fetchall()
-        con.execute("SELECT * FROM note_view WHERE parent_id = %s",
-                    escape_string(str(id_usergroup)))
+        con.execute("SELECT * FROM note_view WHERE notegroup_id = %s",
+                    escape_string(str(id_notegroup)))
         notes = con.fetchall()
         con.close()
         conn.close()
         if usergroups:
             for usergroup in usergroups:
-                usergroup.update(find_usergroup_children(
-                    usergroup['idusergroup'], id_user))
                 childrens.append(usergroup)
         if notes:
             for note in notes:
                 childrens.append(note)
     return dict({"childrens": childrens})
+
+
+def has_access_to_note(id_note, id_user):
+    """Check if user has access to note"""
+    con, conn = connection()
+    con.execute("SELECT notegroup_id FROM note WHERE idnote = %s",
+                escape_string(str(id_note)))
+    note = con.fetchone()
+    con.execute("SELECT 1 FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (escape_string(str(id_user)), escape_string(str(note['notegroup_id']))))
+    has_access = con.fetchone()
+    con.close()
+    conn.close()
+    if has_access:
+        return True
+    return False
+
+
+def get_note(id_note, id_user):
+    """Get note by id"""
+    if has_access_to_note(id_note, id_user):
+        con, conn = connection()
+        con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                    escape_string(str(id_note)))
+        note = con.fetchone()
+        con.close()
+        conn.close()
+        return note
+
+def get_root_id(id_usergroup, id_user):
+    """Get if of root directory in usergroup"""
+    if has_access_to_usergroup(id_usergroup, id_user):
+        con, conn = connection()
+        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        root_id = con.fetchone()['idnotegroup']
+        con.close()
+        conn.close()
+        return root_id
+    return "User has no access"
 
 @APP.route('/')
 def homepage():
@@ -73,9 +136,10 @@ def homepage():
 @APP.route('/app/')
 def app_view():
     if current_user.is_authenticated:
-        content = str(find_usergroup_children(1, current_user['iduser']))
+        content = find_usergroup_children(1, current_user['iduser'])
+        #return jsonify(content)
         print(content)
-        return render_template("homepage.html", subject=None, topics=None, notes=None)
+        return render_template("homepage.html", subject=None, topics=None, notes=None, content=content)
     return redirect('/')
 
 @APP.route('/about/')
@@ -129,10 +193,10 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-        query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
+        query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
         note = con.fetchone()
         if query:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.json()['statuses']['removed_id'])), escape_string(identifier)))
+            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(str(CONFIG.json()['statuses']['removed_id'])), escape_string(str(identifier))))
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
@@ -214,7 +278,6 @@ def allowed_file(filename):
 def add():
     """Add new note"""
     if request.method == 'POST':
-        try:
             form = request.form
             if 'file' not in request.files:
                 flash('Blad: No file part', 'danger')
@@ -226,9 +289,11 @@ def add():
             if request_file:
                 if allowed_file(request_file.filename):
                     filename = secure_filename(request_file.filename)
+                print(filename)
+                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename)):
                     if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
                         os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
-                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
+                    request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
@@ -243,9 +308,6 @@ def add():
             conn.close()
             flash('Notatka zostala dodana!', 'success')
             return redirect(request.args.get('next') if 'next' in request.args else '/#'+str(form['topic']))
-        except Exception as error:
-            flash("Blad: " + str(error), 'danger')
-            return redirect(request.args.get('next') if 'next' in request.args else '/')
     else:
         con, conn = connection()
         con.execute("SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE b.parent_id = a.idusergroup) AND a.iduser = %s", escape_string(str(current_user['iduser'])))
@@ -269,9 +331,11 @@ def admin_add_post():
                     con.execute("SELECT idusergroup FROM usergroup_membership WHERE iduser = %s AND idusergroup = %s", (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
                     group = con.fetchone()
                     if group or request.form['parent_id']==0:
+                        conn.begin()
                         con.execute("INSERT INTO usergroup (name, description, parent_id) VALUES (%s, %s, %s)", (escape_string(request.form['title']), escape_string(request.form['title']), escape_string(request.form['parent_id'] if 'parent_id' in request.form else 0)))
+                        group_id = con.lastrowid
+                        con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(group_id))))
                         conn.commit()
-                        con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(con.lastrowid))))
                         flash('Dodano przedmiot!', 'success')
                     else:
                         flash("Wystąpił błąd w zapytaniu", 'warning')
@@ -291,20 +355,12 @@ def admin_add_get():
         con, conn = connection()
         con.execute("SELECT idusergroup, name, parent_id FROM usergroup_membership WHERE iduser = %s", escape_string(str(current_user['iduser'])))
         subjects = con.fetchall()
+        con.close()
+        conn.close()
         return render_template('admin_add.html', subjects=subjects)
     else:
         flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
-
-def has_access_to_note(id_note, id_user):
-    """Check if user has access to note"""
-    con, conn = connection()
-    con.execute("SELECT usergroup_id FROM note WHERE idnote = %s", escape_string(str(id_note)))
-    note = con.fetchone()
-    con.execute("SELECT 1 FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(note['usergroup_id']))))
-    if con.fetchone():
-        return True
-    return False
 
 @APP.route('/download/<identifier>/')
 @login_manager

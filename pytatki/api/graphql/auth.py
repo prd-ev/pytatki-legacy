@@ -1,6 +1,6 @@
 from flask import g
 from flask_httpauth import HTTPBasicAuth
-from src.models import User
+from pytatki.models import User
 from passlib.hash import sha256_crypt
 from dbconnect import connection
 from pymysql import escape_string
@@ -18,7 +18,6 @@ def verify_password(username, password):
     conn.close()
     if not user or not sha256_crypt.verify(password, user['password']):
         return False
-    g.user = user
     return True
 
 
