@@ -18,7 +18,7 @@ def resolve_raises(*_):
 
 def executeSQL(query):
     con, conn = connection()
-    con.execute(query)
+    con.execute(escape_string(query))
     result = con.fetchone()
     con.close()
     conn.close()

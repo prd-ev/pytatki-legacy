@@ -12,11 +12,12 @@ class Notatki extends React.Component {
   }
 
   componentWillMount() {
-      var xhttp = new XMLHttpRequest();
+    var xhttp = new XMLHttpRequest();
     xhttp.onload = function () {
       if (xhttp.status === 200) {
-        this.setState({subjects: xhttp.responseText.split(" ")});
+        //this.setState({ subjects: xhttp.responseText.split(" ") });
       }
+      this.setState({ subjects: ['Matematyka', 'Programowanie', 'To działa'] });//mock
       return 0;
     }.bind(this);
     xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getRootFolders(id_usergroup:1,id_user:1)}');
@@ -29,10 +30,30 @@ class Notatki extends React.Component {
   };
 
   changeCurrentSubject = e => {
-    this.setState({ current_subject: e.target.className, current_topic: null });
+    var xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+      if (xhttp.status === 200) {
+        //this.setState({ topics: xhttp.responseText.split(",") });
+      }
+      this.setState({ topics: ['Metafizyka', 'Sarmatyzm', 'Dworski'] });//mock
+      return 0;
+    }.bind(this);
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getTopicsByParentId(parent_id:1,id_usergroup:1,id_user:1)}');
+    xhttp.send();
+    this.setState({ current_subject: e.target.className, current_topic: null, notes: null });
   };
 
   changeCurrentTopic = e => {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+      if (xhttp.status === 200) {
+        //this.setState({ notes: xhttp.responseText.split(" ") });
+      }
+      this.setState({ notes: ['Notatka1', 'Notatka2', 'Notatka3'] });//mock
+      return 0;
+    }.bind(this);
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getNotesByParentId(parent_id:1,id_usergroup:1,id_user:1)}');
+    xhttp.send();
     this.setState({ current_topic: e.target.className });
   };
 
@@ -46,42 +67,43 @@ class Notatki extends React.Component {
       }
       return subjects;
     }
-    return 0;
+    return null;
   };
 
   packTopics = () => {
-    if (this.state.notatki) {
+    if (this.state.topics) {
       let topics = [];
-      for (let value of topics_temp) {
+      for (let value of this.state.topics) {
         topics.push(<h2 className={value} onClick={this.changeCurrentTopic} key={value}>
           {value}
         </h2>);
       }
       return topics;
     }
-    return 0;
+    return null;
   };
 
   packNotes = () => {
-    if (this.state.notatki) {
+    if (this.state.notes) {
       let notatki = [];
-      for (let value of this.state.notatki) {
+      for (let value of this.state.notes) {
         notatki.push(<h3 className={value} onClick={this.changeCurrentTopic} key={value}>
           {value}
         </h3>);
       }
       return notatki;
     }
-    return 0;
+    return null;
   };
 
   render() {
     return (<div>
-      <AddNote subjects={this.state.subjects} update={this.updateNotes} /> {this.packSubjects()}
+      <AddNote subjects={this.state.subjects} update={this.updateNotes} />
+      {this.packSubjects()}
       {this.packTopics()}
       {this.packNotes()}
     </div>);
-  }
+  };
 }
 
 export default Notatki;

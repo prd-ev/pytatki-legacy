@@ -7,7 +7,8 @@ class AddNote extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      current_topics: [],
+      topics: null,
+      current_topics: null,
       subject_input: false,
       topic_input: false
     };
@@ -17,123 +18,114 @@ class AddNote extends React.Component {
     e.preventDefault();
     let updated_notes = this.props.notatki;
     let topic_notes_list = [];
-    for (let value of updated_notes) {
-      if (value != null) {      
-        if (document.getElementById("subject").value === value.substring(value.indexOf("/") + 1, value.indexOf("/", 1))) {
-          if (document.getElementById("topic").value === value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/"))) {
-            topic_notes_list.push(value.substring(value.lastIndexOf("/") + 1));
-          }
-        }
-      }
-    }
 
     if (!topic_notes_list.includes(document.getElementById("note").value)) {
-      var new_note = "/"
       if (document.getElementById("subject").value === new_subject_message &&
-        document.getElementById("new-subject").value != "" &&
-        document.getElementById("new-topic").value != "") {
-
-        new_note += document.getElementById("new-subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
+        document.getElementById("new-subject") != null &&
+        document.getElementById("new-topic") != null) {
+        //do new subject-topic-note
       } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") != null) {
-        new_note += document.getElementById("subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
+        //do new topic-note
       } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") == null || document.getElementById("subject").value === new_subject_message && document.getElementById("new-subject") == null) {
-        // handle no input
-        return 0;
+        //do nothing
+        return null;
       } else {
-        new_note += document.getElementById("subject").value + "/" + document.getElementById("topic").value + "/" + document.getElementById("note").value;
+        //do new note
       }
-      updated_notes = [
-        ...updated_notes,
-        new_note
-      ];
       document.getElementById("note").value = "";
     }
     this.props.update(updated_notes);
   };
 
   packTopicOptions = () => {
-    if (this.props.topics){
-      let topic_options = [];   
-      for (let value of this.props.topics) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+      if (xhttp.status === 200) {
+        //this.setState({ notes: xhttp.responseText.split(" ") });
+      }
+      let result = ['Notatka1', 'Notatka2', 'Notatka3'];
+      let topic_options = [];
+      for (let value of result) {
         topic_options.push(<option key={value}>{value}</option>);
       }
       topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
-      if (this.state.current_topics !== topic_options) {
-        this.setState({ current_topics: topic_options });
-      }
+      this.setState({ topics: topic_options });
+    }.bind(this);
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getTopicsByParentId(parent_id:1,id_usergroup:1,id_user:1)}');
+    xhttp.send();
+
+};
+
+componentDidMount(){
+  this.packTopicOptions();
+}
+
+packSubjectOptions = () => {
+  if (this.props.subjects) {
+    let subject_options = [];
+    for (let value of this.props.subjects) {
+      subject_options.push(<option key={value}>{value}</option>);
     }
-  };
+    subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
+    return subject_options;
+  }
+  return 0;
+};
 
-  packSubjectOptions = () => {
-    if(this.props.subjects){
 
-      let subject_options = [];
-      for (let value of this.props.subjects) {
-        subject_options.push(<option key={value}>{value}</option>);
-      }
-      subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
-      return subject_options;
-    }
-    return 0;
-  };
-
-  componentDidMount() {
-    this.packTopicOptions();
+subjectChange = () => {
+  this.packTopicOptions();
+  if (document.getElementById("subject").value === new_subject_message) {
+    this.setState({ subject_input: true, topic_input: true });
+  } else {
+    this.setState({ subject_input: false, topic_input: false });
   }
 
-  subjectChange = () => {
-    this.packTopicOptions();
-    if (document.getElementById("subject").value === new_subject_message) {
-      this.setState({ subject_input: true, topic_input: true });
-    } else {
-      this.setState({ subject_input: false, topic_input: true });
-    }
+};
 
-  };
+topicChange = () => {
+  if (document.getElementById("topic").value === new_topic_message) {
+    this.setState({ topic_input: true });
+  } else {
+    this.setState({ topic_input: false });
+  }
+};
 
-  topicChange = () => {
-    if (document.getElementById("topic").value === new_topic_message) {
-      this.setState({ topic_input: true });
-    } else {
-      this.setState({ topic_input: false });
-    }
-  };
+newSubjectInput = () => {
+  if (this.state.subject_input) {
+    return <input type="text" id="new-subject" />;
+  }
+};
 
-  newSubjectInput = () => {
-    if (this.state.subject_input) {
-      return <input type="text" id="new-subject" />;
-    }
-  };
+newTopicInput = () => {
+  if (this.state.topic_input) {
+    return <input type="text" id="new-topic" />;
+  }
+};
 
-  newTopicInput = () => {
-    if (this.state.topic_input) {
-      return <input type="text" id="new-topic" />;
-    }
-  };
-
-  render() {
-    return (<div style={{
-      marginTop: "100px"
-    }}>
-      <form onSubmit={this.handleSubmit}>
-        Przedmiot
+render() {
+  return (<div style={{
+    marginTop: "100px"
+  }}>
+    <form onSubmit={this.handleSubmit}>
+      Przedmiot
         <select id="subject" onChange={this.subjectChange}>
-          {this.packSubjectOptions()}
-        </select>
-        {this.newSubjectInput()}
-        Dział
+        {this.packSubjectOptions()}
+      </select>
+      {this.newSubjectInput()}
+      Dział
         <select id="topic" onChange={this.topicChange}>
-          {this.state.current_topics}
-        </select>
-        {this.newTopicInput()}
-        Nazwa notatki
+        {this.state.topics}
+      </select>
+      {this.newTopicInput()}
+      Nazwa notatki
         <input type="text" id="note" />
-        Dodaj plik
+      Dodaj plik
         <input type="file" required="required" />
-        <input type="submit" value="Dodaj notatkę" />
-      </form>
-    </div>);
-  }
+      <input type="submit" value="Dodaj notatkę" />
+    </form>
+  </div>);
+}
 }
 
 export default AddNote;
