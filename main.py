@@ -6,13 +6,6 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask import Flask
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
-
-sentry_sdk.init(
-    dsn="https://8fd621a0050d43e993c78fa1764ba1be@sentry.io/1286329",
-    integrations=[FlaskIntegration()]
-)
 
 __author__ = 'Patryk Niedzwiedzinski'
 
