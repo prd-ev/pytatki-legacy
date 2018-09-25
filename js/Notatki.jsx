@@ -15,7 +15,7 @@ class Notatki extends React.Component {
       var xhttp = new XMLHttpRequest();
     xhttp.onload = function () {
       if (xhttp.status === 200) {
-        this.setState({subjects: xhttp.responseText});
+        this.setState({subjects: xhttp.responseText.split(" ")});
       }
       return 0;
     }.bind(this);
@@ -77,7 +77,7 @@ class Notatki extends React.Component {
 
   render() {
     return (<div>
-      <AddNote notatki={this.state.notatki} update={this.updateNotes} /> {this.packSubjects()}
+      <AddNote subjects={this.state.subjects} update={this.updateNotes} /> {this.packSubjects()}
       {this.packTopics()}
       {this.packNotes()}
     </div>);
