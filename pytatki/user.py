@@ -75,7 +75,7 @@ def confirm_email(token):
     try:
         email = ts.loads(token, salt="email-confirm-key", max_age=86400)
         con, conn = connection()
-        user = con.execute(
+        con.execute(
             "UPDATE user SET email_confirm = 1 WHERE email = (%s)", escape_string(email))
         conn.commit()
         flash("Adres email zweryfikowany!", 'success')

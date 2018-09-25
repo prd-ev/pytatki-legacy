@@ -3,7 +3,7 @@ import os
 import gc
 from datetime import datetime
 from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, send_file, g, jsonify
+from flask import render_template, redirect, request, session, flash, send_file, g
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
@@ -297,6 +297,8 @@ def admin_add_get():
         con, conn = connection()
         con.execute("SELECT idusergroup, name, parent_id FROM usergroup_membership WHERE iduser = %s", escape_string(str(current_user['iduser'])))
         subjects = con.fetchall()
+        con.close()
+        conn.close()
         return render_template('admin_add.html', subjects=subjects)
     else:
         flash("Nie masz uprawnien", 'warning')
