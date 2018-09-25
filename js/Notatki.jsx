@@ -12,17 +12,19 @@ class Notatki extends React.Component {
   }
 
   componentWillMount() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onload = function () {
-      if (xhttp.status === 200) {
-        //this.setState({ subjects: xhttp.responseText.split(" ") });
-        console.log(xhttp.responseText);
-      }
-      this.setState({ subjects: ['Matematyka', 'Programowanie', 'To działa'] });//mock
-      return 0;
-    }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
-    xhttp.send();
+    fetch('http://127.0.0.1:5000/graphql?query={getRootId(id_usergroup:3,id_user:1)}')
+      .then(response => response.json())
+      .then(myJson => fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:' + JSON.stringify(myJson) + ',id_user:1)}'))
+      .then(response => response.json())
+      .then(myJson => JSON.parse(myJson.data.getContent))
+      .then(function (innerJson) {
+        let result = [];
+        for (const notegroup of innerJson.childrens) {
+          result.push(notegroup.name);
+        };
+        this.setState({ subjects: result });
+      })
+      .catch(error => console.log(error));
   }
 
 
@@ -31,33 +33,37 @@ class Notatki extends React.Component {
   };
 
   changeCurrentSubject = e => {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onload = function () {
-      if (xhttp.status === 200) {
-        //this.setState({ topics: xhttp.responseText.split(",") });
-        console.log(xhttp.responseText);
-      }
-      this.setState({ topics: ['Metafizyka', 'Sarmatyzm', 'Dworski'] });//mock
-      return 0;
-    }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
-    xhttp.send();
-    this.setState({ current_subject: e.target.className, current_topic: null, notes: null });
+    fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}')
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (myJson) {
+        return JSON.parse(myJson.data.getContent);
+      })
+      .then(function (innerJson) {
+        let result = [];
+        for (const notegroup of innerJson.childrens) {
+          result.push(notegroup.name);
+        };
+        this.setState({ subjects: result });
+      });
   };
 
   changeCurrentTopic = e => {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onload = function () {
-      if (xhttp.status === 200) {
-        //this.setState({ notes: xhttp.responseText.split(" ") });
-        console.log(xhttp.responseText);
-      }
-      this.setState({ notes: ['Notatka1', 'Notatka2', 'Notatka3'] });//mock
-      return 0;
-    }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
-    xhttp.send();
-    this.setState({ current_topic: e.target.className });
+    fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}')
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (myJson) {
+        return JSON.parse(myJson.data.getContent);
+      })
+      .then(function (innerJson) {
+        let result = [];
+        for (const notegroup of innerJson.childrens) {
+          result.push(notegroup.name);
+        };
+        this.setState({ subjects: result });
+      });
   };
 
   packSubjects = () => {
