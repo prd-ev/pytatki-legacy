@@ -5,24 +5,23 @@ class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      notatki: null,
       subjects: null,
       current_subject: null,
       current_topic: null
     };
   }
 
-componentWillMount(){
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if(xhttp.status === 200) {
-      console.log(xhttp.responseText);
-    }
-    return 0;
-  };
-  xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getRootFolders(id_usergroup:1,id_user:1)}');
-  xhttp.send();
-}
+  componentWillMount() {
+      var xhttp = new XMLHttpRequest();
+    xhttp.onload = function () {
+      if (xhttp.status === 200) {
+        this.setState({subjects: xhttp.responseText});
+      }
+      return 0;
+    }.bind(this);
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getRootFolders(id_usergroup:1,id_user:1)}');
+    xhttp.send();
+  }
 
 
   updateNotes = updated_notes => {
@@ -38,42 +37,42 @@ componentWillMount(){
   };
 
   packSubjects = () => {
-    for (let value of this.state.subjects) {
-      subjects.push(<h1 className={value} onClick={this.changeCurrentSubject} key={value}>
-        {value}
-      </h1>);
+    if (this.state.subjects) {
+      var subjects = [];
+      for (let value of this.state.subjects) {
+        subjects.push(<h1 className={value} onClick={this.changeCurrentSubject} key={value}>
+          {value}
+        </h1>);
+      }
+      return subjects;
     }
-    return subjects;
+    return 0;
   };
 
   packTopics = () => {
-    let topics_temp = [];
-    let topics = [];
-    for (let temp_value of this.state.notatki) {
-      if (temp_value != null) {
-        if (topics_temp.indexOf(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/"))) < 0 && temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)) === this.state.current_subject) {
-          topics_temp.push(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/")));
-        }
+    if (this.state.notatki) {
+      let topics = [];
+      for (let value of topics_temp) {
+        topics.push(<h2 className={value} onClick={this.changeCurrentTopic} key={value}>
+          {value}
+        </h2>);
       }
+      return topics;
     }
-    for (let value of topics_temp) {
-      topics.push(<h2 className={value} onClick={this.changeCurrentTopic} key={value}>
-        {value}
-      </h2>);
-    }
-    return topics;
+    return 0;
   };
 
   packNotes = () => {
-    let notatki = [];
-    for (let value of this.state.notatki) {
-      if (value != null) {
-        if (value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/")) === this.state.current_topic) {
-          notatki.push(<h3 key={value}>{value.substring(value.lastIndexOf("/") + 1)}</h3>);
-        }
+    if (this.state.notatki) {
+      let notatki = [];
+      for (let value of this.state.notatki) {
+        notatki.push(<h3 className={value} onClick={this.changeCurrentTopic} key={value}>
+          {value}
+        </h3>);
       }
+      return notatki;
     }
-    return notatki;
+    return 0;
   };
 
   render() {

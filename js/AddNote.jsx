@@ -52,37 +52,29 @@ class AddNote extends React.Component {
   };
 
   packTopicOptions = () => {
-    let topic_options_temp = [];
-    let topic_options = [];
-    for (let temp_value of this.props.notatki) {
-      if (topic_options_temp.indexOf(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/"))) < 0 && document.getElementById("subject").value == temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) {
-        topic_options_temp.push(temp_value.substring(temp_value.indexOf("/", 1) + 1, temp_value.lastIndexOf("/")));
+    if (this.props.topics){
+      let topic_options = [];   
+      for (let value of this.props.topics) {
+        topic_options.push(<option key={value}>{value}</option>);
       }
-    }
-    for (let value of topic_options_temp) {
-      topic_options.push(<option key={value}>{value}</option>);
-    }
-    topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
-    if (this.state.current_topics !== topic_options) {
-      this.setState({ current_topics: topic_options });
+      topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
+      if (this.state.current_topics !== topic_options) {
+        this.setState({ current_topics: topic_options });
+      }
     }
   };
 
   packSubjectOptions = () => {
-    let subject_options_temp = [];
-    let subject_options = [];
-    for (let temp_value of this.props.notatki) {
-      if (temp_value != null) {
-        if (subject_options_temp.indexOf(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1))) < 0) {
-          subject_options_temp.push(temp_value.substring(temp_value.indexOf("/") + 1, temp_value.indexOf("/", 1)));
-        }
+    if(this.props.subjects){
+
+      let subject_options = [];
+      for (let value of this.props.subjects) {
+        subject_options.push(<option key={value}>{value}</option>);
       }
+      subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
+      return subject_options;
     }
-    for (let value of subject_options_temp) {
-      subject_options.push(<option key={value}>{value}</option>);
-    }
-    subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
-    return subject_options;
+    return 0;
   };
 
   componentDidMount() {
