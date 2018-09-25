@@ -41,32 +41,90 @@ ALLOWED_EXTENSIONS = set([
     'cpp',
     ])
 
-def find_usergroup_children(id_usergroup, id_user):
-    """Generate dict with recurent children of usergroup"""
+def has_access_to_notegroup(id_notegroup, id_user):
+    """Returns true if user has access to notegroup, else false"""
     con, conn = connection()
-    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-    user_in_group = con.fetchone()
+    con.execute("SELECT iduser FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (escape_string(str(id_user)), escape_string(str(id_notegroup))))
+    returnValue =  con.fetchone()
     con.close()
     conn.close()
+    if returnValue:
+        return True
+    False
+
+def has_access_to_usergroup(id_usergroup, id_user):
+    """Returns true if user has access to usergroup, else false"""
+    con, conn = connection()
+    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+    returnValue =  con.fetchone()
+    con.close()
+    conn.close()
+    if returnValue:
+        return True
+    False
+
+def find_notegroup_children(id_notegroup, id_user):
+    """Generate dict with recurent children of usergroup"""
+    if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
+        return "ID must be a valid positive integer"
     childrens = []
-    if user_in_group:
+    if has_access_to_notegroup(id_notegroup, id_user):
         con, conn = connection()
-        con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        con.execute("SELECT idnotegroup, name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_notegroup))))
         usergroups = con.fetchall()
-        con.execute("SELECT * FROM note_view WHERE parent_id = %s",
-                    escape_string(str(id_usergroup)))
+        con.execute("SELECT * FROM note_view WHERE notegroup_id = %s",
+                    escape_string(str(id_notegroup)))
         notes = con.fetchall()
         con.close()
         conn.close()
         if usergroups:
             for usergroup in usergroups:
-                usergroup.update(find_usergroup_children(
-                    usergroup['idusergroup'], id_user))
                 childrens.append(usergroup)
         if notes:
             for note in notes:
                 childrens.append(note)
     return dict({"childrens": childrens})
+
+
+def has_access_to_note(id_note, id_user):
+    """Check if user has access to note"""
+    con, conn = connection()
+    con.execute("SELECT notegroup_id FROM note WHERE idnote = %s",
+                escape_string(str(id_note)))
+    note = con.fetchone()
+    con.execute("SELECT 1 FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (escape_string(str(id_user)), escape_string(str(note['notegroup_id']))))
+    has_access = con.fetchone()
+    con.close()
+    conn.close()
+    if has_access:
+        return True
+    return False
+
+
+def get_note(id_note, id_user):
+    """Get note by id"""
+    if has_access_to_note(id_note, id_user):
+        con, conn = connection()
+        con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                    escape_string(str(id_note)))
+        note = con.fetchone()
+        con.close()
+        conn.close()
+        return note
+
+def get_root_id(id_usergroup, id_user):
+    """Get if of root directory in usergroup"""
+    if has_access_to_usergroup(id_usergroup, id_user):
+        con, conn = connection()
+        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        root_id = con.fetchone()['idnotegroup']
+        con.close()
+        conn.close()
+        return root_id
+    return "User has no access"
 
 @APP.route('/')
 def homepage():
@@ -303,16 +361,6 @@ def admin_add_get():
     else:
         flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
-
-def has_access_to_note(id_note, id_user):
-    """Check if user has access to note"""
-    con, conn = connection()
-    con.execute("SELECT usergroup_id FROM note WHERE idnote = %s", escape_string(str(id_note)))
-    note = con.fetchone()
-    con.execute("SELECT 1 FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(str(id_user)), escape_string(str(note['usergroup_id']))))
-    if con.fetchone():
-        return True
-    return False
 
 @APP.route('/download/<identifier>/')
 @login_manager
