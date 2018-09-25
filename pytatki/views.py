@@ -331,4 +331,8 @@ def download(identifier):
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
+@APP.route('/notatki/')
+def react():
+	return render_template('index.html')
+
 APP.secret_key = CONFIG.secret_key
