@@ -14,7 +14,12 @@ from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
 from dbconnect import connection
 from pymysql import escape_string
+from sentry_sdk import last_event_id
 
+
+@APP.errorhandler(500)
+def server_error_handler(error):
+    return render_template("500.html", sentry_event_id=last_event_id()), 500
 
 __author__ = 'Patryk Niedzwiedzinski'
 
@@ -73,9 +78,10 @@ def homepage():
 @APP.route('/app/')
 def app_view():
     if current_user.is_authenticated:
-        content = str(find_usergroup_children(1, current_user['iduser']))
+        content = find_usergroup_children(1, current_user['iduser'])
+        #return jsonify(content)
         print(content)
-        return render_template("homepage.html", subject=None, topics=None, notes=None)
+        return render_template("homepage.html", subject=None, topics=None, notes=None, content=content)
     return redirect('/')
 
 @APP.route('/about/')
@@ -129,10 +135,10 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-        query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
+        query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
         note = con.fetchone()
         if query:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(int(CONFIG.json()['statuses']['removed_id'])), escape_string(identifier)))
+            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s", (escape_string(str(CONFIG.json()['statuses']['removed_id'])), escape_string(str(identifier))))
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
@@ -214,7 +220,6 @@ def allowed_file(filename):
 def add():
     """Add new note"""
     if request.method == 'POST':
-        try:
             form = request.form
             if 'file' not in request.files:
                 flash('Blad: No file part', 'danger')
@@ -226,9 +231,11 @@ def add():
             if request_file:
                 if allowed_file(request_file.filename):
                     filename = secure_filename(request_file.filename)
+                print(filename)
+                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename)):
                     if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
                         os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
-                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
+                    request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
                 else:
                     flash('Nieobslugiwane rozszerzenie', 'warning')
                     return redirect(request.url)
@@ -243,9 +250,6 @@ def add():
             conn.close()
             flash('Notatka zostala dodana!', 'success')
             return redirect(request.args.get('next') if 'next' in request.args else '/#'+str(form['topic']))
-        except Exception as error:
-            flash("Blad: " + str(error), 'danger')
-            return redirect(request.args.get('next') if 'next' in request.args else '/')
     else:
         con, conn = connection()
         con.execute("SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE b.parent_id = a.idusergroup) AND a.iduser = %s", escape_string(str(current_user['iduser'])))
@@ -269,9 +273,11 @@ def admin_add_post():
                     con.execute("SELECT idusergroup FROM usergroup_membership WHERE iduser = %s AND idusergroup = %s", (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
                     group = con.fetchone()
                     if group or request.form['parent_id']==0:
+                        conn.begin()
                         con.execute("INSERT INTO usergroup (name, description, parent_id) VALUES (%s, %s, %s)", (escape_string(request.form['title']), escape_string(request.form['title']), escape_string(request.form['parent_id'] if 'parent_id' in request.form else 0)))
+                        group_id = con.lastrowid
+                        con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(group_id))))
                         conn.commit()
-                        con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (escape_string(str(current_user['iduser'])), escape_string(str(con.lastrowid))))
                         flash('Dodano przedmiot!', 'success')
                     else:
                         flash("Wystąpił błąd w zapytaniu", 'warning')

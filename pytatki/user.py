@@ -57,7 +57,7 @@ def user_info(username):
 
 def send_confirmation_email(email):
     token = ts.dumps(email, salt='email-confirm-key')
-    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[user.email])
+    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[email])
     msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
