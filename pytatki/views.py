@@ -136,7 +136,7 @@ def homepage():
 @APP.route('/app/')
 def app_view():
     if current_user.is_authenticated:
-        content = find_usergroup_children(1, current_user['iduser'])
+        content = find_notegroup_children(1, current_user['iduser'])
         #return jsonify(content)
         print(content)
         return render_template("homepage.html", subject=None, topics=None, notes=None, content=content)
@@ -382,5 +382,6 @@ def download(identifier):
 @APP.route('/notatki/')
 def react():
 	return render_template('index.html')
+
 
 APP.secret_key = CONFIG.secret_key
