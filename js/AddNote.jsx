@@ -42,6 +42,7 @@ class AddNote extends React.Component {
     xhttp.onload = function () {
       if (xhttp.status === 200) {
         //this.setState({ notes: xhttp.responseText.split(" ") });
+        console.log(xhttp.responseText);
       }
       let result = ['Notatka1', 'Notatka2', 'Notatka3'];
       let topic_options = [];
@@ -51,7 +52,7 @@ class AddNote extends React.Component {
       topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
       this.setState({ topics: topic_options });
     }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getTopicsByParentId(parent_id:1,id_usergroup:1,id_user:1)}');
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
     xhttp.send();
 
 };

@@ -6,7 +6,7 @@ from pymysql import escape_string
 import gc
 import json
 
-from pytatki.views import find_usergroup_children
+from pytatki.views import find_notegroup_children, get_note, get_root_id
 
 from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLNonNull, GraphQLObjectType
 from graphql.type.scalars import GraphQLString, GraphQLInt
@@ -28,28 +28,30 @@ def executeSQL(query):
 QueryRootType = GraphQLObjectType(
     name='QueryRoot',
     fields={
-        'getUser': GraphQLField(
+        'getContent': GraphQLField(
             type=GraphQLString,
             args={
-                'ident': GraphQLArgument(GraphQLInt)
+                'id_notegroup': GraphQLArgument(GraphQLInt),
+                'id_user': GraphQLArgument(GraphQLInt)
             },
-            resolver=lambda obj, info, ident: executeSQL("SELECT * FROM user WHERE iduser = %i" % ident)
+            resolver=lambda obj, info, id_notegroup, id_user: find_notegroup_children(id_notegroup, id_user)
         ),
-        'getNoteByParentId': GraphQLField(
+        'getNoteById': GraphQLField(
             type=GraphQLString,
             args={
-                'parent_id': GraphQLArgument(GraphQLInt)
+                'id_note': GraphQLArgument(GraphQLInt),
+                'id_user': GraphQLArgument(GraphQLInt)
             },
-            resolver=lambda obj, info, parent_id: executeSQL("SELECT title FROM note_view WHERE parent_id = %i" % parent_id)
+            resolver=lambda obj, info, id_note, id_user: get_note(id_note, id_user)
         ),
-        'getRootFolders': GraphQLField(
+        'getRootId': GraphQLField(
             type=GraphQLString,
             args={
                 'id_usergroup': GraphQLArgument(GraphQLInt),
                 'id_user': GraphQLArgument(GraphQLInt)
             },
-            resolver=lambda obj, info, id_usergroup, id_user: find_usergroup_children(id_usergroup, id_user)
-        )
+            resolver=lambda obj, info, id_usergroup, id_user: get_root_id(id_usergroup, id_user)
+        )   
     }
 )
 

@@ -16,11 +16,12 @@ class Notatki extends React.Component {
     xhttp.onload = function () {
       if (xhttp.status === 200) {
         //this.setState({ subjects: xhttp.responseText.split(" ") });
+        console.log(xhttp.responseText);
       }
       this.setState({ subjects: ['Matematyka', 'Programowanie', 'To działa'] });//mock
       return 0;
     }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getRootFolders(id_usergroup:1,id_user:1)}');
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
     xhttp.send();
   }
 
@@ -34,11 +35,12 @@ class Notatki extends React.Component {
     xhttp.onload = function () {
       if (xhttp.status === 200) {
         //this.setState({ topics: xhttp.responseText.split(",") });
+        console.log(xhttp.responseText);
       }
       this.setState({ topics: ['Metafizyka', 'Sarmatyzm', 'Dworski'] });//mock
       return 0;
     }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getTopicsByParentId(parent_id:1,id_usergroup:1,id_user:1)}');
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
     xhttp.send();
     this.setState({ current_subject: e.target.className, current_topic: null, notes: null });
   };
@@ -48,11 +50,12 @@ class Notatki extends React.Component {
     xhttp.onload = function () {
       if (xhttp.status === 200) {
         //this.setState({ notes: xhttp.responseText.split(" ") });
+        console.log(xhttp.responseText);
       }
       this.setState({ notes: ['Notatka1', 'Notatka2', 'Notatka3'] });//mock
       return 0;
     }.bind(this);
-    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getNotesByParentId(parent_id:1,id_usergroup:1,id_user:1)}');
+    xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:1,id_user:1)}');
     xhttp.send();
     this.setState({ current_topic: e.target.className });
   };
