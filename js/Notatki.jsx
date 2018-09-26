@@ -12,7 +12,10 @@ class Notatki extends React.Component {
   }
 
   componentWillMount() {
-    fetch('http://127.0.0.1:5000/graphql?query={getRootId(id_usergroup:3,id_user:1)}')
+    fetch('http://127.0.0.1:5000/graphql?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,access_token:'+ token +')}'))
       .then(response => response.json())
       .then(myJson => fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:' + JSON.stringify(myJson) + ',id_user:1)}'))
       .then(response => response.json())
@@ -33,7 +36,9 @@ class Notatki extends React.Component {
   };
 
   changeCurrentSubject = e => {
-    fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}')
+    fetch('http://127.0.0.1:5000/graphql?query={getToken)}')
+      .then(response => console.log(response))
+      .then(fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
