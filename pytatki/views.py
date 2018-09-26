@@ -40,6 +40,14 @@ ALLOWED_EXTENSIONS = set([
     'cpp',
     ])
 
+def type_id(type_name):
+    con, conn = connection()
+    con.execute("SELECT idnote_type FROM note_type WHERE name = %s", escape_string(type_name))
+    file_type = con.fetchone()
+    con.close()
+    conn.close()
+    return file_type['idnote_type']
+
 def has_access_to_notegroup(id_notegroup, id_user):
     """Returns true if user has access to notegroup, else false"""
     con, conn = connection()
@@ -73,7 +81,7 @@ def find_notegroup_children(id_notegroup, id_user):
         con, conn = connection()
         con.execute("SELECT idnotegroup, name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_notegroup))))
         usergroups = con.fetchall()
-        con.execute("SELECT * FROM note_view WHERE notegroup_id = %s",
+        con.execute("SELECT idnote, value, note_type, creator_login, notegroup_id, usergroup_name, title AS 'name' FROM note_view WHERE notegroup_id = %s",
                     escape_string(str(id_notegroup)))
         notes = con.fetchall()
         con.close()
@@ -118,12 +126,60 @@ def get_root_id(id_usergroup, id_user):
     """Get if of root directory in usergroup"""
     if has_access_to_usergroup(id_usergroup, id_user):
         con, conn = connection()
-        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-        root_id = con.fetchone()['idnotegroup']
+        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s AND parent_id = 0", (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        root_id = con.fetchone()
+        if not root_id:
+            return "No root folder" + str(id_user)
+        root_id = root_id['idnotegroup']
         con.close()
         conn.close()
         return root_id
-    return "User has no access"
+    return "Access denied"
+
+def add_tag_to_note(tag, id_note, id_user):
+    """Add tag to note, if tag doesn't exist create new"""
+    if has_access_to_note(id_note, id_user):
+        con, conn = connection()
+        con.execute("SELECT * FROM tag WHERE name = %s", escape_string(tag))
+        tag = con.fetchone()
+        if not tag:
+            conn.begin()
+            con.execute("INSERT INTO tag (name) VALUES (%s)", escape_string(tag))
+            tag_id = con.lastrowid
+            conn.commit()
+        else:
+            tag_id = tag['idtag']
+        conn.begin()
+        con.execute("INSERT INTO tagging (note_id, tag_id) VALUES (%s, %s)",
+                    (escape_string(str(id_note)), escape_string(str(tag_id))))
+        conn.commit()
+        con.execute("SELECT * FROM note_tags WHERE idnote = %s", escape_string(str(id_note)))
+        note = con.fetchone()
+        con.close()
+        conn.close()
+        return note
+
+def postNote(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user=1):
+    """Post a note to database"""
+    if not has_access_to_notegroup(id_notegroup, id_user):
+        return "Access denied"
+    if type_name == "file":
+        return "File type is not supported via GraphQL"
+    con, conn = connection()
+    con.execute("SELECT idnote FROM note WHERE title = %s AND notegroup_id = %s", (escape_string(title), escape_string(str(id_notegroup))))
+    used_name = con.fetchone()
+    if used_name:
+        con.close()
+        conn.close()
+        return "Cannot add note: used title"
+    conn.begin()
+    con.execute("INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, %s)", (escape_string(value), escape_string(title), escape_string(str(type_id(type_name))), escape_string(str(id_user)), escape_string(str(id_notegroup))))
+    note_id = con.lastrowid
+    con.execute("INSERT INTO action (content, user_id, note_id) VALUES (\"Create\", %s, %s)", (escape_string(str(id_user)), escape_string(str(note_id))))
+    conn.commit()
+    con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(note_id)))
+    note = con.fetchone()
+    return note
 
 @APP.route('/')
 def homepage():

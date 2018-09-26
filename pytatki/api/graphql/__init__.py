@@ -6,7 +6,7 @@ from pymysql import escape_string
 import gc
 import json
 from flask_login import current_user
-from pytatki.views import find_notegroup_children, get_note, get_root_id
+from pytatki.views import find_notegroup_children, get_note, get_root_id, postNote, add_tag_to_note
 
 from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLNonNull, GraphQLObjectType
 from graphql.type.scalars import GraphQLString, GraphQLInt
@@ -15,7 +15,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer, BadSignature, Signatur
 from functools import wraps
 
 
-def generate_access_token(id_user, expiration=600):
+def generate_access_token(id_user, expiration=3600):
     s = TimedJSONWebSignatureSerializer(APP.secret_key, expires_in=expiration)
     return s.dumps({'id': id_user})
 
@@ -93,6 +93,11 @@ QueryRootType = GraphQLObjectType(
         'getToken': GraphQLField(
             type=GraphQLString,
             resolver=lambda obj, info: generate_access_token(current_user['iduser']).decode('ascii') if current_user.is_authenticated else "You need to authenticate this app"
+        ),
+        'checkToken': GraphQLField(
+            type=GraphQLString,
+            args={'access_token': GraphQLArgument(GraphQLString)},
+            resolver=lambda obj, info, access_token: verify_auth_token(access_token)
         )
     }
 )
@@ -103,11 +108,33 @@ MutationRootType = GraphQLObjectType(
         'writeTest': GraphQLField(
             type=QueryRootType,
             resolver=lambda *_: QueryRootType
+        ),
+        'postNote': GraphQLField(
+            type=GraphQLString,
+            args={
+                'title': GraphQLArgument(GraphQLString),
+                'type': GraphQLArgument(GraphQLString),
+                'value': GraphQLArgument(GraphQLString),
+                'destination_folder_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, title, type, value, destination_folder_id, access_token: postNote(
+                title, type, value, destination_folder_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'addTagToNote': GraphQLField(
+            type=GraphQLString,
+            args={
+                'tag': GraphQLArgument(GraphQLString),
+                'note_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, tag, note_id, access_token: add_tag_to_note(
+                tag, note_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         )
     }
 )
 
 schema = GraphQLSchema(QueryRootType, MutationRootType)
 
-APP.add_url_rule('/api', view_func=GraphQLView.as_view('graphql', schema=schema))
-APP.add_url_rule('/graphiql', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
+APP.add_url_rule('/api/', view_func=GraphQLView.as_view('api', schema=schema))
+APP.add_url_rule('/graphiql/', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
