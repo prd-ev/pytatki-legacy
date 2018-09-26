@@ -9,13 +9,12 @@
             {% if app['access'] == 'rw' %}wyświetlania i edycji{% elif app['access'] == 'r' %}wyświetlania{% elif app['access'] == 'w' %}edycji{% endif %}
         </p><br/>
         {% if not current_user.is_authenticated %}
-            Wystąpił błąd
-            <a href="/login"><div class="btn btn-primary btn-block">Zaloguj się</div></a>
+            <a href="/login?next={{request.url}}"><div class="btn btn-primary btn-block">Zaloguj się</div></a>
         {% else %}
         <form method="POST" action="{{request.url}}"><input type="submit" class="btn btn-primary btn-block" value="Kontunuuj jako {{current_user['login']}}">
         </input>
         </form>
-        <a href="/logout/"><small>To nie ja</small></a>
+        <a href="/logout/?next={{request.url}}"><small>To nie ja</small></a>
         {% endif %}
 
     </div>
