@@ -7,6 +7,7 @@ class Notatki extends React.Component {
     this.state = {
       subjects: null,
       topics: null,
+      notes: null
     };
   }
 
@@ -17,7 +18,7 @@ class Notatki extends React.Component {
       .then(res => res.data.getToken)
       .then(token => fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:3,access_token:"' + token + '")}')
         .then(response => response.json())
-        .then(myJson => (myJson.data.getRootId))
+        .then(myJson => myJson.data.getRootId)
         .then(myJson => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + Number(myJson) + ',access_token:"' + token + '")}'))
         .then(response => response.json())
         .then(myJson => JSON.parse(myJson.data.getContent))
@@ -26,7 +27,7 @@ class Notatki extends React.Component {
         let result = [];
         for (let notegroup of innerJson) {
           let object = {};
-          object["title"] = notegroup.title;
+          object["title"] = notegroup.name;
           if (notegroup.idnote) {
             object["key"] = notegroup.idnote;
           } else {
@@ -57,7 +58,7 @@ class Notatki extends React.Component {
         let result = [];
         for (let notegroup of innerJson) {
           let object = {};
-          object["title"] = notegroup.title;
+          object["title"] = notegroup.name;
           if (notegroup.idnote) {
             object["key"] = notegroup.idnote;
           } else {
@@ -82,16 +83,9 @@ class Notatki extends React.Component {
       .then(function (innerJson) {
         let result = [];
         for (let notegroup of innerJson) {
-          let object = {};
-          object["title"] = notegroup.title;
-          if (notegroup.idnote) {
-            object["key"] = notegroup.idnote;
-          } else {
-            object["key"] = notegroup.idnotegroup;
-          }
-          result.push(object);
+          result.push(notegroup.name);
         };
-        that.setState({ topics: result });
+        that.setState({ notes: result });
       })
       .catch(error => console.log(error));
   };
@@ -126,7 +120,7 @@ class Notatki extends React.Component {
     if (this.state.notes) {
       let notatki = [];
       for (let value of this.state.notes) {
-        notatki.push(<h3 onClick={this.changeCurrentTopic} key={value}>
+        notatki.push(<h3 key={value}>
           {value}
         </h3>);
       }
