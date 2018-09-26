@@ -92,7 +92,7 @@ QueryRootType = GraphQLObjectType(
         ),
         'getToken': GraphQLField(
             type=GraphQLString,
-            resolver=lambda obj, info: generate_access_token(current_user['iduser']) if current_user.is_authenticated else "You need to authenticate this app"
+            resolver=lambda obj, info: generate_access_token(current_user['iduser']).decode('ascii') if current_user.is_authenticated else "You need to authenticate this app"
         )
     }
 )
@@ -109,5 +109,5 @@ MutationRootType = GraphQLObjectType(
 
 schema = GraphQLSchema(QueryRootType, MutationRootType)
 
-APP.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema))
+APP.add_url_rule('/api', view_func=GraphQLView.as_view('graphql', schema=schema))
 APP.add_url_rule('/graphiql', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
