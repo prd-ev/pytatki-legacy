@@ -47,8 +47,8 @@ class AddNote extends React.Component {
       })
       .then(function (innerJson) {
         let result = [];
-        for (const note of innerJson.childrens) {
-          result.push(note.name);
+        for (const notegroup of innerJson) {
+          result.push(notegroup.name);
         };
         let topic_options = [];
         for (let value of result) {

@@ -19,7 +19,7 @@ class Notatki extends React.Component {
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
         let result = [];
-        for (const notegroup of innerJson.childrens) {
+        for (const notegroup of innerJson) {
           result.push(notegroup.name);
         };
         this.setState({ subjects: result });
@@ -34,15 +34,11 @@ class Notatki extends React.Component {
 
   changeCurrentSubject = e => {
     fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}')
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (myJson) {
-        return JSON.parse(myJson.data.getContent);
-      })
+      .then(response => response.json())
+      .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
         let result = [];
-        for (const notegroup of innerJson.childrens) {
+        for (const notegroup of innerJson) {
           result.push(notegroup.name);
         };
         this.setState({ subjects: result });
@@ -59,7 +55,7 @@ class Notatki extends React.Component {
       })
       .then(function (innerJson) {
         let result = [];
-        for (const notegroup of innerJson.childrens) {
+        for (const notegroup of innerJson) {
           result.push(notegroup.name);
         };
         this.setState({ subjects: result });
