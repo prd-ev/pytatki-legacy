@@ -6,26 +6,35 @@ class Notatki extends React.Component {
     super(props);
     this.state = {
       subjects: null,
-      current_subject: null,
-      current_topic: null
+      topics: null,
     };
   }
 
   componentWillMount() {
-    fetch('http://127.0.0.1:5000/graphql?query={getToken}')
+    const that = this;
+    fetch('http://127.0.0.1:5000/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,access_token:'+ token +')}'))
-      .then(response => response.json())
-      .then(myJson => fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:' + JSON.stringify(myJson) + ',id_user:1)}'))
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getContent))
+      .then(token => fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:3,access_token:"' + token + '")}')
+        .then(response => response.json())
+        .then(myJson => (myJson.data.getRootId))
+        .then(myJson => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + Number(myJson) + ',access_token:"' + token + '")}'))
+        .then(response => response.json())
+        .then(myJson => JSON.parse(myJson.data.getContent))
+      )
       .then(function (innerJson) {
         let result = [];
-        for (const notegroup of innerJson) {
-          result.push(notegroup.name);
+        for (let notegroup of innerJson) {
+          let object = {};
+          object["title"] = notegroup.title;
+          if (notegroup.idnote) {
+            object["key"] = notegroup.idnote;
+          } else {
+            object["key"] = notegroup.idnotegroup;
+          }
+          result.push(object);
         };
-        this.setState({ subjects: result });
+        that.setState({ subjects: result });
       })
       .catch(error => console.log(error));
   }
@@ -36,43 +45,63 @@ class Notatki extends React.Component {
   };
 
   changeCurrentSubject = e => {
-    fetch('http://127.0.0.1:5000/graphql?query={getToken)}')
-      .then(response => console.log(response))
-      .then(fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}'))
+    let selected_subject = e.target.id;
+    const that = this;
+    fetch('http://127.0.0.1:5000/api?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_subject + ',access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
         let result = [];
-        for (const notegroup of innerJson) {
-          result.push(notegroup.name);
+        for (let notegroup of innerJson) {
+          let object = {};
+          object["title"] = notegroup.title;
+          if (notegroup.idnote) {
+            object["key"] = notegroup.idnote;
+          } else {
+            object["key"] = notegroup.idnotegroup;
+          }
+          result.push(object);
         };
-        this.setState({ subjects: result });
-      });
+        that.setState({ topics: result });
+      })
+      .catch(error => console.log(error));
   };
 
   changeCurrentTopic = e => {
-    fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}')
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (myJson) {
-        return JSON.parse(myJson.data.getContent);
-      })
+    let selected_topic = e.target.id;
+    const that = this;
+    fetch('http://127.0.0.1:5000/api?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_topic + ',access_token:"' + token + '")}'))
+      .then(response => response.json())
+      .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
         let result = [];
-        for (const notegroup of innerJson) {
-          result.push(notegroup.name);
+        for (let notegroup of innerJson) {
+          let object = {};
+          object["title"] = notegroup.title;
+          if (notegroup.idnote) {
+            object["key"] = notegroup.idnote;
+          } else {
+            object["key"] = notegroup.idnotegroup;
+          }
+          result.push(object);
         };
-        this.setState({ subjects: result });
-      });
+        that.setState({ topics: result });
+      })
+      .catch(error => console.log(error));
   };
 
   packSubjects = () => {
     if (this.state.subjects) {
       var subjects = [];
       for (let value of this.state.subjects) {
-        subjects.push(<h1 className={value} onClick={this.changeCurrentSubject} key={value}>
-          {value}
+        subjects.push(<h1 onClick={this.changeCurrentSubject} id={value.key} key={value.key}>
+          {value.title}
         </h1>);
       }
       return subjects;
@@ -84,8 +113,8 @@ class Notatki extends React.Component {
     if (this.state.topics) {
       let topics = [];
       for (let value of this.state.topics) {
-        topics.push(<h2 className={value} onClick={this.changeCurrentTopic} key={value}>
-          {value}
+        topics.push(<h2 onClick={this.changeCurrentTopic} id={value.key} key={value.key}>
+          {value.title}
         </h2>);
       }
       return topics;
@@ -97,7 +126,7 @@ class Notatki extends React.Component {
     if (this.state.notes) {
       let notatki = [];
       for (let value of this.state.notes) {
-        notatki.push(<h3 className={value} onClick={this.changeCurrentTopic} key={value}>
+        notatki.push(<h3 onClick={this.changeCurrentTopic} key={value}>
           {value}
         </h3>);
       }

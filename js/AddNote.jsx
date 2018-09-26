@@ -38,25 +38,22 @@ class AddNote extends React.Component {
   };
 
   packTopicOptions = () => {
-    fetch('http://127.0.0.1:5000/graphql?query={getContent(id_notegroup:2,id_user:1)}')
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (myJson) {
-        return JSON.parse(myJson.data.getContent);
-      })
+    const that = this;
+    fetch('http://127.0.0.1:5000/api?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:2,access_token:"' + token + '")}'))
+      .then(response => response.json())
+      .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
-        let result = [];
-        for (const notegroup of innerJson) {
-          result.push(notegroup.name);
-        };
         let topic_options = [];
-        for (let value of result) {
-          topic_options.push(<option key={value}>{value}</option>);
-        }
+        for (let notegroup of innerJson) {
+          topic_options.push(<option key={notegroup.idnotegroup}>{notegroup.name}</option>);
+        };
         topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
-        this.setState({ topics: topic_options });
-      });
+        that.setState({ topics: topic_options });
+      })
+      .catch(error => console.log(error));
   };
 
   componentDidMount() {
@@ -67,7 +64,7 @@ class AddNote extends React.Component {
     if (this.props.subjects) {
       let subject_options = [];
       for (let value of this.props.subjects) {
-        subject_options.push(<option key={value}>{value}</option>);
+        subject_options.push(<option key={value.key}>{value.title}</option>);
       }
       subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
       return subject_options;
