@@ -24,6 +24,7 @@ class Notatki extends React.Component {
         .then(myJson => JSON.parse(myJson.data.getContent))
       )
       .then(function (innerJson) {
+        console.log(innerJson);
         let result = [];
         for (let notegroup of innerJson) {
           let object = {};
