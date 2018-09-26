@@ -17,6 +17,9 @@ from config import CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, login_required
 from itsdangerous import URLSafeTimedSerializer
+from pytatki.api.graphql import generate_access_token
+from werkzeug.wrappers import Response
+
 
 
 ts = URLSafeTimedSerializer(CONFIG.secret_key)
@@ -218,3 +221,33 @@ def logout():
     """Logout"""
     logout_user()
     return redirect('/')
+
+@login_required
+@APP.route('/api/dialog/auth/', methods=['GET'])
+def get_token_get():
+    next_url = request.args.get('next')
+    state = request.args.get('state')
+    con, conn = connection()
+    #con.execute("SELECT * FROM app_view WHERE client_id = %s",
+    #            escape_string(request.args.get('client_id')))
+    app = {'idapp': 1, 'name': 'GraphQL', 'access': 'rw'}
+    con.close()
+    conn.close()
+    return render_template("dialog/auth.html", app=app, next_url=next_url, state=state)
+
+@login_required
+@APP.route('/api/dialog/auth/', methods=['POST'])
+def get_token_post():
+    if not 'client_id' in request.args:
+        return "Something goes wrong"
+    next_url = request.args.get('next')
+    state = request.args.get('state')
+    con, conn = connection()
+    #con.execute("SELECT * FROM app_view WHERE client_id = %s", escape_string(request.args.get('client_id')))
+    app = {'idapp': 1, 'name': 'GraphQL', 'access': 'rw'}
+    con.close()
+    conn.close()
+    gc.collect()
+    response = Response()
+    response.headers={'auth_status': 'success', 'access_token': generate_access_token(current_user['iduser'])}
+    return redirect(next_url+'?state='+state, 302)

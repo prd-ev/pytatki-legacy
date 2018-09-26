@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang='pl'>
+
+<head>
+
+    <meta charset=utf-8>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=300, height=device-height, target-densitydpi=medium-dpi, user-scalable=no"
+    />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script>
+        $('.modal').on('shown.bs.modal', function () {
+            $(this).find('input:first').focus();
+        });
+    </script>
+</head>
+
+<body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}" {%if current_user.is_authenticated and page_id=='homepage'
+    %}onhashchange="check_hash()" onload="check_hash()" {%endif%}>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
+        <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
+            <span class="align-middle">Pytatki</span>
+            <span class="align-middle badge" style="border-color:#ffc107; color:#ffc107; border: 1px solid">alpha</span>
+        </a>
+        {% if page_id == 'register' or page_id == 'login' %} {% else %}
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-controls="navbarsExampleDefault"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+             {% block menu %}{% endblock %}
+        </div>
+        {% endif %}
+        </nav>
+        
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3"></div>
+                <div class="col-lg-6">
+                    <div id="messages">
+                        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+                        <div data-alert class="alert alert-{{category}} alert-dismissible show">
+                            {{ message|safe }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endfor %} {% endif %} {% endwith %}
+                    </div>
+                </div>
+                <div class="col-lg-6"></div>
+            </div>
+            {% block content %}{% endblock %}
+        </div>
+        {% if page_id != 'register' %}
+        <div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+            style="text-align: left;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zarejestruj się</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <form id="form" method=post action="/register/">
+                                <div class="form-group">
+                                    <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="" placeholder="Nazwa użytkownika">
+                                </div>
+                                <div class="form-group">
+                                    <input autocapitalize="none" class="form-control" id="email" name="email" type="email" value="" placeholder="Adres email">
+                                </div>
+                                <div class="form-group">
+                                    <input autocapitalize="none" class="form-control" id="reg_password" name="password" type="password" value="" placeholder="Hasło">
+                                    <ul id="pass" class="bg-white m-2 p-2 rounded" style="width: 80%; padding: .375rem .75rem; display: none; position: absolute; z-index: 999; -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);">
+                                        <li id="letter" class="text-danger ml-4">
+                                            <small class="form-text">
+                                                <b>Duże</b> i
+                                                <b>małe</b> litery</small>
+                                        </li>
+                                        <li id="number" class="text-danger ml-4">
+                                            <small class="form-text">
+                                                <b>Cyfry</b>
+                                            </small>
+                                        </li>
+                                        <li id="length" class="text-danger ml-4">
+                                            <small class="form-text">
+                                                <b>8</b> znaków</small>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="form-group">
+                                    <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password" value="" placeholder="Powtórz hasło">
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked">
+                                    <label class="form-check-label" for="accept_tos">
+                                        Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia 2018r.)
+                                    </label>
+                                </div>
+                                <br>
+                                <input id="submit" class="btn btn-primary" disabled="disabled" type=submit value="Zarejestruj się">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var form = document.getElementById("form");
+
+            var username = document.getElementById("username");
+            var email = document.getElementById("email");
+            var password = document.getElementById("reg_password");
+            var confirm = document.getElementById("confirm");
+            var letter = document.getElementById("letter");
+            var number = document.getElementById("number");
+            var length = document.getElementById("length");
+
+            var username_status = false;
+            var email_status = false;
+
+            var pass = { letter: false, number: false, length: false };
+            var pass_status = false;
+
+            var pass_confirm = false
+
+            password.onfocus = function () {
+                document.getElementById("pass").style.display = "block";
+                var lowerCaseLetters = /[a-z]/g;
+                var upperCaseLetters = /[A-Z]/g;
+                if (password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
+                    letter.classList.remove("text-danger");
+                    letter.classList.add("text-success");
+                    pass.letter = true;
+                } else {
+                    letter.classList.remove("text-success");
+                    letter.classList.add("text-danger");
+                    pass.letter = false;
+                }
+
+                var numbers = /[0-9]/g;
+                if (password.value.match(numbers)) {
+                    number.classList.remove("text-danger");
+                    number.classList.add("text-success");
+                    pass.number = true;
+                } else {
+                    number.classList.remove("text-success");
+                    number.classList.add("text-danger");
+                    pass.number = false;
+                }
+
+                if (password.value.length >= 8) {
+                    length.classList.remove("text-danger");
+                    length.classList.add("text-success");
+                    pass.length = true;
+                } else {
+                    length.classList.remove("text-success");
+                    length.classList.add("text-danger");
+                    pass.length = false;
+                }
+            }
+
+            password.onblur = function () {
+                document.getElementById("pass").style.display = "none";
+            }
+
+            password.onkeyup = function () {
+                var lowerCaseLetters = /[a-z]/g;
+                var upperCaseLetters = /[A-Z]/g;
+                if (password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
+                    letter.classList.remove("text-danger");
+                    letter.classList.add("text-success");
+                    pass.letter = true;
+                } else {
+                    letter.classList.remove("text-success");
+                    letter.classList.add("text-danger");
+                    pass.letter = false;
+                }
+
+                var numbers = /[0-9]/g;
+                if (password.value.match(numbers)) {
+                    number.classList.remove("text-danger");
+                    number.classList.add("text-success");
+                    pass.number = true;
+                } else {
+                    number.classList.remove("text-success");
+                    number.classList.add("text-danger");
+                    pass.number = false;
+                }
+
+                if (password.value.length >= 8) {
+                    length.classList.remove("text-danger");
+                    length.classList.add("text-success");
+                    pass.length = true;
+                } else {
+                    length.classList.remove("text-success");
+                    length.classList.add("text-danger");
+                    pass.length = false;
+                }
+            }
+
+            form.onchange = function () {
+
+                var lowerCaseLetters = /[a-z]/g;
+                var upperCaseLetters = /[A-Z]/g;
+                if (password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
+                    letter.classList.remove("text-danger");
+                    letter.classList.add("text-success");
+                    pass.letter = true;
+                } else {
+                    letter.classList.remove("text-success");
+                    letter.classList.add("text-danger");
+                    pass.letter = false;
+                }
+
+                var numbers = /[0-9]/g;
+                if (password.value.match(numbers)) {
+                    number.classList.remove("text-danger");
+                    number.classList.add("text-success");
+                    pass.number = true;
+                } else {
+                    number.classList.remove("text-success");
+                    number.classList.add("text-danger");
+                    pass.number = false;
+                }
+
+                if (password.value.length >= 8) {
+                    length.classList.remove("text-danger");
+                    length.classList.add("text-success");
+                    pass.length = true;
+                } else {
+                    length.classList.remove("text-success");
+                    length.classList.add("text-danger");
+                    pass.length = false;
+                }
+
+                if (pass.letter && pass.number && pass.length) {
+                    pass_status = true;
+                } else {
+                    pass_status = false;
+                }
+
+                if (password.value == confirm.value) {
+                    pass_confirm = true;
+                } else {
+                    pass_confirm = false;
+                }
+                if (email.value != "") {
+                    email_status = true;
+                } else {
+                    email_status = false;
+                }
+                if (email.value != "") {
+                    email_status = true;
+                } else {
+                    email_status = false;
+                }
+                if (username.value != "") {
+                    username_status = true;
+                } else {
+                    username_status = false;
+                }
+                console.log(pass_status, pass_confirm, username_status, email_status);
+                if (pass_status && pass_confirm && username_status && email_status) {
+                    document.getElementById("submit").disabled = "";
+                } else {
+                    document.getElementById("submit").disabled = "disabled";
+                }
+            }
+        </script> {%endif%} {% if page_id != 'login' %}
+        <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="text-align: left;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zaloguj się</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <form method=post action="/login/">
+                                <div class="form-group">
+                                    <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="" placeholder="Login lub email">
+                                </div>
+                                <div class="form-group">
+                                    <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło">
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                    <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
+                                </div>
+                                <input class="btn btn-primary" type=submit value="Zaloguj się">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {%endif%}
+        
+        </body>
+        
+        </html>
