@@ -79,7 +79,7 @@ def find_notegroup_children(id_notegroup, id_user):
     children = []
     if has_access_to_notegroup(id_notegroup, id_user):
         con, conn = connection()
-        con.execute("SELECT idnotegroup, name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_notegroup))))
+        con.execute("SELECT idnotegroup, folder_name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_notegroup))))
         usergroups = con.fetchall()
         con.execute("SELECT idnote, value, note_type, creator_login, notegroup_id, notegroup_name, title AS 'name' FROM note_view WHERE notegroup_id = %s",
                     escape_string(str(id_notegroup)))
