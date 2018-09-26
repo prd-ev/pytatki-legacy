@@ -24,11 +24,10 @@ class Notatki extends React.Component {
         .then(myJson => JSON.parse(myJson.data.getContent))
       )
       .then(function (innerJson) {
-        console.log(innerJson);
         let result = [];
         for (let notegroup of innerJson) {
           let object = {};
-          object["title"] = notegroup.name;
+          object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
             object["key"] = notegroup.idnote;
           } else {
@@ -59,7 +58,7 @@ class Notatki extends React.Component {
         let result = [];
         for (let notegroup of innerJson) {
           let object = {};
-          object["title"] = notegroup.name;
+          object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
             object["key"] = notegroup.idnote;
           } else {
