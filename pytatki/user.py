@@ -219,8 +219,11 @@ def login_get():
 @login_required
 def logout():
     """Logout"""
+    next = request.args.get('next') if 'next' in request.args else None
+    status = request.args.get('status') if 'status' in request.args else None
+    client_id = request.args.get('client_id') if 'client_id' in request.args else None
     logout_user()
-    return redirect('/')
+    return redirect(next if next else '/')
 
 @login_required
 @APP.route('/api/dialog/auth/', methods=['GET'])

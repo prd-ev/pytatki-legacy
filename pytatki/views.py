@@ -14,7 +14,7 @@ from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
 from dbconnect import connection
 from pymysql import escape_string
-
+import json
 
 @APP.errorhandler(500)
 def server_error_handler(error):
@@ -68,7 +68,7 @@ def find_notegroup_children(id_notegroup, id_user):
     """Generate dict with recurent children of usergroup"""
     if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
         return "ID must be a valid positive integer"
-    childrens = []
+    children = []
     if has_access_to_notegroup(id_notegroup, id_user):
         con, conn = connection()
         con.execute("SELECT idnotegroup, name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (escape_string(str(id_user)), escape_string(str(id_notegroup))))
@@ -80,11 +80,11 @@ def find_notegroup_children(id_notegroup, id_user):
         conn.close()
         if usergroups:
             for usergroup in usergroups:
-                childrens.append(usergroup)
+                children.append(usergroup)
         if notes:
             for note in notes:
-                childrens.append(note)
-    return dict({"childrens": childrens})
+                children.append(note)
+    return json.dumps(children, ensure_ascii=False)
 
 
 def has_access_to_note(id_note, id_user):
@@ -382,5 +382,8 @@ def download(identifier):
 def react():
 	return render_template('index.html')
 
+@APP.route('/graphql/')
+def graphql_explorer():
+    return render_template("graphql.html")
 
 APP.secret_key = CONFIG.secret_key
