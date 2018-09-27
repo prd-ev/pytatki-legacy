@@ -1,13 +1,12 @@
 import React from "react";
-import AddNote from "./AddNote.jsx";
+//import AddNote from "./AddNote.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      subjects: null,
-      topics: null,
-      notes: null
+      currentDepth: 0,
+      data: [],
     };
   }
 
@@ -24,28 +23,26 @@ class Notatki extends React.Component {
         .then(myJson => JSON.parse(myJson.data.getContent))
       )
       .then(function (innerJson) {
-        let result = [];
+        let rootFolders = [];
         for (let notegroup of innerJson) {
           let object = {};
           object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
-            object["key"] = notegroup.idnote;
+            object["key"] = "note" + notegroup.idnote;
           } else {
             object["key"] = notegroup.idnotegroup;
           }
-          result.push(object);
+          rootFolders.push(object);
         };
-        that.setState({ subjects: result });
+        let updated_data = that.state.data;
+        updated_data[0] = rootFolders;
+        that.setState({ data: updated_data });
       })
       .catch(error => console.log(error));
   }
 
 
-  updateNotes = updated_notes => {
-    this.setState((prevState, props) => ({ notatki: updated_notes }));
-  };
-
-  changeCurrentSubject = e => {
+  changeCurrentDirectory = e => {
     let selected_subject = e.target.id;
     const that = this;
     fetch('http://127.0.0.1:5000/api?query={getToken}')
@@ -55,86 +52,42 @@ class Notatki extends React.Component {
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
-        let result = [];
+        let content = [];
         for (let notegroup of innerJson) {
           let object = {};
           object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
-            object["key"] = notegroup.idnote;
+            object["key"] = "note" + notegroup.idnote;
           } else {
             object["key"] = notegroup.idnotegroup;
           }
-          result.push(object);
+          content.push(object);
         };
-        that.setState({ topics: result });
+        let updated_data = that.state.data;
+        updated_data[that.state.currentDepth + 1] = content;
+        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1 });
       })
       .catch(error => console.log(error));
   };
 
-  changeCurrentTopic = e => {
-    let selected_topic = e.target.id;
-    const that = this;
-    fetch('http://127.0.0.1:5000/api?query={getToken}')
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_topic + ',access_token:"' + token + '")}'))
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getContent))
-      .then(function (innerJson) {
-        let result = [];
-        for (let notegroup of innerJson) {
-          result.push(notegroup.name);
-        };
-        that.setState({ notes: result });
-      })
-      .catch(error => console.log(error));
-  };
-
-  packSubjects = () => {
-    if (this.state.subjects) {
-      var subjects = [];
-      for (let value of this.state.subjects) {
-        subjects.push(<h1 onClick={this.changeCurrentSubject} id={value.key} key={value.key}>
+  packContent = () => {
+    if (this.state.data[this.state.currentDepth]) {
+      var content = [];
+      for (let value of this.state.data[this.state.currentDepth]) {
+        content.push(<h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
           {value.title}
         </h1>);
       }
-      return subjects;
+      return content;
     }
     return null;
   };
 
-  packTopics = () => {
-    if (this.state.topics) {
-      let topics = [];
-      for (let value of this.state.topics) {
-        topics.push(<h2 onClick={this.changeCurrentTopic} id={value.key} key={value.key}>
-          {value.title}
-        </h2>);
-      }
-      return topics;
-    }
-    return null;
-  };
-
-  packNotes = () => {
-    if (this.state.notes) {
-      let notatki = [];
-      for (let value of this.state.notes) {
-        notatki.push(<h3 key={value}>
-          {value}
-        </h3>);
-      }
-      return notatki;
-    }
-    return null;
-  };
-
+  // That was first in render
+  //<AddNote rootFolders={this.state.rootFolders} update={this.updateNotes} />
   render() {
     return (<div>
-      <AddNote subjects={this.state.subjects} update={this.updateNotes} />
-      {this.packSubjects()}
-      {this.packTopics()}
-      {this.packNotes()}
+      {this.packContent()}
     </div>);
   };
 }

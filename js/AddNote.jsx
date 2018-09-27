@@ -61,9 +61,9 @@ class AddNote extends React.Component {
   }
 
   packSubjectOptions = () => {
-    if (this.props.subjects) {
+    if (this.props.rootFolders) {
       let subject_options = [];
-      for (let value of this.props.subjects) {
+      for (let value of this.props.rootFolders) {
         subject_options.push(<option key={value.key}>{value.title}</option>);
       }
       subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
