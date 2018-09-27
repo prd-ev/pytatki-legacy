@@ -7,6 +7,7 @@ class Notatki extends React.Component {
     this.state = {
       currentDepth: 0,
       data: [],
+      currentPath: []
     };
   }
 
@@ -24,7 +25,7 @@ class Notatki extends React.Component {
       )
       .then(function (innerJson) {
         let rootFolders = [];
-        for (let notegroup of innerJson) {
+        for (const notegroup of innerJson) {
           let object = {};
           object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
@@ -43,40 +44,77 @@ class Notatki extends React.Component {
 
 
   changeCurrentDirectory = e => {
-    let selected_subject = e.target.id;
+    let selected_dir_id = e.target.id;
+    let selected_dir_name = e.target.innerText;
     const that = this;
     fetch('http://127.0.0.1:5000/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_subject + ',access_token:"' + token + '")}'))
+      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
         let content = [];
-        for (let notegroup of innerJson) {
+        for (const notegroup of innerJson) {
           let object = {};
-          object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
+            object["title"] = notegroup.name;
             object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
           } else {
+            object["title"] = notegroup.folder_name;
             object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
           }
           content.push(object);
         };
         let updated_data = that.state.data;
         updated_data[that.state.currentDepth + 1] = content;
-        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1 });
+        let updated_path = that.state.currentPath;
+        updated_path[that.state.currentDepth] = selected_dir_name;
+        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path });
       })
       .catch(error => console.log(error));
   };
 
+  openNote = () => {
+    console.log("Jak wyświetlić notatkę?");
+  }
+
+  prevFolder = () => {
+    let path = this.state.currentPath;
+    let depth = this.state.currentDepth;
+    path.pop();
+    if (!this.state.currentDepth < 1) {
+      depth -=1;
+    }
+    this.setState({
+      currentDepth: depth,
+      currentPath: path
+    });
+  }
+
+  showCurrentPath = () => {
+    let path = "";
+    for (const folder of this.state.currentPath) {
+      path = path + " / " + folder;
+    }
+    return <h5>{path}</h5>
+  }
+
   packContent = () => {
     if (this.state.data[this.state.currentDepth]) {
       var content = [];
-      for (let value of this.state.data[this.state.currentDepth]) {
-        content.push(<h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
-          {value.title}
-        </h1>);
+      for (const value of this.state.data[this.state.currentDepth]) {
+        if (value.is_note) {
+          content.push(<h1 onClick={this.openNote} id={value.key} key={value.key}>
+            Notatka {value.title}
+          </h1>);
+        } else {
+          content.push(<h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
+            {value.title}
+          </h1>);
+        }
       }
       return content;
     }
@@ -87,6 +125,8 @@ class Notatki extends React.Component {
   //<AddNote rootFolders={this.state.rootFolders} update={this.updateNotes} />
   render() {
     return (<div>
+      <h1 onClick={this.prevFolder}>Cofnij</h1>
+      {this.showCurrentPath()}
       {this.packContent()}
     </div>);
   };
