@@ -1,5 +1,4 @@
 import React from "react";
-//import AddNote from "./AddNote.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -12,6 +11,7 @@ class Notatki extends React.Component {
   }
 
   componentWillMount() {
+    //Download root folders and set state of data[0] to array of folder objects
     const that = this;
     fetch('http://127.0.0.1:5000/api?query={getToken}')
       .then(response => response.json())
@@ -44,6 +44,7 @@ class Notatki extends React.Component {
 
 
   changeCurrentDirectory = e => {
+    //Increase depth, set state of data[depth] to downloaded array of folder/note object
     let selected_dir_id = e.target.id;
     let selected_dir_name = e.target.innerText;
     const that = this;
@@ -54,7 +55,7 @@ class Notatki extends React.Component {
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
-        let content = [];
+        let folderContent = [];
         for (const notegroup of innerJson) {
           let object = {};
           if (notegroup.idnote) {
@@ -66,10 +67,10 @@ class Notatki extends React.Component {
             object["key"] = notegroup.idnotegroup;
             object["is_note"] = false;
           }
-          content.push(object);
+          folderContent.push(object);
         };
         let updated_data = that.state.data;
-        updated_data[that.state.currentDepth + 1] = content;
+        updated_data[that.state.currentDepth + 1] = folderContent;
         let updated_path = that.state.currentPath;
         updated_path[that.state.currentDepth] = selected_dir_name;
         that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path });
@@ -82,11 +83,12 @@ class Notatki extends React.Component {
   }
 
   prevFolder = () => {
+    //Update current path and decrease depth (if 1 or higher)
     let path = this.state.currentPath;
     let depth = this.state.currentDepth;
     path.pop();
     if (!this.state.currentDepth < 1) {
-      depth -=1;
+      depth -= 1;
     }
     this.setState({
       currentDepth: depth,
@@ -95,6 +97,7 @@ class Notatki extends React.Component {
   }
 
   showCurrentPath = () => {
+    //Show current path from state
     let path = "";
     for (const folder of this.state.currentPath) {
       path = path + " / " + folder;
@@ -103,6 +106,7 @@ class Notatki extends React.Component {
   }
 
   packContent = () => {
+    //Show content of current depth form state (this.state.data)
     if (this.state.data[this.state.currentDepth]) {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
@@ -121,8 +125,6 @@ class Notatki extends React.Component {
     return null;
   };
 
-  // That was first in render
-  //<AddNote rootFolders={this.state.rootFolders} update={this.updateNotes} />
   render() {
     return (<div>
       <h1 onClick={this.prevFolder}>Cofnij</h1>
