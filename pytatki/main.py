@@ -1,4 +1,4 @@
-'''Plik glowny aplikacji'''
+"""Plik glowny aplikacji"""
 
 import os
 from config import CONFIG
@@ -9,16 +9,18 @@ from flask import Flask
 
 __author__ = 'Patryk Niedzwiedzinski'
 
+
 def create_app(test_config=None):
-    APP = Flask(__name__)
-    APP.static_path = os.path.join(os.path.abspath(__file__), 'static')
+    app = Flask(__name__)
+    app.static_path = os.path.join(os.path.abspath(__file__), 'static')
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        APP.config.from_pyfile('config.py', silent=True)
+        app.config.from_pyfile('config.py', silent=True)
     else:
         # load the test config if passed in
-        APP.config.update(test_config)
-    return APP
+        app.config.update(test_config)
+    return app
+
 
 APP = create_app()
 APP.config.update(
