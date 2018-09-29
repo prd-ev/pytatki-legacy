@@ -6,8 +6,7 @@ from flask import render_template, redirect, request, session, flash, send_file,
 from werkzeug.utils import secure_filename
 
 from flask_login import logout_user, current_user
-from pytatki.main import APP
-from config import CONFIG
+from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
 from pytatki import __version__
@@ -246,7 +245,7 @@ def delete_note(identifier):
         note = con.fetchone()
         if query:
             con.execute("UPDATE note SET status_id = %s WHERE idnote = %s",
-                        (escape_string(str(CONFIG.json()['statuses']['removed_id'])), escape_string(str(identifier))))
+                        (escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), escape_string(str(identifier))))
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
@@ -288,7 +287,7 @@ def give_admin(identifier):
     if current_user.is_admin and user and user['iduser'] != current_user:
         try:
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
-                        (escape_string(user['iduser']), CONFIG.json['admin_group_id']))
+                        (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))
             conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 user['login']), 'success')
@@ -301,7 +300,7 @@ def give_admin(identifier):
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if int(identifier) != int(CONFIG.json()['admin_id']):
+    if int(identifier) != int(CONFIG['IDENTIFIERS']['ADMIN_ID']):
         con, conn = connection()
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
@@ -309,7 +308,7 @@ def take_admin(identifier):
         if current_user.is_admin and query:
             try:
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                            (escape_string(identifier), escape_string(int(CONFIG.json['admin_group_id']))))
+                            (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))))
                 conn.commit()
                 flash('Odebrano uprawnienia administratora uzytkownikowi ' + user['login'], 'success')
             except Exception as error:
@@ -359,8 +358,8 @@ def add():
             "INSERT INTO note (value, title, note_type_id, user_id, usergroup_id, status_id) VALUES (%s, %s, %s, %s, "
             "%s, %s)",
             (escape_string(str(os.path.join(form['topic'], filename))), escape_string(form['title']),
-             escape_string(str(CONFIG.json()['note_types']['file_id'])), escape_string(str(current_user['iduser'])),
-             escape_string(form['topic']), escape_string(str(CONFIG.json()['statuses']['active_id']))))
+             escape_string(str(CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'])), escape_string(str(current_user['iduser'])),
+             escape_string(form['topic']), escape_string(str(CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID']))))
         conn.commit()
         note_id = con.lastrowid
         con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (
@@ -465,4 +464,4 @@ def graphql_explorer():
     return render_template("graphql.html")
 
 
-APP.secret_key = CONFIG.secret_key
+APP.secret_key = CONFIG['DEFAULT']['secret_key']

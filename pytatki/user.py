@@ -11,15 +11,14 @@ from passlib.hash import sha256_crypt
 from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
-from pytatki.main import APP, MAIL
-from config import CONFIG
+from pytatki.main import APP, MAIL, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, login_required
 from itsdangerous import URLSafeTimedSerializer
 from pytatki.api.graphql import generate_access_token
 from werkzeug.wrappers import Response
 
-ts = URLSafeTimedSerializer(CONFIG.secret_key)
+ts = URLSafeTimedSerializer(CONFIG['DEFAULT']['secret_key'])
 
 
 def valid_password(password):
@@ -59,7 +58,7 @@ def user_info(username):
 
 def send_confirmation_email(email):
     token = ts.dumps(email, salt='email-confirm-key')
-    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG.EMAIL, recipients=[email])
+    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG['EMAIL']['EMAIL'], recipients=[email])
     msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
