@@ -263,6 +263,14 @@ CREATE  OR REPLACE VIEW `usergroup_membership` AS
 SELECT a.iduser, a.login, b.idusergroup, b.name, b.color, b.description, b.image_path FROM user a, usergroup b, user_membership c WHERE a.iduser = c.user_id AND b.idusergroup = c.usergroup_id;
 
 -- -----------------------------------------------------
+-- View `pytatki`.`notegroup_view`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `pytatki`.`notegroup_view`;
+USE `pytatki`;
+CREATE  OR REPLACE VIEW `notegroup_view` AS
+SELECT d.idusergroup, d.name, b.idnotegroup, b.name AS 'folder_name', b.parent_id, d.iduser FROM notegroup b, usergroup_has_notegroup c, usergroup_membership d WHERE d.idusergroup = c.usergroup_id AND b.idnotegroup = c.notegroup_id AND d.idusergroup = c.usergroup_id;
+
+-- -----------------------------------------------------
 -- View `pytatki`.`note_view`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `pytatki`.`note_view`;
@@ -294,16 +302,9 @@ USE `pytatki`;
 CREATE  OR REPLACE VIEW `note_tags` AS
 SELECT b.idnote, a.tag_id, c.name AS 'tag_name' FROM tagging a, note b, tag c WHERE a.note_id = b.idnote AND a.tag_id = c.idtag;
 
--- -----------------------------------------------------
--- View `pytatki`.`notegroup_view`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `pytatki`.`notegroup_view`;
-USE `pytatki`;
-CREATE  OR REPLACE VIEW `notegroup_view` AS
-SELECT d.idusergroup, d.name, b.idnotegroup, b.name AS 'folder_name', b.parent_id, d.iduser FROM notegroup b, usergroup_has_notegroup c, usergroup_membership d WHERE d.idusergroup = c.usergroup_id AND b.idnotegroup = c.notegroup_id AND d.idusergroup = c.usergroup_id;
-CREATE USER 'pytatki' IDENTIFIED BY 'pytatki';
-
-GRANT ALL ON `pytatki`.* TO 'pytatki';
+DROP USER IF EXISTS 'pytatki'@'127.0.0.1';
+CREATE USER 'pytatki'@'127.0.0.1' IDENTIFIED BY 'pytatki';
+GRANT ALL ON `pytatki`.* TO 'pytatki'@'127.0.0.1';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

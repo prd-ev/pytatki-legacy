@@ -2,16 +2,61 @@ __author__ = "Patryk Niedźwiedziński"
 """Skrypt tworzenia bazy danych"""
 
 from pytatki.dbconnect import connection
-from pymysql import escape_string
+from pymysql import escape_string, connect
 from passlib.hash import sha256_crypt
 import json
 
 
+def parse_sql(filename):
+    data = open(filename, 'r').readlines()
+    stmts = []
+    DELIMITER = ';'
+    stmt = ''
+
+    for lineno, line in enumerate(data):
+        if not line.strip():
+            continue
+
+        if line.startswith('--'):
+            continue
+
+        if 'DELIMITER' in line:
+            DELIMITER = line.split()[1]
+            continue
+
+        if (DELIMITER not in line):
+            stmt += line.replace(DELIMITER, ';')
+            continue
+
+        if stmt:
+            stmt += line
+            stmts.append(stmt.strip())
+            stmt = ''
+        else:
+            stmts.append(line.strip())
+    return stmts
+
+create_database = parse_sql('sql/create-database.sql')
+print(create_database)
+
 def db_start():
     print("Connecting...")
-    con, conn = connection()
+    host = input("DB host: [127.0.0.1]")
+    host = '127.0.0.1' if host == '' else host
+    user = input("DB user: [root] ")
+    user = 'root' if user == '' else user
+    password = input("DB root password: ")
+    conn = connect(host=host, user=user, password=password)
     print("Connection OK")
     print("Setting up database...")
+    create_database = parse_sql('sql/create-database.sql')
+    print(create_database)
+    conn.begin()
+    for query in create_database:
+        conn.cursor().execute(query)
+    conn.commit()
+    conn.close()
+    con, conn = connection()
     conn.begin()
     con.execute("INSERT INTO usergroup (name, description) VALUES (\"admins\", \"group of admins\")")
     admin_group_id = con.lastrowid
