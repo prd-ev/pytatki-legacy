@@ -1,131 +1,32 @@
 import React from "react";
 
-var new_topic_message = "--Dodaj nowy dział--";
-var new_subject_message = "--Dodaj nowy przedmiot--";
-
-class AddNote extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      topics: null,
-      current_topics: null,
-      subject_input: false,
-      topic_input: false
-    };
-  }
-
-  handleSubmit = e => {
-    e.preventDefault();
-    let updated_notes = this.props.notatki;
-    let topic_notes_list = [];
-
-    if (!topic_notes_list.includes(document.getElementById("note").value)) {
-      if (document.getElementById("subject").value === new_subject_message &&
-        document.getElementById("new-subject") != null &&
-        document.getElementById("new-topic") != null) {
-        //do new subject-topic-note
-      } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") != null) {
-        //do new topic-note
-      } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") == null || document.getElementById("subject").value === new_subject_message && document.getElementById("new-subject") == null) {
-        //do nothing
-        return null;
-      } else {
-        //do new note
-      }
-      document.getElementById("note").value = "";
-    }
-    this.props.update(updated_notes);
-  };
-
-  packTopicOptions = () => {
-    const that = this;
-    fetch('http://127.0.0.1:5000/api?query={getToken}')
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:2,access_token:"' + token + '")}'))
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getContent))
-      .then(function (innerJson) {
-        let topic_options = [];
-        for (let notegroup of innerJson) {
-          topic_options.push(<option key={notegroup.idnotegroup}>{notegroup.name}</option>);
-        };
-        topic_options.push(<option key={new_topic_message}>{new_topic_message}</option>);
-        that.setState({ topics: topic_options });
-      })
-      .catch(error => console.log(error));
-  };
-
-  componentDidMount() {
-    this.packTopicOptions();
-  }
-
-  packSubjectOptions = () => {
-    if (this.props.rootFolders) {
-      let subject_options = [];
-      for (let value of this.props.rootFolders) {
-        subject_options.push(<option key={value.key}>{value.title}</option>);
-      }
-      subject_options.push(<option key={new_subject_message}>{new_subject_message}</option>);
-      return subject_options;
-    }
-    return 0;
-  };
-
-
-  subjectChange = () => {
-    this.packTopicOptions();
-    if (document.getElementById("subject").value === new_subject_message) {
-      this.setState({ subject_input: true, topic_input: true });
-    } else {
-      this.setState({ subject_input: false, topic_input: false });
-    }
-
-  };
-
-  topicChange = () => {
-    if (document.getElementById("topic").value === new_topic_message) {
-      this.setState({ topic_input: true });
-    } else {
-      this.setState({ topic_input: false });
-    }
-  };
-
-  newSubjectInput = () => {
-    if (this.state.subject_input) {
-      return <input type="text" id="new-subject" />;
-    }
-  };
-
-  newTopicInput = () => {
-    if (this.state.topic_input) {
-      return <input type="text" id="new-topic" />;
-    }
-  };
-
-  render() {
-    return (<div style={{
-      marginTop: "100px"
-    }}>
-      <form onSubmit={this.handleSubmit}>
-        Przedmiot
-        <select id="subject" onChange={this.subjectChange}>
-          {this.packSubjectOptions()}
-        </select>
-        {this.newSubjectInput()}
-        Dział
-        <select id="topic" onChange={this.topicChange}>
-          {this.state.topics}
-        </select>
-        {this.newTopicInput()}
-        Nazwa notatki
-        <input type="text" id="note" />
-        Dodaj plik
-        <input type="file" required="required" />
-        <input type="submit" value="Dodaj notatkę" />
-      </form>
-    </div>);
-  }
+function uploadNote(e) {
+  e.preventDefault();
+  let file = document.getElementById('file').files[0];
+  fetch('http://127.0.0.1:5000/notatki', {
+    method: 'POST',
+    headers: {
+      "Content-Type": "You will perhaps need to define a content-type here"
+    },
+    body: file // This is your file object
+  }).then(
+    response => response.json() // if the response is a JSON object
+  ).then(
+    success => console.log(success) // Handle the success response object
+  ).catch(
+    error => console.log(error) // Handle the error response object
+  );
 }
+
+const AddNote = () => {
+  return (
+    <form onSubmit={uploadNote}>
+      <input type="text"></input>
+      <input id="file" type="file"></input>
+      <input type="submit"></input>
+    </form>
+  )
+};
+
 
 export default AddNote;

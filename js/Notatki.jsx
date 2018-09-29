@@ -1,4 +1,5 @@
 import React from "react";
+import AddNote from "./AddNote.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -127,6 +128,7 @@ class Notatki extends React.Component {
 
   render() {
     return (<div>
+      <AddNote></AddNote>
       <h1 onClick={this.prevFolder}>Cofnij</h1>
       {this.showCurrentPath()}
       {this.packContent()}
