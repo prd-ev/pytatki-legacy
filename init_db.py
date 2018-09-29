@@ -4,7 +4,7 @@ __author__ = "Patryk Niedźwiedziński"
 from pytatki.dbconnect import connection
 from pymysql import escape_string, connect
 from passlib.hash import sha256_crypt
-import json
+import configparser
 
 
 def parse_sql(filename):
@@ -84,11 +84,18 @@ def db_start():
     conn.commit()
     con.close()
     conn.close()
-    with open("config/config.json", "r+") as f:
-        json.dump({'admin_group_id': admin_group_id, 'admin_id': admin_id, 'statuses': {
-            'active_id': active_id,
-            'removed_id': removed_id
-        }, 'note_types': {'file_id': file_id, 'text_id': text_id, 'url_id': url_id}}, f)
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    config.sections()
+    config['IDENTIFIERS']['ADMINGROUP_ID'] = admin_group_id
+    config['IDENTIFIERS']['ADMIN_ID'] = admin_id
+    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = active_id
+    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = removed_id
+    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = file_id
+    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = text_id
+    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = url_id
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 """Plik glowny aplikacji"""
 
 import os
-from config import CONFIG
+from pytatki.config import parse_config
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
@@ -21,14 +21,15 @@ def create_app(test_config=None):
         app.config.update(test_config)
     return app
 
+CONFIG = parse_config()
 
 APP = create_app()
 APP.config.update(
-    MAIL_SERVER='smtp.gmail.com',
-    MAIL_PORT=465,
-    MAIL_USE_SSL=True,
-    MAIL_USERNAME=CONFIG.EMAIL,
-    MAIL_PASSWORD=CONFIG.EMAIL_PASSWORD
+    MAIL_SERVER=CONFIG['EMAIL']['MAIL_SERVER'],
+    MAIL_PORT=CONFIG['EMAIL']['MAIL_PORT'],
+    MAIL_USE_SSL=CONFIG['EMAIL']['MAIL_USE_SSL'],
+    MAIL_USERNAME=CONFIG['EMAIL']['EMAIL'],
+    MAIL_PASSWORD=CONFIG['EMAIL']['EMAIL_PASSWORD']
 )
 LM = LoginManager()
 LM.init_app(APP)
@@ -37,3 +38,4 @@ BCRYPT = Bcrypt()
 MAIL = Mail(APP)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
