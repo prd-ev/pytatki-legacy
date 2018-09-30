@@ -1,8 +1,9 @@
-from pytatki.main import CONFIG
 import pymysql
+from pytatki.config import parse_config
 
 __author__ = "Filip Wachowiak"
 
+CONFIG = parse_config('config.ini', check_db_configuration=False)
 
 def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_USER'],
                password=CONFIG['DATABASE']['DB_PASSWORD'], db=CONFIG['DATABASE']['DB_NAME'],

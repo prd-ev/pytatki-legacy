@@ -36,27 +36,24 @@ def parse_sql(filename):
             stmts.append(line.strip())
     return stmts
 
-create_database = parse_sql('sql/create-database.sql')
-print(create_database)
 
 def db_start():
-    print("Connecting...")
     host = input("DB host: [127.0.0.1]")
     host = '127.0.0.1' if host == '' else host
     user = input("DB user: [root] ")
     user = 'root' if user == '' else user
     password = input("DB root password: ")
+    print("Connecting...")
     conn = connect(host=host, user=user, password=password)
     print("Connection OK")
     print("Setting up database...")
     create_database = parse_sql('sql/create-database.sql')
-    print(create_database)
     conn.begin()
     for query in create_database:
         conn.cursor().execute(query)
     conn.commit()
     conn.close()
-    con, conn = connection()
+    con, conn = connection(host='127.0.0.1', user='pytatki', password='pytatki', db='pytatki')
     conn.begin()
     con.execute("INSERT INTO usergroup (name, description) VALUES (\"admins\", \"group of admins\")")
     admin_group_id = con.lastrowid
@@ -72,7 +69,8 @@ def db_start():
     text_id = con.lastrowid
     con.execute("INSERT INTO note_type (name, description) VALUES(\"url\",\"An URL link to another resource\")")
     url_id = con.lastrowid
-    username = input("Insert your admin login: ")
+    username = input("Insert your admin login: [admin]")
+    username = 'admin' if username == '' else username
     email = input("Insert your admin email: ")
     password = input("Insert your admin password: ")
     con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (
@@ -87,13 +85,14 @@ def db_start():
     config = configparser.ConfigParser()
     config.read('config.ini')
     config.sections()
-    config['IDENTIFIERS']['ADMINGROUP_ID'] = admin_group_id
-    config['IDENTIFIERS']['ADMIN_ID'] = admin_id
-    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = active_id
-    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = removed_id
-    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = file_id
-    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = text_id
-    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = url_id
+    config.add_section('IDENTIFIERS')
+    config['IDENTIFIERS']['ADMINGROUP_ID'] = str(admin_group_id)
+    config['IDENTIFIERS']['ADMIN_ID'] = str(admin_id)
+    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = str(active_id)
+    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = str(removed_id)
+    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = str(file_id)
+    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = str(text_id)
+    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = str(url_id)
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
 

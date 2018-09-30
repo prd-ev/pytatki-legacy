@@ -1,7 +1,7 @@
 """Plik glowny aplikacji"""
 
 import os
-from pytatki.config import parse_config, ParsingError
+from pytatki.config import parse_config
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
@@ -15,7 +15,8 @@ def create_app(test_config=None):
     app.static_path = os.path.join(os.path.abspath(__file__), 'static')
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        # app.config.from_pyfile('config.py', silent=True)
+        pass
     else:
         # load the test config if passed in
         app.config.update(test_config)
@@ -23,8 +24,9 @@ def create_app(test_config=None):
 
 
 CONFIG = parse_config('config.ini')
-if CONFIG is None:
-    raise ParsingError
+if not CONFIG:
+    print("An error occurred while parsing config file")
+    exit("Error")
 
 APP = create_app()
 APP.config.update(
@@ -41,4 +43,3 @@ BCRYPT = Bcrypt()
 MAIL = Mail(APP)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
