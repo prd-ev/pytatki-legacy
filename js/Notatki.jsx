@@ -79,8 +79,11 @@ class Notatki extends React.Component {
       .catch(error => console.log(error));
   };
 
-  openNote = () => {
+  openNote = (e) => {
     console.log("Jak wyświetlić notatkę?");
+    
+    let id = e.target.id.slice(4);
+    window.open(`http://127.0.0.1:5000/download/${id}`);
   }
 
   prevFolder = () => {
@@ -113,7 +116,7 @@ class Notatki extends React.Component {
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
           content.push(<h1 onClick={this.openNote} id={value.key} key={value.key}>
-            Notatka {value.title}
+            {"Notatka " + value.title}
           </h1>);
         } else {
           content.push(<h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
@@ -127,12 +130,14 @@ class Notatki extends React.Component {
   };
 
   render() {
-    return (<div>
-      <AddNote></AddNote>
-      <h1 onClick={this.prevFolder}>Cofnij</h1>
-      {this.showCurrentPath()}
-      {this.packContent()}
-    </div>);
+    return (
+      <div>
+        <AddNote></AddNote>
+        <h1 onClick={this.prevFolder}>Cofnij</h1>
+        {this.showCurrentPath()}
+        {this.packContent()}
+      </div>
+    );
   };
 }
 
