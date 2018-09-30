@@ -1,24 +1,17 @@
-from configparser import ConfigParser, MissingSectionHeaderError, ParsingError
+from configparser import ConfigParser
 
 
-def parse_config(check_email=False, check_uwsgi=False):
+def parse_config(filename, check_email=False, check_uwsgi=False):
     config = ConfigParser()
-    try:
-        with open('config.ini') as fp:
-            config.read_file(fp, source='config.ini')
-    except MissingSectionHeaderError:
-        print("You have missing section header in your config.ini file")
-        return None
-    except ParsingError:
-        print("You have syntax error in your config.ini file")
-        return None
-    except FileNotFoundError:
-        print("Couldn't find config.ini file")
-        return None
+    with open(filename) as fp:
+        config.read_file(fp, source='config.ini')
     print(config)
     config.sections()
+    if 'DEFAULT' not in config:
+        print("No DEFAULT section")
+        return None
     if 'uwsgi' in config:
-        print("uwsgi configuration found - you can run it with `uwsgi --ini config.ini")
+        print("uwsgi configuration found - you can run it with `uwsgi --ini config.ini`")
         if check_uwsgi:
             return None
     if 'DATABASE' not in config:
@@ -35,4 +28,4 @@ def parse_config(check_email=False, check_uwsgi=False):
 
 
 if __name__ == '__main__':
-    parse_config()
+    parse_config('../config.ini')

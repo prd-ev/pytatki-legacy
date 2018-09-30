@@ -1,7 +1,7 @@
 """Plik glowny aplikacji"""
 
 import os
-from pytatki.config import parse_config
+from pytatki.config import parse_config, ParsingError
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
@@ -21,7 +21,10 @@ def create_app(test_config=None):
         app.config.update(test_config)
     return app
 
-CONFIG = parse_config()
+
+CONFIG = parse_config('config.ini')
+if CONFIG is None:
+    raise ParsingError
 
 APP = create_app()
 APP.config.update(
