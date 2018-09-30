@@ -1,7 +1,7 @@
 from src.api.v1.auth import auth
-from main import APP
-from flask import send_from_directory, jsonify
-from dbconnect import connection
+from pytatki.main import APP
+from flask import send_from_directory
+from pytatki.dbconnect import connection
 from pymysql import escape_string
 
 @APP.route('/api/note/<identifier>/', methods=["GET"])

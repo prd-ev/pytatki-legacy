@@ -1,4 +1,4 @@
-from main import create_app
+from pytatki.main import create_app
 import pytest
 from flask import jsonify
 

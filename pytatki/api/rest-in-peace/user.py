@@ -2,7 +2,7 @@ from passlib.utils import unicode
 from passlib.hash import sha256_crypt
 from src.api.v1.auth import auth
 from flask import jsonify, request, abort
-from main import APP, DB
+from pytatki.main import APP, DB
 from src.models import User
 
 @APP.route('/api/user/<username>/', methods=["GET"])
