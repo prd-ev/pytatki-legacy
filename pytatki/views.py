@@ -345,21 +345,24 @@ def add():
         if request_file:
             if allowed_file(request_file.filename):
                 filename = secure_filename(request_file.filename)
+            else:
+                flash("File unsecure")
+                return redirect('/')
             print(filename)
             if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename)):
                 if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
                     os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
                 request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
-            else:
-                flash('Nieobslugiwane rozszerzenie', 'warning')
-                return redirect(request.url)
+        else:
+            flash('Nieobslugiwane rozszerzenie', 'warning')
+            return redirect(request.url)
         con, conn = connection()
         con.execute(
-            "INSERT INTO note (value, title, note_type_id, user_id, usergroup_id, status_id) VALUES (%s, %s, %s, %s, "
-            "%s, %s)",
+            "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, "
+            "%s)",
             (escape_string(str(os.path.join(form['topic'], filename))), escape_string(form['title']),
              escape_string(str(CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'])), escape_string(str(current_user['iduser'])),
-             escape_string(form['topic']), escape_string(str(CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID']))))
+             escape_string(form['topic'])))
         conn.commit()
         note_id = con.lastrowid
         con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (
@@ -373,8 +376,7 @@ def add():
     else:
         con, conn = connection()
         con.execute(
-            "SELECT * FROM usergroup_membership a WHERE NOT EXISTS (SELECT * FROM usergroup_membership b WHERE "
-            "b.parent_id = a.idusergroup) AND a.iduser = %s",
+            "SELECT * FROM notegroup_view WHERE iduser = %s",
             escape_string(str(current_user['iduser'])))
         topics = con.fetchall()
         con.close()
@@ -387,33 +389,31 @@ def add():
 def admin_add_post():
     """Admin add"""
     if current_user.is_admin:
-        try:
-            con, conn = connection()
-            con.execute("SELECT idusergroup FROM usergroup WHERE lower(name) = lower(%s)",
-                        escape_string(request.form['title']))
-            if con.fetchone():
-                flash("Dany przedmiot juz istnieje", 'warning')
-            else:
-                print(request.form['parent_id'])
-                con.execute("SELECT idusergroup FROM usergroup_membership WHERE iduser = %s AND idusergroup = %s",
+        con, conn = connection()
+        con.execute("SELECT idnotegroup FROM notegroup WHERE lower(name) = lower(%s)",
+                    escape_string(request.form['title']))
+        if con.fetchone():
+            flash("Dany przedmiot juz istnieje", 'warning')
+        else:
+            group = None
+            if 'parent_id' in request.form:
+                con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
                             (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
                 group = con.fetchone()
-                if group or request.form['parent_id'] == 0:
-                    conn.begin()
-                    con.execute("INSERT INTO usergroup (name, description, parent_id) VALUES (%s, %s, %s)", (
-                        escape_string(request.form['title']), escape_string(request.form['title']),
-                        escape_string(request.form['parent_id'] if 'parent_id' in request.form else 0)))
-                    group_id = con.lastrowid
-                    con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
-                                (escape_string(str(current_user['iduser'])), escape_string(str(group_id))))
-                    conn.commit()
-                    flash('Dodano przedmiot!', 'success')
-                else:
-                    flash("Wystąpił błąd w zapytaniu", 'warning')
-            con.close()
-            conn.close()
-        except Exception as e:
-            flash('Blad: ' + str(e), 'danger')
+            if group or 'parent_id' not in request.form:
+                conn.begin()
+                con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
+                    escape_string(request.form['title']),
+                    escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
+                group_id = con.lastrowid
+                con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
+                            (escape_string(str(group_id)), escape_string(str(request.form['class']))))
+                conn.commit()
+                flash('Dodano przedmiot!', 'success')
+            else:
+                flash("Wystąpił błąd w zapytaniu", 'warning')
+        con.close()
+        conn.close()
     else:
         flash('Nie mozesz tego zrobic', 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
@@ -425,12 +425,14 @@ def admin_add_get():
     """Admin add"""
     if current_user.is_admin:
         con, conn = connection()
-        con.execute("SELECT idusergroup, name, parent_id FROM usergroup_membership WHERE iduser = %s",
+        con.execute("SELECT idnotegroup, folder_name, parent_id FROM notegroup_view WHERE iduser = %s",
                     escape_string(str(current_user['iduser'])))
         subjects = con.fetchall()
+        con.execute("SELECT idusergroup, name FROM usergroup_membership WHERE iduser = %s ", escape_string(str(current_user['iduser'])))
+        classes = con.fetchall()
         con.close()
         conn.close()
-        return render_template('admin_add.html', subjects=subjects)
+        return render_template('admin_add.html', subjects=subjects, classes=classes)
     else:
         flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
