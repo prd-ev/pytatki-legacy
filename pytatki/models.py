@@ -6,7 +6,7 @@ from pytatki.main import LM
 from pytatki.dbconnect import connection
 from pymysql import escape_string
 import gc
-from config import Config as Config
+from pytatki.main import CONFIG as Config
 
 
 @LM.user_loader
