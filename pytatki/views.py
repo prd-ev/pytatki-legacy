@@ -376,8 +376,7 @@ def add():
     else:
         con, conn = connection()
         con.execute(
-            "SELECT * FROM notegroup_view a WHERE NOT EXISTS (SELECT * FROM notegroup_view b WHERE "
-            "b.parent_id = a.idnotegroup) AND a.iduser = %s",
+            "SELECT * FROM notegroup_view WHERE iduser = %s",
             escape_string(str(current_user['iduser'])))
         topics = con.fetchall()
         con.close()
