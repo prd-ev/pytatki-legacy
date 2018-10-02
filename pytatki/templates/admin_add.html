@@ -6,7 +6,7 @@
 <script>
     function select_check(){
         if (document.getElementById('topic-type').selected){
-            var $html = $('<select class="custom-select" id="parent_id" name="parent_id">{%for subject in subjects%}<option value="{{subject["idusergroup"]}}">{{subject.name}}</option>{%endfor%}</select>');
+            var $html = $('<select class="custom-select" id="parent_id" name="parent_id">{%for subject in subjects%}<option value="{{subject["idnotegroup"]}}">{{subject['folder_name']}}</option>{%endfor%}</select>');
             str = $html.prop('outerHTML');
             document.getElementById('choose-subject').innerHTML = str;
         }
@@ -22,6 +22,14 @@
       <h3>Dodaj</h3>
 		<form method=post id='add-form' action="{{request.url}}">
             <div class="form-group">
+                <label for="class">Klasa</label>
+                <select form="add-form" class="custom-select" id="class" name="class">
+                    {% for class in classes %}
+                    <option value="{{class['idusergroup']}}">{{class['name']}}</option>
+                    {% endfor %}
+                </select>
+            <div class="form-group">
+                <label for="title">Nazwa</label>
                 <input class="form-control" id="title" name="title" type="text" value="" autofocus placeholder="Nazwa">
             </div>
             <div class="form-group">

@@ -9,56 +9,37 @@ Notatki we flasku
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Instalacja
+### Instalation
 
-Sklonuj to repozytorium na komputer, na którym chcesz uruchomić aplikację
+Clone this repo
 ```
 git clone https://github.com/PRD-ev/pytatki.git
 ```
-### Dependencies
-
-Aby uruchomić aplikację potrzebne są odpowiednie moduły python'a. Można je pobrać za pomocą pip'a wpisując następujące komendy:
-
+Install dependencies
 ```
 pip install -r requirements/common.txt
 ```
-### Konfiguracja
-Następnie otwórz plik config/\_\_init\_\_.py. Uzupełnij plik konfiguracyjny.
+### Configuration
+Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
 
 
 ```
-class Config():
-    """Config class"""
-    secret_key = str()
-    DEBUG = True #True oznacza, że aplikacja będzie sprawdzać zmiany w plikach
-    HOST = "127.0.0.1" #Tutaj wpisujemy adres, na którym chcemy postawić stronę
-    PORT = 5000 #Tutaj wpisujemy port, na którym ma działać aplikacja
-    EMAIL = "twoj@email" #Z tego maila wysyłane będą powiadomienia do użytkowników
-    EMAIL_PASSWORD = "haslo_do_twojego_maila" #Hasło do maila
+[DEFAULT]
+secret_key = "your_own_secret_key" # Don't leave default value
+DEBUG = True
+HOST = 127.0.0.1
+PORT = 5000
 
-    DB_HOST = '127.0.0.1' #DB configuration
-    DB_USER = 'webapp'
-    DB_PASSWORD = '12345'
-    DB_NAME = 'pytatki' 
-    
-    (...)
-    
-CONFIG = Config("sekretny_klucz") #W nawiasie wpisujemy klucz do szyfrowania haseł w bazie danych
-# NIE ZATRZYMUJ WARTOŚCI DOMYŚLNEJ!!!
+[DATABASE]
+DB_HOST = '127.0.0.1'
+DB_USER = 'pytatki'
+DB_PASSWORD = 'pytatki'
+DB_NAME = 'pytatki'
 ```
 
-Żeby uruchomić aplikację wpisz:
+To configure database run `init_db.py` script.
 
-- za pomocą pythona (lokalnie, nie na serwerze)
-```
-python3 wsgi.py
-```
-- za pomocą wsgi (skonfiguruj najpierw plik uwsgi.ini)
-```
-uwsgi -ini uwsgi.ini
-```
-
-## Testowanie
+## Testing
 ### 
 ```
 pytest
@@ -86,8 +67,8 @@ Zobacz również listę [współautorów](https://github.com/butterfly-pn/pytatk
 
 ## TODO
 
-1. Dodawanie plików/notatek (dodanie tagów, przedmiotu itd.)
-2. Logowanie i rejestracja + admin
-3. Wyszukiwanie notatek
-4. Zarządzanie notatkami (usuń, ukryj itp.)
-5. Podział użytkowników na klasy
+- [ ] Dodawanie plików/notatek (dodanie tagów, przedmiotu itd.)
+- [x] Logowanie i rejestracja + admin
+- [ ] Wyszukiwanie notatek
+- [ ] Zarządzanie notatkami (usuń, ukryj itp.)
+- [x] Podział użytkowników na grupy

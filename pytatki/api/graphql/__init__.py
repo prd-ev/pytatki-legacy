@@ -1,18 +1,15 @@
 from flask_graphql import GraphQLView
-from main import APP
+from pytatki.main import APP
 
-from dbconnect import connection
-from pymysql import escape_string
+from pytatki.dbconnect import connection
 import gc
-import json
 from flask_login import current_user
-from pytatki.views import find_notegroup_children, get_note, get_root_id, postNote, add_tag_to_note
+from pytatki.views import find_notegroup_children, get_note, get_root_id, post_note, add_tag_to_note
 
-from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLNonNull, GraphQLObjectType
+from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLObjectType
 from graphql.type.scalars import GraphQLString, GraphQLInt
 from graphql.type.schema import GraphQLSchema
 from itsdangerous import TimedJSONWebSignatureSerializer, BadSignature, SignatureExpired
-from functools import wraps
 
 
 def generate_access_token(id_user, expiration=3600):
@@ -95,7 +92,7 @@ MutationRootType = GraphQLObjectType(
             type=QueryRootType,
             resolver=lambda *_: QueryRootType
         ),
-        'postNote': GraphQLField(
+        'post_note': GraphQLField(
             type=GraphQLString,
             args={
                 'title': GraphQLArgument(GraphQLString),
@@ -104,7 +101,7 @@ MutationRootType = GraphQLObjectType(
                 'destination_folder_id': GraphQLArgument(GraphQLInt),
                 'access_token': GraphQLArgument(GraphQLString)
             },
-            resolver=lambda obj, info, title, type, value, destination_folder_id, access_token: postNote(
+            resolver=lambda obj, info, title, type, value, destination_folder_id, access_token: post_note(
                 title, type, value, destination_folder_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'addTagToNote': GraphQLField(
