@@ -14,13 +14,6 @@ from pytatki.dbconnect import connection
 from pymysql import escape_string
 import json
 
-<<<<<<< HEAD
-@APP.errorhandler(500)
-def server_error_handler(error):
-    return render_template("500.html"), 500
-
-=======
->>>>>>> origin/release/1.0
 __author__ = 'Patryk Niedzwiedzinski'
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt',
