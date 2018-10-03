@@ -10910,252 +10910,49 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(51);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+function uploadNote(e) {
+  e.preventDefault();
+  var form = document.getElementById('form');
+  var files = form[1];
+  var formData = new FormData(files);
+  fetch('http://127.0.0.1:5000/add/', {
+    method: 'POST',
+    headers: {
+      "Content-Type": "multipart/form-data"
+    },
+    body: formData
+  }).then(function (response) {
+    return response.text();
+  } // if the response is a JSON object
+  ).then(function (success) {
+    return console.log(success);
+  } // Handle the success response object
+  ).catch(function (error) {
+    return console.log(error);
+  } // Handle the error response object
+  );
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var new_topic_message = "--Dodaj nowy dział--";
-var new_subject_message = "--Dodaj nowy przedmiot--";
-
-var AddNote = function (_React$Component) {
-  _inherits(AddNote, _React$Component);
-
-  function AddNote(props) {
-    _classCallCheck(this, AddNote);
-
-    var _this = _possibleConstructorReturn(this, (AddNote.__proto__ || Object.getPrototypeOf(AddNote)).call(this, props));
-
-    _this.handleSubmit = function (e) {
-      e.preventDefault();
-      var updated_notes = _this.props.notatki;
-      var topic_notes_list = [];
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = updated_notes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var value = _step.value;
-
-          if (value != null) {
-            if (document.getElementById("subject").value === value.substring(value.indexOf("/") + 1, value.indexOf("/", 1))) {
-              if (document.getElementById("topic").value === value.substring(value.indexOf("/", 1) + 1, value.lastIndexOf("/"))) {
-                topic_notes_list.push(value.substring(value.lastIndexOf("/") + 1));
-              }
-            }
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      if (!topic_notes_list.includes(document.getElementById("note").value)) {
-        var new_note = "/";
-        if (document.getElementById("subject").value === new_subject_message && document.getElementById("new-subject").value != "" && document.getElementById("new-topic").value != "") {
-
-          new_note += document.getElementById("new-subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
-        } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") != null) {
-          new_note += document.getElementById("subject").value + "/" + document.getElementById("new-topic").value + "/" + document.getElementById("note").value;
-        } else if (document.getElementById("topic").value === new_topic_message && document.getElementById("new-topic") == null || document.getElementById("subject").value === new_subject_message && document.getElementById("new-subject") == null) {
-          // handle no input
-          return 0;
-        } else {
-          new_note += document.getElementById("subject").value + "/" + document.getElementById("topic").value + "/" + document.getElementById("note").value;
-        }
-        updated_notes = [].concat(_toConsumableArray(updated_notes), [new_note]);
-        document.getElementById("note").value = "";
-      }
-      _this.props.update(updated_notes);
-    };
-
-    _this.packTopicOptions = function () {
-      if (_this.props.topics) {
-        var topic_options = [];
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
-
-        try {
-          for (var _iterator2 = _this.props.topics[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var value = _step2.value;
-
-            topic_options.push(_react2.default.createElement(
-              "option",
-              { key: value },
-              value
-            ));
-          }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
-          }
-        }
-
-        topic_options.push(_react2.default.createElement(
-          "option",
-          { key: new_topic_message },
-          new_topic_message
-        ));
-        if (_this.state.current_topics !== topic_options) {
-          _this.setState({ current_topics: topic_options });
-        }
-      }
-    };
-
-    _this.packSubjectOptions = function () {
-      if (_this.props.subjects) {
-
-        var subject_options = [];
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-          for (var _iterator3 = _this.props.subjects[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var value = _step3.value;
-
-            subject_options.push(_react2.default.createElement(
-              "option",
-              { key: value },
-              value
-            ));
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
-        }
-
-        subject_options.push(_react2.default.createElement(
-          "option",
-          { key: new_subject_message },
-          new_subject_message
-        ));
-        return subject_options;
-      }
-      return 0;
-    };
-
-    _this.subjectChange = function () {
-      _this.packTopicOptions();
-      if (document.getElementById("subject").value === new_subject_message) {
-        _this.setState({ subject_input: true, topic_input: true });
-      } else {
-        _this.setState({ subject_input: false, topic_input: true });
-      }
-    };
-
-    _this.topicChange = function () {
-      if (document.getElementById("topic").value === new_topic_message) {
-        _this.setState({ topic_input: true });
-      } else {
-        _this.setState({ topic_input: false });
-      }
-    };
-
-    _this.newSubjectInput = function () {
-      if (_this.state.subject_input) {
-        return _react2.default.createElement("input", { type: "text", id: "new-subject" });
-      }
-    };
-
-    _this.newTopicInput = function () {
-      if (_this.state.topic_input) {
-        return _react2.default.createElement("input", { type: "text", id: "new-topic" });
-      }
-    };
-
-    _this.state = {
-      current_topics: [],
-      subject_input: false,
-      topic_input: false
-    };
-    return _this;
-  }
-
-  _createClass(AddNote, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.packTopicOptions();
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      return _react2.default.createElement(
-        "div",
-        { style: {
-            marginTop: "100px"
-          } },
-        _react2.default.createElement(
-          "form",
-          { onSubmit: this.handleSubmit },
-          "Przedmiot",
-          _react2.default.createElement(
-            "select",
-            { id: "subject", onChange: this.subjectChange },
-            this.packSubjectOptions()
-          ),
-          this.newSubjectInput(),
-          "Dzia\u0142",
-          _react2.default.createElement(
-            "select",
-            { id: "topic", onChange: this.topicChange },
-            this.state.current_topics
-          ),
-          this.newTopicInput(),
-          "Nazwa notatki",
-          _react2.default.createElement("input", { type: "text", id: "note" }),
-          "Dodaj plik",
-          _react2.default.createElement("input", { type: "file", required: "required" }),
-          _react2.default.createElement("input", { type: "submit", value: "Dodaj notatk\u0119" })
-        )
-      );
-    }
-  }]);
-
-  return AddNote;
-}(_react2.default.Component);
+var AddNote = function AddNote() {
+  return _react2.default.createElement(
+    'form',
+    { id: 'form', onSubmit: uploadNote },
+    _react2.default.createElement(
+      'span',
+      null,
+      'Dodaj notatk\u0119 w aktualnym folderze'
+    ),
+    _react2.default.createElement('input', { type: 'text', name: 'title' }),
+    _react2.default.createElement('input', { id: 'file', type: 'file', name: 'file' }),
+    _react2.default.createElement('input', { type: 'submit' })
+  );
+};
 
 exports.default = AddNote;
 
@@ -11196,36 +10993,42 @@ var Notatki = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Notatki.__proto__ || Object.getPrototypeOf(Notatki)).call(this, props));
 
-    _this.updateNotes = function (updated_notes) {
-      _this.setState(function (prevState, props) {
-        return { notatki: updated_notes };
-      });
-    };
-
-    _this.changeCurrentSubject = function (e) {
-      _this.setState({ current_subject: e.target.className, current_topic: null });
-    };
-
-    _this.changeCurrentTopic = function (e) {
-      _this.setState({ current_topic: e.target.className });
-    };
-
-    _this.packSubjects = function () {
-      if (_this.state.subjects) {
-        var subjects = [];
+    _this.changeCurrentDirectory = function (e) {
+      //Increase depth, set state of data[depth] to downloaded array of folder/note object
+      var selected_dir_id = e.target.id;
+      var selected_dir_name = e.target.innerText;
+      var that = _this;
+      fetch('http://127.0.0.1:5000/api?query={getToken}').then(function (response) {
+        return response.json();
+      }).then(function (res) {
+        return res.data.getToken;
+      }).then(function (token) {
+        return fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}');
+      }).then(function (response) {
+        return response.json();
+      }).then(function (myJson) {
+        return JSON.parse(myJson.data.getContent);
+      }).then(function (innerJson) {
+        var folderContent = [];
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
         var _iteratorError = undefined;
 
         try {
-          for (var _iterator = _this.state.subjects[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var value = _step.value;
+          for (var _iterator = innerJson[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var notegroup = _step.value;
 
-            subjects.push(_react2.default.createElement(
-              "h1",
-              { className: value, onClick: _this.changeCurrentSubject, key: value },
-              value
-            ));
+            var object = {};
+            if (notegroup.idnote) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+            } else {
+              object["title"] = notegroup.folder_name;
+              object["key"] = notegroup.idnotegroup;
+              object["is_note"] = false;
+            }
+            folderContent.push(object);
           }
         } catch (err) {
           _didIteratorError = true;
@@ -11242,64 +11045,98 @@ var Notatki = function (_React$Component) {
           }
         }
 
-        return subjects;
-      }
-      return 0;
+        ;
+        var updated_data = that.state.data;
+        updated_data[that.state.currentDepth + 1] = folderContent;
+        var updated_path = that.state.currentPath;
+        updated_path[that.state.currentDepth] = selected_dir_name;
+        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path });
+      }).catch(function (error) {
+        return console.log(error);
+      });
     };
 
-    _this.packTopics = function () {
-      if (_this.state.notatki) {
-        var topics = [];
-        var _iteratorNormalCompletion2 = true;
-        var _didIteratorError2 = false;
-        var _iteratorError2 = undefined;
+    _this.openNote = function (e) {
+      console.log("Jak wyświetlić notatkę?");
 
+      var id = e.target.id.slice(4);
+      window.open("http://127.0.0.1:5000/download/" + id);
+    };
+
+    _this.prevFolder = function () {
+      //Update current path and decrease depth (if 1 or higher)
+      var path = _this.state.currentPath;
+      var depth = _this.state.currentDepth;
+      path.pop();
+      if (!_this.state.currentDepth < 1) {
+        depth -= 1;
+      }
+      _this.setState({
+        currentDepth: depth,
+        currentPath: path
+      });
+    };
+
+    _this.showCurrentPath = function () {
+      //Show current path from state
+      var path = "";
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = _this.state.currentPath[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var folder = _step2.value;
+
+          path = path + " / " + folder;
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
         try {
-          for (var _iterator2 = topics_temp[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var value = _step2.value;
-
-            topics.push(_react2.default.createElement(
-              "h2",
-              { className: value, onClick: _this.changeCurrentTopic, key: value },
-              value
-            ));
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
           }
-        } catch (err) {
-          _didIteratorError2 = true;
-          _iteratorError2 = err;
         } finally {
-          try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-              _iterator2.return();
-            }
-          } finally {
-            if (_didIteratorError2) {
-              throw _iteratorError2;
-            }
+          if (_didIteratorError2) {
+            throw _iteratorError2;
           }
         }
-
-        return topics;
       }
-      return 0;
+
+      return _react2.default.createElement(
+        "h5",
+        null,
+        path
+      );
     };
 
-    _this.packNotes = function () {
-      if (_this.state.notatki) {
-        var notatki = [];
+    _this.packContent = function () {
+      //Show content of current depth form state (this.state.data)
+      if (_this.state.data[_this.state.currentDepth]) {
+        var content = [];
         var _iteratorNormalCompletion3 = true;
         var _didIteratorError3 = false;
         var _iteratorError3 = undefined;
 
         try {
-          for (var _iterator3 = _this.state.notatki[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          for (var _iterator3 = _this.state.data[_this.state.currentDepth][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
             var value = _step3.value;
 
-            notatki.push(_react2.default.createElement(
-              "h3",
-              { className: value, onClick: _this.changeCurrentTopic, key: value },
-              value
-            ));
+            if (value.is_note) {
+              content.push(_react2.default.createElement(
+                "h1",
+                { onClick: _this.openNote, id: value.key, key: value.key },
+                "Notatka " + value.title
+              ));
+            } else {
+              content.push(_react2.default.createElement(
+                "h1",
+                { onClick: _this.changeCurrentDirectory, id: value.key, key: value.key },
+                value.title
+              ));
+            }
           }
         } catch (err) {
           _didIteratorError3 = true;
@@ -11316,15 +11153,15 @@ var Notatki = function (_React$Component) {
           }
         }
 
-        return notatki;
+        return content;
       }
-      return 0;
+      return null;
     };
 
     _this.state = {
-      subjects: null,
-      current_subject: null,
-      current_topic: null
+      currentDepth: 0,
+      data: [],
+      currentPath: []
     };
     return _this;
   }
@@ -11332,15 +11169,65 @@ var Notatki = function (_React$Component) {
   _createClass(Notatki, [{
     key: "componentWillMount",
     value: function componentWillMount() {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onload = function () {
-        if (xhttp.status === 200) {
-          this.setState({ subjects: xhttp.responseText.split(" ") });
+      //Download root folders and set state of data[0] to array of folder objects
+      var that = this;
+      fetch('http://127.0.0.1:5000/api?query={getToken}').then(function (response) {
+        return response.json();
+      }).then(function (res) {
+        return res.data.getToken;
+      }).then(function (token) {
+        return fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:3,access_token:"' + token + '")}').then(function (response) {
+          return response.json();
+        }).then(function (myJson) {
+          return myJson.data.getRootId;
+        }).then(function (myJson) {
+          return fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + Number(myJson) + ',access_token:"' + token + '")}');
+        }).then(function (response) {
+          return response.json();
+        }).then(function (myJson) {
+          return JSON.parse(myJson.data.getContent);
+        });
+      }).then(function (innerJson) {
+        var rootFolders = [];
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+
+        try {
+          for (var _iterator4 = innerJson[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var notegroup = _step4.value;
+
+            var object = {};
+            object["title"] = notegroup.folder_name;
+            if (notegroup.idnote) {
+              object["key"] = "note" + notegroup.idnote;
+            } else {
+              object["key"] = notegroup.idnotegroup;
+            }
+            rootFolders.push(object);
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+              _iterator4.return();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
         }
-        return 0;
-      }.bind(this);
-      xhttp.open('GET', 'http://127.0.0.1:5000/graphql?query={getRootFolders(id_usergroup:1,id_user:1)}');
-      xhttp.send();
+
+        ;
+        var updated_data = that.state.data;
+        updated_data[0] = rootFolders;
+        that.setState({ data: updated_data });
+      }).catch(function (error) {
+        return console.log(error);
+      });
     }
   }, {
     key: "render",
@@ -11348,11 +11235,14 @@ var Notatki = function (_React$Component) {
       return _react2.default.createElement(
         "div",
         null,
-        _react2.default.createElement(_AddNote2.default, { subjects: this.state.subjects, update: this.updateNotes }),
-        " ",
-        this.packSubjects(),
-        this.packTopics(),
-        this.packNotes()
+        _react2.default.createElement(_AddNote2.default, null),
+        _react2.default.createElement(
+          "h1",
+          { onClick: this.prevFolder },
+          "Cofnij"
+        ),
+        this.showCurrentPath(),
+        this.packContent()
       );
     }
   }]);

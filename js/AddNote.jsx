@@ -2,13 +2,15 @@ import React from "react";
 
 function uploadNote(e) {
   e.preventDefault();
-  let file = document.getElementById('file').files[0];
+  const form = document.getElementById('form');
+  const files = form[1];
+  var formData = new FormData(files);
   fetch('http://127.0.0.1:5000/add/', {
     method: 'POST',
     headers: {
-      "Content-Type": "You will perhaps need to define a content-type here"
+      "Content-Type": "multipart/form-data"
     },
-    body: file // This is your file object
+    body: formData
   }).then(
     response => response.text() // if the response is a JSON object
   ).then(
@@ -20,10 +22,10 @@ function uploadNote(e) {
 
 const AddNote = () => {
   return (
-    <form onSubmit={uploadNote}>
+    <form id="form" onSubmit={uploadNote}>
       <span>Dodaj notatkę w aktualnym folderze</span>
-      <input type="text"></input>
-      <input id="file" type="file"></input>
+      <input type="text" name="title"></input>
+      <input id="file" type="file" name="file"></input>
       <input type="submit"></input>
     </form>
   )

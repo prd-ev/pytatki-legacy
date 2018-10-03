@@ -2,7 +2,7 @@ var webpack = require("webpack");
 module.exports = {
   entry: ["./js/index.js"],
   output: {
-    path: __dirname + "/static",
+    path: __dirname + "/pytatki/static",
     filename: "bundle.js"
   },
   module: {
