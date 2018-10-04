@@ -4,7 +4,7 @@ __author__ = "Patryk Niedźwiedziński"
 import configparser
 from pymysql import escape_string, connect
 from passlib.hash import sha256_crypt
-from pytatki.dbconnect import connection, create_usergroup, create_status
+from pytatki.dbconnect import connection, create_usergroup, create_status, create_note_type, create_user
 
 def parse_sql(filename):
     data = open(filename, 'r').readlines()
@@ -75,24 +75,15 @@ def db_init(host=None, user=None, password=None):
     conn.begin()
     admin_group_id = create_usergroup(conn, 'admins', 'Group of admins')
     active_id = create_status(conn, 'active', 'Record is active')
-    con.execute(
-        "INSERT INTO status (name, description) VALUES (\"removed\", \"Record is removed\")")
-    removed_id = con.lastrowid
-    con.execute("INSERT INTO note_type (name, description) VALUES(\"file\", \"A file in format of txt, pdf, "
-                "png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp\")")
-    file_id = con.lastrowid
-    con.execute("INSERT INTO note_type (name, description) VALUES(\"text\", \"Just plain non-formated text\")")
-    text_id = con.lastrowid
-    con.execute("INSERT INTO note_type (name, description) VALUES(\"url\",\"An URL link to another resource\")")
-    url_id = con.lastrowid
+    removed_id = create_status(conn, 'removed', 'Record is removed')
+    file_id = create_note_type(conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
+    text_id = create_note_type(conn, "text", "Just plain non-formated text")
+    url_id = create_note_type(conn, "url", "An URL link to another resource")
     username = input("Insert your admin login: [admin]")
     username = 'admin' if username == '' else username
     email = input("Insert your admin email: ")
     password = input("Insert your admin password: ")
-    con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (
-        escape_string(username), escape_string(sha256_crypt.encrypt(str(password))), escape_string(email),
-        escape_string(str(active_id))))
-    admin_id = con.lastrowid
+    admin_id = create_user(conn, username, email, password, active_id)
     con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (
         escape_string(str(admin_id)), escape_string(str(admin_group_id))))
     conn.commit()

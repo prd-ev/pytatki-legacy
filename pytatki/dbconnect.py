@@ -1,5 +1,6 @@
 import pymysql
 from pytatki.config import parse_config
+from passlib.hash import sha256_crypt
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
@@ -21,12 +22,23 @@ def create_usergroup(conn, name, description, parent_id='0'):
     """Insert usergroup into the database using given connection and returns its id"""
     conn.cursor().execute(
         "INSERT INTO usergroup (name, description) VALUES (%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(description)))
-    group_id = conn.cursor().lastrowid
-    return group_id
+    return conn.cursor().lastrowid
 
 def create_status(conn, name, description):
     """Insert status into the database using given connection and returns its id"""
     conn.cursor().execute(
         "INSERT INTO status (name, description) VALUES (\"active\", \"Record is ative\")")
-    active_id = conn.cursor().lastrowid
-    return active_id
+    return conn.cursor().lastrowid
+
+def create_note_type(conn, name, description):
+    """Insert note type into the database using given connection and returns its id"""
+    conn.cursor().execute("INSERT INTO note_type (name, description) VALUES(%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(description)))
+    return conn.cursor().lastrowid
+
+def create_user(conn, login, password, email, status_id):
+    """Insert user into the database using given connection and returns its id"""
+    conn.cursor().execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (
+        pymysql.escape_string(login), pymysql.escape_string(
+            sha256_crypt.encrypt(str(password))), pymysql.escape_string(email),
+        pymysql.escape_string(str(status_id))))
+    return conn.cursor().lastrowid
