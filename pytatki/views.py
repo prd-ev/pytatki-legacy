@@ -345,7 +345,6 @@ def add():
     """Add new note"""
     if request.method == 'POST':
         form = request.form
-        print(str(request))
         if 'file' not in request.files:
             flash('Blad: No file part', 'danger')
             return redirect(request.url)
@@ -360,12 +359,12 @@ def add():
                 flash("File unsecure")
                 return redirect('/')
             print(filename)
-            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename)):
-                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
+            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
+                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
                     os.makedirs(os.path.join(
-                        APP.config['UPLOAD_FOLDER'], form['topic']))
+                        APP.config['UPLOAD_FOLDER'], form['notegroup_id']))
                 request_file.save(os.path.join(
-                    APP.config['UPLOAD_FOLDER'], form['topic'], filename))
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
         else:
             flash('Nieobslugiwane rozszerzenie', 'warning')
             return redirect(request.url)
@@ -373,10 +372,10 @@ def add():
         con.execute(
             "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, "
             "%s)",
-            (escape_string(str(os.path.join(form['topic'], filename))), escape_string(form['title']),
+            (escape_string(str(os.path.join(form['notegroup_id'], filename))), escape_string(form['title']),
              escape_string(str(CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'])), escape_string(
                  str(current_user['iduser'])),
-             escape_string(form['topic'])))
+             escape_string(form['notegroup_id'])))
         conn.commit()
         note_id = con.lastrowid
         con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (
@@ -387,7 +386,7 @@ def add():
         con.close()
         conn.close()
         flash('Notatka zostala dodana!', 'success')
-        return redirect(request.args.get('next') if 'next' in request.args else '/#' + str(form['topic']))
+        return redirect(request.args.get('next') if 'next' in request.args else '/#' + str(form['notegroup_id']))
     else:
         con, conn = connection()
         con.execute(

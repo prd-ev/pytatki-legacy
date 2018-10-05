@@ -7,7 +7,8 @@ class Notatki extends React.Component {
     this.state = {
       currentDepth: 0,
       data: [],
-      currentPath: []
+      currentPath: [],
+      currentDirId: "2"//mock
     };
   }
 
@@ -74,7 +75,7 @@ class Notatki extends React.Component {
         updated_data[that.state.currentDepth + 1] = folderContent;
         let updated_path = that.state.currentPath;
         updated_path[that.state.currentDepth] = selected_dir_name;
-        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path });
+        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path, currentDirId: selected_dir_id });
       })
       .catch(error => console.log(error));
   };
@@ -129,10 +130,31 @@ class Notatki extends React.Component {
     return null;
   };
 
+  uploadNote = (e) => {
+    e.preventDefault();
+    const form = document.getElementById('form');
+    const file = form[1].files[0];
+    const title = form[0].value;
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('notegroup_id', this.state.currentDirId);
+    fetch('http://127.0.0.1:5000/add/', {
+      method: 'POST',
+      body: formData
+    }).then(
+      response => response.text() // if the response is a JSON object
+    ).then(
+      success => console.log(success) // Handle the success response object
+    ).catch(
+      error => console.log(error) // Handle the error response object
+    );
+  }
+
   render() {
     return (
       <div>
-        <AddNote></AddNote>
+        <AddNote uploadNote={this.uploadNote}></AddNote>
         <h1 onClick={this.prevFolder}>Cofnij</h1>
         {this.showCurrentPath()}
         {this.packContent()}

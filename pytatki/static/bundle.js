@@ -10916,41 +10916,18 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function uploadNote(e) {
-  e.preventDefault();
-  var form = document.getElementById('form');
-  var files = form[1];
-  var formData = new FormData(files);
-  fetch('http://127.0.0.1:5000/add/', {
-    method: 'POST',
-    headers: {
-      "Content-Type": "multipart/form-data"
-    },
-    body: formData
-  }).then(function (response) {
-    return response.text();
-  } // if the response is a JSON object
-  ).then(function (success) {
-    return console.log(success);
-  } // Handle the success response object
-  ).catch(function (error) {
-    return console.log(error);
-  } // Handle the error response object
-  );
-}
-
-var AddNote = function AddNote() {
+var AddNote = function AddNote(props) {
   return _react2.default.createElement(
-    'form',
-    { id: 'form', onSubmit: uploadNote },
+    "form",
+    { id: "form", onSubmit: props.uploadNote },
     _react2.default.createElement(
-      'span',
+      "span",
       null,
-      'Dodaj notatk\u0119 w aktualnym folderze'
+      "Dodaj notatk\u0119 w aktualnym folderze"
     ),
-    _react2.default.createElement('input', { type: 'text', name: 'title' }),
-    _react2.default.createElement('input', { id: 'file', type: 'file', name: 'file' }),
-    _react2.default.createElement('input', { type: 'submit' })
+    _react2.default.createElement("input", { type: "text", name: "title" }),
+    _react2.default.createElement("input", { id: "file", type: "file", name: "file" }),
+    _react2.default.createElement("input", { type: "submit" })
   );
 };
 
@@ -11050,7 +11027,7 @@ var Notatki = function (_React$Component) {
         updated_data[that.state.currentDepth + 1] = folderContent;
         var updated_path = that.state.currentPath;
         updated_path[that.state.currentDepth] = selected_dir_name;
-        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path });
+        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path, currentDirId: selected_dir_id });
       }).catch(function (error) {
         return console.log(error);
       });
@@ -11158,10 +11135,35 @@ var Notatki = function (_React$Component) {
       return null;
     };
 
+    _this.uploadNote = function (e) {
+      e.preventDefault();
+      var form = document.getElementById('form');
+      var file = form[1].files[0];
+      var title = form[0].value;
+      var formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', title);
+      formData.append('notegroup_id', _this.state.currentDirId);
+      fetch('http://127.0.0.1:5000/add/', {
+        method: 'POST',
+        body: formData
+      }).then(function (response) {
+        return response.text();
+      } // if the response is a JSON object
+      ).then(function (success) {
+        return console.log(success);
+      } // Handle the success response object
+      ).catch(function (error) {
+        return console.log(error);
+      } // Handle the error response object
+      );
+    };
+
     _this.state = {
       currentDepth: 0,
       data: [],
-      currentPath: []
+      currentPath: [],
+      currentDirId: "2" //mock
     };
     return _this;
   }
@@ -11235,7 +11237,7 @@ var Notatki = function (_React$Component) {
       return _react2.default.createElement(
         "div",
         null,
-        _react2.default.createElement(_AddNote2.default, null),
+        _react2.default.createElement(_AddNote2.default, { uploadNote: this.uploadNote }),
         _react2.default.createElement(
           "h1",
           { onClick: this.prevFolder },
