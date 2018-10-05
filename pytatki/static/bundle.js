@@ -11027,7 +11027,16 @@ var Notatki = function (_React$Component) {
         updated_data[that.state.currentDepth + 1] = folderContent;
         var updated_path = that.state.currentPath;
         updated_path[that.state.currentDepth] = selected_dir_name;
-        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path, currentDirId: selected_dir_id });
+        var updated_dir_id = that.state.currentDirId;
+        updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
+        that.setState(function (prevState) {
+          return {
+            data: updated_data,
+            currentDepth: prevState.currentDepth + 1,
+            currentPath: updated_path,
+            currentDirId: updated_dir_id
+          };
+        });
       }).catch(function (error) {
         return console.log(error);
       });
@@ -11143,7 +11152,7 @@ var Notatki = function (_React$Component) {
       var formData = new FormData();
       formData.append('file', file);
       formData.append('title', title);
-      formData.append('notegroup_id', _this.state.currentDirId);
+      formData.append('notegroup_id', _this.state.currentDirId[_this.state.currentDepth]);
       fetch('http://127.0.0.1:5000/add/', {
         method: 'POST',
         body: formData
@@ -11163,7 +11172,7 @@ var Notatki = function (_React$Component) {
       currentDepth: 0,
       data: [],
       currentPath: [],
-      currentDirId: "2" //mock
+      currentDirId: []
     };
     return _this;
   }
@@ -11178,12 +11187,15 @@ var Notatki = function (_React$Component) {
       }).then(function (res) {
         return res.data.getToken;
       }).then(function (token) {
-        return fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:3,access_token:"' + token + '")}').then(function (response) {
+        return fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}').then(function (response) {
           return response.json();
         }).then(function (myJson) {
-          return myJson.data.getRootId;
-        }).then(function (myJson) {
-          return fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + Number(myJson) + ',access_token:"' + token + '")}');
+          return Number(myJson.data.getRootId);
+        }).then(function (rootId) {
+          that.setState({
+            currentDirId: [rootId]
+          });
+          return fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}');
         }).then(function (response) {
           return response.json();
         }).then(function (myJson) {

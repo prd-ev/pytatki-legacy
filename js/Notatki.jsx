@@ -8,7 +8,7 @@ class Notatki extends React.Component {
       currentDepth: 0,
       data: [],
       currentPath: [],
-      currentDirId: "2"//mock
+      currentDirId: []
     };
   }
 
@@ -18,10 +18,15 @@ class Notatki extends React.Component {
     fetch('http://127.0.0.1:5000/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:3,access_token:"' + token + '")}')
+      .then(token => fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}')
         .then(response => response.json())
-        .then(myJson => myJson.data.getRootId)
-        .then(myJson => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + Number(myJson) + ',access_token:"' + token + '")}'))
+        .then(myJson => Number(myJson.data.getRootId))
+        .then(rootId => {
+          that.setState({
+            currentDirId: [rootId]
+          })
+          return fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
+        })
         .then(response => response.json())
         .then(myJson => JSON.parse(myJson.data.getContent))
       )
@@ -75,14 +80,21 @@ class Notatki extends React.Component {
         updated_data[that.state.currentDepth + 1] = folderContent;
         let updated_path = that.state.currentPath;
         updated_path[that.state.currentDepth] = selected_dir_name;
-        that.setState({ data: updated_data, currentDepth: that.state.currentDepth + 1, currentPath: updated_path, currentDirId: selected_dir_id });
+        let updated_dir_id = that.state.currentDirId;
+        updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
+        that.setState(prevState => ({
+          data: updated_data,
+          currentDepth: prevState.currentDepth + 1,
+          currentPath: updated_path,
+          currentDirId: updated_dir_id
+        }));
       })
       .catch(error => console.log(error));
   };
 
   openNote = (e) => {
     console.log("Jak wyświetlić notatkę?");
-    
+
     let id = e.target.id.slice(4);
     window.open(`http://127.0.0.1:5000/download/${id}`);
   }
@@ -138,7 +150,7 @@ class Notatki extends React.Component {
     var formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
-    formData.append('notegroup_id', this.state.currentDirId);
+    formData.append('notegroup_id', this.state.currentDirId[this.state.currentDepth]);
     fetch('http://127.0.0.1:5000/add/', {
       method: 'POST',
       body: formData
