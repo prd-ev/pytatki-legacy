@@ -1,5 +1,7 @@
 import React from "react";
 import AddNote from "./AddNote.jsx";
+import AddFolder from './AddFolder.jsx';
+import EditMode from './EditMode.jsx'
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -8,7 +10,8 @@ class Notatki extends React.Component {
       currentDepth: 0,
       data: [],
       currentPath: [],
-      currentDirId: []
+      currentDirId: [],
+      editModeOn: false
     };
   }
 
@@ -128,13 +131,21 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(<h1 onClick={this.openNote} id={value.key} key={value.key}>
+          content.push(<div><h1 onClick={this.openNote} id={value.key} key={value.key}>
             {"Notatka " + value.title}
-          </h1>);
+          </h1>
+            <span onClick={this.deleteNote}>
+              {this.state.editModeOn ? " x" : null}
+            </span>
+          </div>);
         } else {
-          content.push(<h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
+          content.push(<div><h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
             {value.title}
-          </h1>);
+          </h1>
+            <span onClick={this.deleteFolder}>
+              {this.state.editModeOn ? " x " : null}
+            </span>
+          </div>);
         }
       }
       return content;
@@ -163,10 +174,54 @@ class Notatki extends React.Component {
     );
   }
 
+  addFolder = (e) => {
+    e.preventDefault();
+    var formData = new FormData();
+    formData.append('title', document.getElementById('addFolderForm')[0].value);
+    formData.append('parent_id', this.state.currentDirId[this.state.currentDirId.length - 1]);
+    formData.append('class', '3');
+    fetch('http://127.0.0.1:5000/admin/add/', {
+      method: 'POST',
+      body: formData
+    }).then(
+      response => response.text() // if the response is a JSON object
+    ).then(
+      success => console.log(success) // Handle the success response object
+    ).catch(
+      error => console.log(error) // Handle the error response object
+    );
+  }
+
+  changeMode = (e) => {
+    e.preventDefault();
+    this.setState(prevState => ({
+      editModeOn: !prevState.editModeOn
+    }))
+  }
+  
+  deleteNote = (e) => {
+    let note_id = e.target.previousSibling.id.slice(4);
+    fetch('http://127.0.0.1:5000/admin/delete/note/' + note_id, {
+    }).then(
+      response => response.text() // if the response is a JSON object
+    ).then(
+      success => console.log(success) // Handle the success response object
+    ).catch(
+      error => console.log(error) // Handle the error response object
+    );
+  }
+
+  deleteFolder = (e) => {
+    console.log("Jak usunąć folder?")
+    console.log(e.target.previousSibling.id);   
+  }
+
   render() {
     return (
       <div>
         <AddNote uploadNote={this.uploadNote}></AddNote>
+        <AddFolder addFolder={this.addFolder}></AddFolder>
+        <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
         <h1 onClick={this.prevFolder}>Cofnij</h1>
         {this.showCurrentPath()}
         {this.packContent()}
