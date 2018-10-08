@@ -2,6 +2,9 @@ import React from "react";
 import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
+import NotegroupList from './NotegroupList.jsx'
+
+const siteUrl = "http://127.0.0.1:5000"; 
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -18,17 +21,17 @@ class Notatki extends React.Component {
   componentWillMount() {
     //Download root folders and set state of data[0] to array of folder objects
     const that = this;
-    fetch('http://127.0.0.1:5000/api?query={getToken}')
+    fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}')
+      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}')
         .then(response => response.json())
         .then(myJson => Number(myJson.data.getRootId))
         .then(rootId => {
           that.setState({
             currentDirId: [rootId]
           })
-          return fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
+          return fetch(siteUrl+'/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
         })
         .then(response => response.json())
         .then(myJson => JSON.parse(myJson.data.getContent))
@@ -58,10 +61,10 @@ class Notatki extends React.Component {
     let selected_dir_id = e.target.id;
     let selected_dir_name = e.target.innerText;
     const that = this;
-    fetch('http://127.0.0.1:5000/api?query={getToken}')
+    fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch('http://127.0.0.1:5000/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}'))
+      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
       .then(function (innerJson) {
@@ -99,7 +102,7 @@ class Notatki extends React.Component {
     console.log("Jak wyświetlić notatkę?");
 
     let id = e.target.id.slice(4);
-    window.open(`http://127.0.0.1:5000/download/${id}`);
+    window.open(siteUrl + `/download/${id}`);
   }
 
   prevFolder = () => {
@@ -162,7 +165,7 @@ class Notatki extends React.Component {
     formData.append('file', file);
     formData.append('title', title);
     formData.append('notegroup_id', this.state.currentDirId[this.state.currentDepth]);
-    fetch('http://127.0.0.1:5000/add/', {
+    fetch(siteUrl + '/add/', {
       method: 'POST',
       body: formData
     }).then(
@@ -180,7 +183,7 @@ class Notatki extends React.Component {
     formData.append('title', document.getElementById('addFolderForm')[0].value);
     formData.append('parent_id', this.state.currentDirId[this.state.currentDirId.length - 1]);
     formData.append('class', '3');
-    fetch('http://127.0.0.1:5000/admin/add/', {
+    fetch(siteUrl + '/admin/add/', {
       method: 'POST',
       body: formData
     }).then(
@@ -201,7 +204,7 @@ class Notatki extends React.Component {
   
   deleteNote = (e) => {
     let note_id = e.target.previousSibling.id.slice(4);
-    fetch('http://127.0.0.1:5000/admin/delete/note/' + note_id, {
+    fetch(siteUrl + '/admin/delete/note/' + note_id, {
     }).then(
       response => response.text() // if the response is a JSON object
     ).then(
@@ -219,6 +222,7 @@ class Notatki extends React.Component {
   render() {
     return (
       <div>
+        <NotegroupList></NotegroupList>
         <AddNote uploadNote={this.uploadNote}></AddNote>
         <AddFolder addFolder={this.addFolder}></AddFolder>
         <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
