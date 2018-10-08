@@ -182,7 +182,7 @@ class Notatki extends React.Component {
     var formData = new FormData();
     formData.append('title', document.getElementById('addFolderForm')[0].value);
     formData.append('parent_id', this.state.currentDirId[this.state.currentDirId.length - 1]);
-    formData.append('class', '3');
+    formData.append('class', '1');//dodać dynamicznie 
     fetch(siteUrl + '/admin/add/', {
       method: 'POST',
       body: formData
