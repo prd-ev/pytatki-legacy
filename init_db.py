@@ -1,11 +1,10 @@
 __author__ = "Patryk Niedźwiedziński"
 """Skrypt tworzenia bazy danych"""
 
-from pytatki.dbconnect import connection
+import configparser
 from pymysql import escape_string, connect
 from passlib.hash import sha256_crypt
-import configparser
-
+from pytatki.dbconnect import connection, create_usergroup, create_status, create_note_type, create_user
 
 def parse_sql(filename):
     data = open(filename, 'r').readlines()
@@ -36,13 +35,32 @@ def parse_sql(filename):
             stmts.append(line.strip())
     return stmts
 
+def save_to_config(config_dict):
+    """
+    Save data to config.ini
+    """
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    config.sections()
+    config.add_section('IDENTIFIERS')
+    config['IDENTIFIERS']['ADMINGROUP_ID'] = str(config_dict['admingroup_id'])
+    config['IDENTIFIERS']['ADMIN_ID'] = str(config_dict['admin_id'])
+    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = str(config_dict['active_id'])
+    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = str(config_dict['removed_id'])
+    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = str(config_dict['file_id'])
+    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = str(config_dict['text_id'])
+    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = str(config_dict['url_id'])
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
 
-def db_start():
-    host = input("DB host: [127.0.0.1]")
+def db_init(host=None, user=None, password=None):
+    """""Create database from sql/create-database"""
+    
+    host = input("DB host: [127.0.0.1]") if not host else host
     host = '127.0.0.1' if host == '' else host
-    user = input("DB user: [root] ")
+    user = input("DB user: [root] ") if not user else user
     user = 'root' if user == '' else user
-    password = input("DB root password: ")
+    password = input("DB root password: ") if not password else password
     print("Connecting...")
     conn = connect(host=host, user=user, password=password)
     print("Connection OK")
@@ -55,47 +73,32 @@ def db_start():
     conn.close()
     con, conn = connection(host='127.0.0.1', user='pytatki', password='pytatki', db='pytatki')
     conn.begin()
-    con.execute("INSERT INTO usergroup (name, description) VALUES (\"admins\", \"group of admins\")")
-    admin_group_id = con.lastrowid
-    con.execute("INSERT INTO status (name, description) VALUES (\"active\", \"Record is ative\")")
-    active_id = con.lastrowid
-    con.execute(
-        "INSERT INTO status (name, description) VALUES (\"removed\", \"Record is removed\")")
-    removed_id = con.lastrowid
-    con.execute("INSERT INTO note_type (name, description) VALUES(\"file\", \"A file in format of txt, pdf, "
-                "png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp\")")
-    file_id = con.lastrowid
-    con.execute("INSERT INTO note_type (name, description) VALUES(\"text\", \"Just plain non-formated text\")")
-    text_id = con.lastrowid
-    con.execute("INSERT INTO note_type (name, description) VALUES(\"url\",\"An URL link to another resource\")")
-    url_id = con.lastrowid
+    admin_group_id = create_usergroup(conn, 'admins', 'Group of admins')
+    active_id = create_status(conn, 'active', 'Record is active')
+    removed_id = create_status(conn, 'removed', 'Record is removed')
+    file_id = create_note_type(conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
+    text_id = create_note_type(conn, "text", "Just plain non-formated text")
+    url_id = create_note_type(conn, "url", "An URL link to another resource")
     username = input("Insert your admin login: [admin]")
     username = 'admin' if username == '' else username
     email = input("Insert your admin email: ")
     password = input("Insert your admin password: ")
-    con.execute("INSERT INTO user (login, password, email, status_id) VALUES (%s, %s, %s, %s)", (
-        escape_string(username), escape_string(sha256_crypt.encrypt(str(password))), escape_string(email),
-        escape_string(str(active_id))))
-    admin_id = con.lastrowid
+    admin_id = create_user(conn, username, email, password, active_id)
     con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (
         escape_string(str(admin_id)), escape_string(str(admin_group_id))))
     conn.commit()
     con.close()
     conn.close()
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    config.sections()
-    config.add_section('IDENTIFIERS')
-    config['IDENTIFIERS']['ADMINGROUP_ID'] = str(admin_group_id)
-    config['IDENTIFIERS']['ADMIN_ID'] = str(admin_id)
-    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = str(active_id)
-    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = str(removed_id)
-    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = str(file_id)
-    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = str(text_id)
-    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = str(url_id)
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
+    save_to_config({
+        'admingroup_id': admin_group_id,
+        'admin_id': admin_id,
+        'active_id': active_id,
+        'removed_id': removed_id,
+        'file_id': file_id,
+        'text_id': text_id,
+        'url_id': url_id
+        })
 
 
 if __name__ == '__main__':
-    db_start()
+    db_init()
