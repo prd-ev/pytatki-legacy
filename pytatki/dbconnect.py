@@ -6,6 +6,7 @@ __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
 CONFIG = parse_config('config.ini', check_db_configuration=False)
 
+
 def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_USER'],
                password=CONFIG['DATABASE']['DB_PASSWORD'], db=CONFIG['DATABASE']['DB_NAME'],
                charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor):
@@ -18,6 +19,7 @@ def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_U
     c = conn.cursor()
     return c, conn
 
+
 def create_usergroup(conn, name, description, parent_id='0'):
     """Insert usergroup into the database using given connection and returns its id"""
     c = conn.cursor()
@@ -25,19 +27,38 @@ def create_usergroup(conn, name, description, parent_id='0'):
         "INSERT INTO usergroup (name, description) VALUES (%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(description)))
     return c.lastrowid
 
+
+def note_exists(conn, idnote):
+    """Checks if note exists"""
+    note_exists = conn.cursor().execute(
+        "SELECT * FROM note_view WHERE idnote = %s", pymysql.escape_string(str(idnote)))
+    return True if note_exists else False
+
+
+def remove_note(conn, idnote):
+    """Removes a note"""
+    conn.cursor().execute("DELETE FROM note WHERE idnote = %s",
+                          pymysql.escape_string(str(idnote)))
+
+
 def add_user_to_usergroup(conn, iduser, idusergroup):
     """Add user to usergroup"""
     c = conn.cursor()
-    c.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (pymysql.escape_string(str(iduser)), pymysql.escape_string(str(idusergroup))))
+    c.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
+              (pymysql.escape_string(str(iduser)), pymysql.escape_string(str(idusergroup))))
     return c.lastrowid
+
 
 def create_notegroup(conn, name, idusergroup, parent_id='0'):
     """Insert new notegroup into the database in given usergroup using given connection and returns its id"""
     c = conn.cursor()
-    c.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(str(parent_id))))
+    c.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)",
+              (pymysql.escape_string(name), pymysql.escape_string(str(parent_id))))
     idnotegroup = c.lastrowid
-    c.execute("INSERT INTO usergroup_has_notegroup (usergroup_id, notegroup_id) VALUES (%s, %s)", (pymysql.escape_string(str(idusergroup)), pymysql.escape_string(str(idnotegroup))))
+    c.execute("INSERT INTO usergroup_has_notegroup (usergroup_id, notegroup_id) VALUES (%s, %s)",
+              (pymysql.escape_string(str(idusergroup)), pymysql.escape_string(str(idnotegroup))))
     return idnotegroup
+
 
 def notegroup_empty(conn, idnotegroup):
     """Chcecks if notegroup is empty"""
@@ -45,13 +66,16 @@ def notegroup_empty(conn, idnotegroup):
         "SELECT * FROM note WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))
     return False if not_empty else True
 
+
 def remove_notegroup(conn, idnotegroup):
     """Important function"""
     if notegroup_empty(conn, idnotegroup):
         c = conn.cursor()
-        c.execute("DELETE FROM notegroup WHERE idnotegroup = %s", pymysql.escape_string(str(idnotegroup)))
+        c.execute("DELETE FROM notegroup WHERE idnotegroup = %s",
+                  pymysql.escape_string(str(idnotegroup)))
         return True
     return False
+
 
 def create_status(conn, name, description):
     """Insert status into the database using given connection and returns its id"""
@@ -60,11 +84,14 @@ def create_status(conn, name, description):
         "INSERT INTO status (name, description) VALUES (%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(description)))
     return c.lastrowid
 
+
 def create_note_type(conn, name, description):
     """Insert note type into the database using given connection and returns its id"""
     c = conn.cursor()
-    c.execute("INSERT INTO note_type (name, description) VALUES(%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(description)))
+    c.execute("INSERT INTO note_type (name, description) VALUES(%s, %s)",
+              (pymysql.escape_string(name), pymysql.escape_string(description)))
     return c.lastrowid
+
 
 def create_user(conn, login, password, email, status_id):
     """Insert user into the database using given connection and returns its id"""
@@ -75,16 +102,18 @@ def create_user(conn, login, password, email, status_id):
         pymysql.escape_string(str(status_id))))
     return c.lastrowid
 
-def create_note(conn, value, title, note_type_id, user_id, notegroup_id):
+
+def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_id):
     c = conn.cursor()
     c.execute(
-        "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, %s)", 
+        "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)",
         (
-            pymysql.escape_string(value), 
-            pymysql.escape_string(title), 
-            pymysql.escape_string(str(note_type_id)), 
+            pymysql.escape_string(value),
+            pymysql.escape_string(title),
+            pymysql.escape_string(str(note_type_id)),
             pymysql.escape_string(str(user_id)),
-            pymysql.escape_string(str(notegroup_id))
+            pymysql.escape_string(str(notegroup_id)),
+            pymysql.escape_string(str(status_id))
         )
-        )
+    )
     return c.lastrowid

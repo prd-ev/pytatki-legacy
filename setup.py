@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='Pytatki',
-    version="1.0a3",
+    version="1.0a4",
     description="Organizer klasowy",
     long_description=long_description,
     long_description_content_type="text/markdown",
