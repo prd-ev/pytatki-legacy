@@ -241,9 +241,9 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-        query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
+        note_exists = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
         note = con.fetchone()
-        if query:
+        if note_exists:
             con.execute("UPDATE note SET status_id = %s WHERE idnote = %s",
                         (escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), escape_string(str(identifier))))
             conn.commit()
