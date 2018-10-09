@@ -4,7 +4,7 @@ import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
 import NotegroupList from './NotegroupList.jsx'
 
-const siteUrl = "http://127.0.0.1:5000"; 
+const siteUrl = "http://127.0.0.1:5000";
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -16,9 +16,6 @@ class Notatki extends React.Component {
       currentDirId: [],
       editModeOn: false
     };
-  }
-
-  componentWillMount() {
     //Download root folders and set state of data[0] to array of folder objects
     const that = this;
     fetch(siteUrl + '/api?query={getToken}')
@@ -31,7 +28,7 @@ class Notatki extends React.Component {
           that.setState({
             currentDirId: [rootId]
           })
-          return fetch(siteUrl+'/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
+          return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
         })
         .then(response => response.json())
         .then(myJson => JSON.parse(myJson.data.getContent))
@@ -54,7 +51,6 @@ class Notatki extends React.Component {
       })
       .catch(error => console.log(error));
   }
-
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
@@ -134,7 +130,7 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(<div><h1 onClick={this.openNote} id={value.key} key={value.key}>
+          content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
             {"Notatka " + value.title}
           </h1>
             <span onClick={this.deleteNote}>
@@ -142,7 +138,7 @@ class Notatki extends React.Component {
             </span>
           </div>);
         } else {
-          content.push(<div><h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
+          content.push(<div key={value.key}><h1 onClick={this.changeCurrentDirectory} id={value.key} >
             {value.title}
           </h1>
             <span onClick={this.deleteFolder}>
@@ -201,7 +197,7 @@ class Notatki extends React.Component {
       editModeOn: !prevState.editModeOn
     }))
   }
-  
+
   deleteNote = (e) => {
     let note_id = e.target.previousSibling.id.slice(4);
     fetch(siteUrl + '/admin/delete/note/' + note_id, {
@@ -216,7 +212,7 @@ class Notatki extends React.Component {
 
   deleteFolder = (e) => {
     console.log("Jak usunąć folder?")
-    console.log(e.target.previousSibling.id);   
+    console.log(e.target.previousSibling.id);
   }
 
   render() {

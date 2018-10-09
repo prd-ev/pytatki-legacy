@@ -11004,7 +11004,7 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = function (props) {
+var EditMode = function EditMode(props) {
     if (props.isOn) {
         return _react2.default.createElement(
             'div',
@@ -11026,6 +11026,7 @@ exports.default = function (props) {
         )
     );
 };
+exports.default = EditMode;
 
 /***/ }),
 /* 90 */
@@ -11078,270 +11079,7 @@ var Notatki = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Notatki.__proto__ || Object.getPrototypeOf(Notatki)).call(this, props));
 
-    _this.changeCurrentDirectory = function (e) {
-      //Increase depth, set state of data[depth] to downloaded array of folder/note object
-      var selected_dir_id = e.target.id;
-      var selected_dir_name = e.target.innerText;
-      var that = _this;
-      fetch(siteUrl + '/api?query={getToken}').then(function (response) {
-        return response.json();
-      }).then(function (res) {
-        return res.data.getToken;
-      }).then(function (token) {
-        return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}');
-      }).then(function (response) {
-        return response.json();
-      }).then(function (myJson) {
-        return JSON.parse(myJson.data.getContent);
-      }).then(function (innerJson) {
-        var folderContent = [];
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = innerJson[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var notegroup = _step.value;
-
-            var object = {};
-            if (notegroup.idnote) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
-            } else {
-              object["title"] = notegroup.folder_name;
-              object["key"] = notegroup.idnotegroup;
-              object["is_note"] = false;
-            }
-            folderContent.push(object);
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-
-        ;
-        var updated_data = that.state.data;
-        updated_data[that.state.currentDepth + 1] = folderContent;
-        var updated_path = that.state.currentPath;
-        updated_path[that.state.currentDepth] = selected_dir_name;
-        var updated_dir_id = that.state.currentDirId;
-        updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
-        that.setState(function (prevState) {
-          return {
-            data: updated_data,
-            currentDepth: prevState.currentDepth + 1,
-            currentPath: updated_path,
-            currentDirId: updated_dir_id
-          };
-        });
-      }).catch(function (error) {
-        return console.log(error);
-      });
-    };
-
-    _this.openNote = function (e) {
-      console.log("Jak wyświetlić notatkę?");
-
-      var id = e.target.id.slice(4);
-      window.open(siteUrl + ("/download/" + id));
-    };
-
-    _this.prevFolder = function () {
-      //Update current path and decrease depth (if 1 or higher)
-      var path = _this.state.currentPath;
-      var depth = _this.state.currentDepth;
-      path.pop();
-      if (!_this.state.currentDepth < 1) {
-        depth -= 1;
-      }
-      _this.setState({
-        currentDepth: depth,
-        currentPath: path
-      });
-    };
-
-    _this.showCurrentPath = function () {
-      //Show current path from state
-      var path = "";
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = _this.state.currentPath[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var folder = _step2.value;
-
-          path = path + " / " + folder;
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-
-      return _react2.default.createElement(
-        "h5",
-        null,
-        path
-      );
-    };
-
-    _this.packContent = function () {
-      //Show content of current depth form state (this.state.data)
-      if (_this.state.data[_this.state.currentDepth]) {
-        var content = [];
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-          for (var _iterator3 = _this.state.data[_this.state.currentDepth][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var value = _step3.value;
-
-            if (value.is_note) {
-              content.push(_react2.default.createElement(
-                "div",
-                null,
-                _react2.default.createElement(
-                  "h1",
-                  { onClick: _this.openNote, id: value.key, key: value.key },
-                  "Notatka " + value.title
-                ),
-                _react2.default.createElement(
-                  "span",
-                  { onClick: _this.deleteNote },
-                  _this.state.editModeOn ? " x" : null
-                )
-              ));
-            } else {
-              content.push(_react2.default.createElement(
-                "div",
-                null,
-                _react2.default.createElement(
-                  "h1",
-                  { onClick: _this.changeCurrentDirectory, id: value.key, key: value.key },
-                  value.title
-                ),
-                _react2.default.createElement(
-                  "span",
-                  { onClick: _this.deleteFolder },
-                  _this.state.editModeOn ? " x " : null
-                )
-              ));
-            }
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
-        }
-
-        return content;
-      }
-      return null;
-    };
-
-    _this.uploadNote = function (e) {
-      e.preventDefault();
-      var form = document.getElementById('form');
-      var file = form[1].files[0];
-      var title = form[0].value;
-      var formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', title);
-      formData.append('notegroup_id', _this.state.currentDirId[_this.state.currentDepth]);
-      fetch(siteUrl + '/add/', {
-        method: 'POST',
-        body: formData
-      }).then(function (response) {
-        return response.text();
-      } // if the response is a JSON object
-      ).then(function (success) {
-        return console.log(success);
-      } // Handle the success response object
-      ).catch(function (error) {
-        return console.log(error);
-      } // Handle the error response object
-      );
-    };
-
-    _this.addFolder = function (e) {
-      e.preventDefault();
-      var formData = new FormData();
-      formData.append('title', document.getElementById('addFolderForm')[0].value);
-      formData.append('parent_id', _this.state.currentDirId[_this.state.currentDirId.length - 1]);
-      formData.append('class', '1'); //dodać dynamicznie 
-      fetch(siteUrl + '/admin/add/', {
-        method: 'POST',
-        body: formData
-      }).then(function (response) {
-        return response.text();
-      } // if the response is a JSON object
-      ).then(function (success) {
-        return console.log(success);
-      } // Handle the success response object
-      ).catch(function (error) {
-        return console.log(error);
-      } // Handle the error response object
-      );
-    };
-
-    _this.changeMode = function (e) {
-      e.preventDefault();
-      _this.setState(function (prevState) {
-        return {
-          editModeOn: !prevState.editModeOn
-        };
-      });
-    };
-
-    _this.deleteNote = function (e) {
-      var note_id = e.target.previousSibling.id.slice(4);
-      fetch(siteUrl + '/admin/delete/note/' + note_id, {}).then(function (response) {
-        return response.text();
-      } // if the response is a JSON object
-      ).then(function (success) {
-        return console.log(success);
-      } // Handle the success response object
-      ).catch(function (error) {
-        return console.log(error);
-      } // Handle the error response object
-      );
-    };
-
-    _this.deleteFolder = function (e) {
-      console.log("Jak usunąć folder?");
-      console.log(e.target.previousSibling.id);
-    };
+    _initialiseProps.call(_this);
 
     _this.state = {
       currentDepth: 0,
@@ -11350,76 +11088,72 @@ var Notatki = function (_React$Component) {
       currentDirId: [],
       editModeOn: false
     };
+    //Download root folders and set state of data[0] to array of folder objects
+    var that = _this;
+    fetch(siteUrl + '/api?query={getToken}').then(function (response) {
+      return response.json();
+    }).then(function (res) {
+      return res.data.getToken;
+    }).then(function (token) {
+      return fetch(siteUrl + '/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}').then(function (response) {
+        return response.json();
+      }).then(function (myJson) {
+        return Number(myJson.data.getRootId);
+      }).then(function (rootId) {
+        that.setState({
+          currentDirId: [rootId]
+        });
+        return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}');
+      }).then(function (response) {
+        return response.json();
+      }).then(function (myJson) {
+        return JSON.parse(myJson.data.getContent);
+      });
+    }).then(function (innerJson) {
+      var rootFolders = [];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = innerJson[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var notegroup = _step.value;
+
+          var object = {};
+          object["title"] = notegroup.folder_name;
+          if (notegroup.idnote) {
+            object["key"] = "note" + notegroup.idnote;
+          } else {
+            object["key"] = notegroup.idnotegroup;
+          }
+          rootFolders.push(object);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      ;
+      var updated_data = that.state.data;
+      updated_data[0] = rootFolders;
+      that.setState({ data: updated_data });
+    }).catch(function (error) {
+      return console.log(error);
+    });
     return _this;
   }
 
   _createClass(Notatki, [{
-    key: "componentWillMount",
-    value: function componentWillMount() {
-      //Download root folders and set state of data[0] to array of folder objects
-      var that = this;
-      fetch(siteUrl + '/api?query={getToken}').then(function (response) {
-        return response.json();
-      }).then(function (res) {
-        return res.data.getToken;
-      }).then(function (token) {
-        return fetch(siteUrl + '/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}').then(function (response) {
-          return response.json();
-        }).then(function (myJson) {
-          return Number(myJson.data.getRootId);
-        }).then(function (rootId) {
-          that.setState({
-            currentDirId: [rootId]
-          });
-          return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}');
-        }).then(function (response) {
-          return response.json();
-        }).then(function (myJson) {
-          return JSON.parse(myJson.data.getContent);
-        });
-      }).then(function (innerJson) {
-        var rootFolders = [];
-        var _iteratorNormalCompletion4 = true;
-        var _didIteratorError4 = false;
-        var _iteratorError4 = undefined;
-
-        try {
-          for (var _iterator4 = innerJson[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-            var notegroup = _step4.value;
-
-            var object = {};
-            object["title"] = notegroup.folder_name;
-            if (notegroup.idnote) {
-              object["key"] = "note" + notegroup.idnote;
-            } else {
-              object["key"] = notegroup.idnotegroup;
-            }
-            rootFolders.push(object);
-          }
-        } catch (err) {
-          _didIteratorError4 = true;
-          _iteratorError4 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-              _iterator4.return();
-            }
-          } finally {
-            if (_didIteratorError4) {
-              throw _iteratorError4;
-            }
-          }
-        }
-
-        ;
-        var updated_data = that.state.data;
-        updated_data[0] = rootFolders;
-        that.setState({ data: updated_data });
-      }).catch(function (error) {
-        return console.log(error);
-      });
-    }
-  }, {
     key: "render",
     value: function render() {
       return _react2.default.createElement(
@@ -11442,6 +11176,275 @@ var Notatki = function (_React$Component) {
 
   return Notatki;
 }(_react2.default.Component);
+
+var _initialiseProps = function _initialiseProps() {
+  var _this2 = this;
+
+  this.changeCurrentDirectory = function (e) {
+    //Increase depth, set state of data[depth] to downloaded array of folder/note object
+    var selected_dir_id = e.target.id;
+    var selected_dir_name = e.target.innerText;
+    var that = _this2;
+    fetch(siteUrl + '/api?query={getToken}').then(function (response) {
+      return response.json();
+    }).then(function (res) {
+      return res.data.getToken;
+    }).then(function (token) {
+      return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}');
+    }).then(function (response) {
+      return response.json();
+    }).then(function (myJson) {
+      return JSON.parse(myJson.data.getContent);
+    }).then(function (innerJson) {
+      var folderContent = [];
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = innerJson[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var notegroup = _step2.value;
+
+          var object = {};
+          if (notegroup.idnote) {
+            object["title"] = notegroup.name;
+            object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
+          } else {
+            object["title"] = notegroup.folder_name;
+            object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
+          }
+          folderContent.push(object);
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      ;
+      var updated_data = that.state.data;
+      updated_data[that.state.currentDepth + 1] = folderContent;
+      var updated_path = that.state.currentPath;
+      updated_path[that.state.currentDepth] = selected_dir_name;
+      var updated_dir_id = that.state.currentDirId;
+      updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
+      that.setState(function (prevState) {
+        return {
+          data: updated_data,
+          currentDepth: prevState.currentDepth + 1,
+          currentPath: updated_path,
+          currentDirId: updated_dir_id
+        };
+      });
+    }).catch(function (error) {
+      return console.log(error);
+    });
+  };
+
+  this.openNote = function (e) {
+    console.log("Jak wyświetlić notatkę?");
+
+    var id = e.target.id.slice(4);
+    window.open(siteUrl + ("/download/" + id));
+  };
+
+  this.prevFolder = function () {
+    //Update current path and decrease depth (if 1 or higher)
+    var path = _this2.state.currentPath;
+    var depth = _this2.state.currentDepth;
+    path.pop();
+    if (!_this2.state.currentDepth < 1) {
+      depth -= 1;
+    }
+    _this2.setState({
+      currentDepth: depth,
+      currentPath: path
+    });
+  };
+
+  this.showCurrentPath = function () {
+    //Show current path from state
+    var path = "";
+    var _iteratorNormalCompletion3 = true;
+    var _didIteratorError3 = false;
+    var _iteratorError3 = undefined;
+
+    try {
+      for (var _iterator3 = _this2.state.currentPath[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+        var folder = _step3.value;
+
+        path = path + " / " + folder;
+      }
+    } catch (err) {
+      _didIteratorError3 = true;
+      _iteratorError3 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion3 && _iterator3.return) {
+          _iterator3.return();
+        }
+      } finally {
+        if (_didIteratorError3) {
+          throw _iteratorError3;
+        }
+      }
+    }
+
+    return _react2.default.createElement(
+      "h5",
+      null,
+      path
+    );
+  };
+
+  this.packContent = function () {
+    //Show content of current depth form state (this.state.data)
+    if (_this2.state.data[_this2.state.currentDepth]) {
+      var content = [];
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = _this2.state.data[_this2.state.currentDepth][Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var value = _step4.value;
+
+          if (value.is_note) {
+            content.push(_react2.default.createElement(
+              "div",
+              { key: value.key },
+              _react2.default.createElement(
+                "h1",
+                { onClick: _this2.openNote, id: value.key },
+                "Notatka " + value.title
+              ),
+              _react2.default.createElement(
+                "span",
+                { onClick: _this2.deleteNote },
+                _this2.state.editModeOn ? " x" : null
+              )
+            ));
+          } else {
+            content.push(_react2.default.createElement(
+              "div",
+              { key: value.key },
+              _react2.default.createElement(
+                "h1",
+                { onClick: _this2.changeCurrentDirectory, id: value.key },
+                value.title
+              ),
+              _react2.default.createElement(
+                "span",
+                { onClick: _this2.deleteFolder },
+                _this2.state.editModeOn ? " x " : null
+              )
+            ));
+          }
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
+      return content;
+    }
+    return null;
+  };
+
+  this.uploadNote = function (e) {
+    e.preventDefault();
+    var form = document.getElementById('form');
+    var file = form[1].files[0];
+    var title = form[0].value;
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('notegroup_id', _this2.state.currentDirId[_this2.state.currentDepth]);
+    fetch(siteUrl + '/add/', {
+      method: 'POST',
+      body: formData
+    }).then(function (response) {
+      return response.text();
+    } // if the response is a JSON object
+    ).then(function (success) {
+      return console.log(success);
+    } // Handle the success response object
+    ).catch(function (error) {
+      return console.log(error);
+    } // Handle the error response object
+    );
+  };
+
+  this.addFolder = function (e) {
+    e.preventDefault();
+    var formData = new FormData();
+    formData.append('title', document.getElementById('addFolderForm')[0].value);
+    formData.append('parent_id', _this2.state.currentDirId[_this2.state.currentDirId.length - 1]);
+    formData.append('class', '1'); //dodać dynamicznie 
+    fetch(siteUrl + '/admin/add/', {
+      method: 'POST',
+      body: formData
+    }).then(function (response) {
+      return response.text();
+    } // if the response is a JSON object
+    ).then(function (success) {
+      return console.log(success);
+    } // Handle the success response object
+    ).catch(function (error) {
+      return console.log(error);
+    } // Handle the error response object
+    );
+  };
+
+  this.changeMode = function (e) {
+    e.preventDefault();
+    _this2.setState(function (prevState) {
+      return {
+        editModeOn: !prevState.editModeOn
+      };
+    });
+  };
+
+  this.deleteNote = function (e) {
+    var note_id = e.target.previousSibling.id.slice(4);
+    fetch(siteUrl + '/admin/delete/note/' + note_id, {}).then(function (response) {
+      return response.text();
+    } // if the response is a JSON object
+    ).then(function (success) {
+      return console.log(success);
+    } // Handle the success response object
+    ).catch(function (error) {
+      return console.log(error);
+    } // Handle the error response object
+    );
+  };
+
+  this.deleteFolder = function (e) {
+    console.log("Jak usunąć folder?");
+    console.log(e.target.previousSibling.id);
+  };
+};
 
 exports.default = Notatki;
 
@@ -11483,10 +11486,9 @@ var NotegroupList = function (_Component) {
     key: 'render',
     value: function render() {
 
-      //componentWillMount = () => {
-      //fetch wszyskich notegroup dla użytkownika
+      //konstruktor    
+      //fetch wszystkich notegroup dla użytkownika
       //spakowanie wyników w listę
-      //}
 
       return _react2.default.createElement(
         'div',

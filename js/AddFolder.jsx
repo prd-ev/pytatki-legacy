@@ -5,7 +5,6 @@ export default class AddFolder extends Component {
       super(props)
     
       this.state = {
-         
       }
     }
     

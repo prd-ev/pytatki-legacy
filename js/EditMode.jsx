@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default (props) => {
+const EditMode = (props) => {
     if (props.isOn) {
         return (
             <div>
@@ -15,3 +15,4 @@ export default (props) => {
         </div>
     )
 }
+export default EditMode;
