@@ -1,6 +1,6 @@
 import pytest
 import pymysql
-from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note
+from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, notegroup_empty, remove_notegroup
 from passlib.hash import sha256_crypt
 from pytatki.views import has_access_to_note, type_id, has_access_to_usergroup
 from init_db import parse_sql, db_init
@@ -53,8 +53,20 @@ def insert_usergroup(insert_user):
     return usergroup_id
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def insert_notegroup(insert_usergroup, insert_user):
+    def _insert(*args, **kwargs):
+        _, conn = connection()
+        conn.begin()
+        notegroup_id = create_notegroup(*args, **kwargs)
+        conn.commit()
+        _.close()
+        conn.close()
+        return notegroup_id
+    return _insert
+
+@pytest.fixture(scope='session', autouse=True)
+def insert_test_notegroup(insert_usergroup, insert_user):
     _, conn = connection()
     conn.begin()
     notegroup_id = create_notegroup(conn, 'test', insert_usergroup)
@@ -74,14 +86,15 @@ def insert_text_note_type(create_db):
     return note_type_id
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_note(insert_user, insert_text_note_type, insert_notegroup):
+def insert_note(insert_user, insert_text_note_type, insert_test_notegroup):
     """Insert new note"""
     con, conn = connection()
     conn.begin()
-    note_id = create_note(conn, 'test', 'Test', insert_text_note_type, insert_user, insert_notegroup)
+    note_id = create_note(conn, 'test', 'Test', insert_text_note_type, insert_user, insert_test_notegroup)
     conn.commit()
     con.close()
     conn.close()
+    return note_id
 
 def test_user_has_access_to_note(insert_note):
     if has_access_to_note(1, 1) != True:
@@ -93,4 +106,10 @@ def test_type_id(insert_text_note_type):
 
 def test_has_access_to_usergroup(insert_usergroup):
     if has_access_to_usergroup(1, 1) != True:
+        raise AssertionError()
+
+def test_notegroup_empty(insert_notegroup, insert_usergroup):
+    _, conn = connection()
+    notegroup_id = insert_notegroup(conn, 'test_empty', insert_usergroup)
+    if notegroup_empty(conn, notegroup_id) != True:
         raise AssertionError()
