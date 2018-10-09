@@ -39,6 +39,20 @@ def create_notegroup(conn, name, idusergroup, parent_id='0'):
     c.execute("INSERT INTO usergroup_has_notegroup (usergroup_id, notegroup_id) VALUES (%s, %s)", (pymysql.escape_string(str(idusergroup)), pymysql.escape_string(str(idnotegroup))))
     return idnotegroup
 
+def notegroup_empty(conn, idnotegroup):
+    """Chcecks if notegroup is empty"""
+    not_empty = conn.cursor().execute(
+        "SELECT * FROM note WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))
+    return False if not_empty else True
+
+def remove_notegroup(conn, idnotegroup):
+    """Important function"""
+    if notegroup_empty(conn, idnotegroup):
+        c = conn.cursor()
+        c.execute("DELETE FROM notegroup WHERE idnotegroup = %s", pymysql.escape_string(str(idnotegroup)))
+        return True
+    return False
+
 def create_status(conn, name, description):
     """Insert status into the database using given connection and returns its id"""
     c = conn.cursor()
