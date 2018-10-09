@@ -25,6 +25,17 @@ def create_usergroup(conn, name, description, parent_id='0'):
         "INSERT INTO usergroup (name, description) VALUES (%s, %s)", (pymysql.escape_string(name), pymysql.escape_string(description)))
     return c.lastrowid
 
+def note_exists(conn, idnote):
+    """Checks if note exists"""
+    note_exists = conn.cursor().execute(
+        "SELECT * FROM note_view WHERE idnote = %s", pymysql.escape_string(str(idnote)))
+    return True if note_exists else False
+
+def remove_note(conn, idnote):
+    """Removes a note"""
+    conn.cursor().execute("UPDATE note SET status_id = %s WHERE idnote = %s", 
+        (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote))))
+
 def add_user_to_usergroup(conn, iduser, idusergroup):
     """Add user to usergroup"""
     c = conn.cursor()
@@ -75,16 +86,17 @@ def create_user(conn, login, password, email, status_id):
         pymysql.escape_string(str(status_id))))
     return c.lastrowid
 
-def create_note(conn, value, title, note_type_id, user_id, notegroup_id):
+def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_id):
     c = conn.cursor()
     c.execute(
-        "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, %s)", 
+        "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)", 
         (
             pymysql.escape_string(value), 
             pymysql.escape_string(title), 
             pymysql.escape_string(str(note_type_id)), 
             pymysql.escape_string(str(user_id)),
-            pymysql.escape_string(str(notegroup_id))
+            pymysql.escape_string(str(notegroup_id)),
+            pymysql.escape_string(str(status_id))
         )
         )
     return c.lastrowid
