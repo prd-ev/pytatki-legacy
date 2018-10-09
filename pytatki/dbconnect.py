@@ -33,8 +33,8 @@ def note_exists(conn, idnote):
 
 def remove_note(conn, idnote):
     """Removes a note"""
-    conn.cursor().execute("UPDATE note SET status_id = %s WHERE idnote = %s", 
-        (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote))))
+    conn.cursor().execute("DELETE FROM note WHERE idnote = %s", 
+        pymysql.escape_string(str(idnote)))
 
 def add_user_to_usergroup(conn, iduser, idusergroup):
     """Add user to usergroup"""
