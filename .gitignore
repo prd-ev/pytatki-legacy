@@ -14,5 +14,5 @@ src/.DS_Store
 docs/database-schema.mwb.bak
 config/__init__.py
 node_modules
-static/bundle.js
+pytatki/static/bundle.js
 config.ini

@@ -11,7 +11,7 @@ export default class AddFolder extends Component {
   render() {
     return (
       <form id="addFolderForm" onSubmit={this.props.addFolder}>
-          <input name="title" type="text"/>
+          <input required name="title" type="text"/>
           <input type="submit" value="Dodaj folder w aktualnej lokalizacji"/>
       </form>
     )
