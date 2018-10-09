@@ -248,18 +248,9 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-<<<<<<< HEAD
-        query = con.execute(
-            "SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
-        note = con.fetchone()
-        if query:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s",
-                        (escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), escape_string(str(identifier))))
-=======
         if note_exists(conn, identifier):
             conn.begin()
             remove_note(conn, identifier)
->>>>>>> origin/release/1.0
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
