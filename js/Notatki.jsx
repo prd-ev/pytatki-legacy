@@ -14,14 +14,15 @@ class Notatki extends React.Component {
       data: [],
       currentPath: [],
       currentDirId: [],
-      editModeOn: false
+      editModeOn: false,
+      current_usergroup_id: "1"
     };
     //Download root folders and set state of data[0] to array of folder objects
     const that = this;
     fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}')
+      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + that.state.current_usergroup_id + ',access_token:"' + token + '")}')
         .then(response => response.json())
         .then(myJson => Number(myJson.data.getRootId))
         .then(rootId => {
