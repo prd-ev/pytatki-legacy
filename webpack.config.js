@@ -1,21 +1,16 @@
-var webpack = require("webpack");
+const path = require('path');
+
 module.exports = {
-  entry: ["./js/index.js"],
+  entry: "./js",
   output: {
-    path: __dirname + "/pytatki/static",
+    path: path.resolve(__dirname, "./pytatki/static"),
     filename: "bundle.js"
   },
   module: {
-    loaders: [
-      {
-        test: /\.(js|jsx)$/,
-        loader: "babel-loader",
-        query: {
-          presets: ["es2015", "react", "stage-2"],
-          plugins: ["transform-class-properties"]
-        }
-      }
-    ]
-  },
-  plugins: [],
+    rules: [{
+      test: /\.(js|jsx)$/,
+      exclude: /node_modules/,
+      loader: "babel-loader",
+    }]
+  }
 };
