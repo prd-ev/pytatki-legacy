@@ -171,6 +171,15 @@ def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user
     note = con.fetchone()
     return note
 
+def get_usergroups_of_user(iduser):
+    """Get list of usergroups"""
+    con, conn = connection()
+    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s", escape_string(str(iduser)))
+    usergroups = con.fetchall()
+    con.close()
+    conn.close()
+    return usergroups
+
 
 @APP.route('/')
 def homepage():
@@ -210,29 +219,8 @@ def admin():
 @login_manager
 def delete_user(identifier):
     """Delete user"""
-    if not User.query.filter_by(id=identifier).first().superuser:
-        if identifier == current_user.id or current_user.admin:
-            user = User.query.filter_by(id=identifier).first()
-            if user:
-                if identifier == current_user.id:
-                    logout_user()
-                    DB.session.delete(user)
-                    DB.session.commit()
-                    gc.collect()
-                    session.clear()
-                    gc.collect()
-                    flash('Twoje konto zostalo usuniete', 'success')
-                else:
-                    DB.session.delete(user)
-                    DB.session.commit()
-                    flash('Uzytkownik zostal usuniety', 'success')
-            else:
-                flash('Nie ma takiego uzytkownika', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    #TODO: delete user
+    pass
 
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
@@ -241,9 +229,9 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-        query = con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
+        con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
         note = con.fetchone()
-        if query:
+        if note:
             con.execute("UPDATE note SET status_id = %s WHERE idnote = %s",
                         (escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), escape_string(str(identifier))))
             conn.commit()
@@ -448,6 +436,8 @@ def download(identifier):
             con, conn = connection()
             con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
             note = con.fetchone()
+            con.close()
+            conn.close()
             if note['note_type'] == "file":
                 return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
             else:
