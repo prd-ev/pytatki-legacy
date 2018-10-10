@@ -10,7 +10,7 @@ from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
 from pytatki import __version__
-from pytatki.dbconnect import connection
+from pytatki.dbconnect import connection, note_exists, remove_note
 from pymysql import escape_string
 import json
 
@@ -229,11 +229,9 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-        con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(identifier)))
-        note = con.fetchone()
-        if note:
-            con.execute("UPDATE note SET status_id = %s WHERE idnote = %s",
-                        (escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), escape_string(str(identifier))))
+        if note_exists(conn, identifier):
+            conn.begin()
+            remove_note(conn, identifier)
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
