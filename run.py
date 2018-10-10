@@ -1,5 +1,6 @@
 #!./venv/bin python3
 from pytatki.user import *
+from pytatki.views import *
 from pytatki.main import APP, CONFIG
 
 

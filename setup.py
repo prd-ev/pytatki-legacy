@@ -1,11 +1,12 @@
 from setuptools import setup, find_packages
+from pytatki import __version__
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
     name='Pytatki',
-    version="1.0a5",
+    version=__version__,
     description="Organizer klasowy",
     long_description=long_description,
     long_description_content_type="text/markdown",
