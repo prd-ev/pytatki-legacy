@@ -91,7 +91,7 @@ QueryRootType = GraphQLObjectType(
             args={
                 'access_token': GraphQLArgument(GraphQLString)
             },
-            resolver=lambda obj, info, access_token: get_usergroups_of_user(verify_auth_token(access_token)) if verify_auth_token(access_token) else "invalid or expired access_token"
+            resolver=lambda obj, info, access_token: get_usergroups_of_user(verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getToken': GraphQLField(
             type=GraphQLString,
