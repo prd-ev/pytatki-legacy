@@ -19,6 +19,10 @@ Install dependencies
 ```
 pip install -r requirements/common.txt
 ```
+yarn add
+```
+yarn run build
+```
 ### Configuration
 Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
 
