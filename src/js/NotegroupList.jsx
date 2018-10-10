@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import styles from "../scss/test.scss";
 
 export default class NotegroupList extends Component {
   render() {
@@ -8,7 +9,7 @@ export default class NotegroupList extends Component {
       //spakowanie wyników w listę
     
     return (
-      <div className="lala">
+      <div className={styles.lala}>
         NotegroupList
         {/*wyświetlenie listy*/}
       </div>
