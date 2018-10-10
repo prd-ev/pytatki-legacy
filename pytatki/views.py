@@ -10,7 +10,7 @@ from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
 from pytatki import __version__
-from pytatki.dbconnect import connection, note_exists, remove_note
+from pytatki.dbconnect import connection, note_exists, remove_note, notegroup_empty, remove_notegroup
 from pymysql import escape_string
 import json
 
@@ -220,7 +220,21 @@ def admin():
 def delete_user(identifier):
     """Delete user"""
     #TODO: delete user
-    pass
+    flash("This function is not avaliable in this version: \'{}\'".format(str(__version__)), 'warning')
+    return redirect('/')
+
+@APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
+def delete_notegroup(identifier):
+    con, conn = connection()
+    if notegroup_empty(conn, identifier):
+        conn.begin()
+        remove_notegroup(conn, identifier)
+        conn.commit()
+    else:
+        flash("Notegroup is not empty")
+    con.close()
+    conn.close()
+    return redirect('/')
 
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])

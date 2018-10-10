@@ -198,7 +198,7 @@ def login_post():
             remember_me = request.form['remember'] if 'remember' in request.form else False
             login_user(user, remember=remember_me)
             return redirect(request.args.get('next') if 'next' in request.args else '/app/')
-        return render_template('login.html')
+        return render_template('login.html', wrong=True)
     except Exception as error:
         flash('Błąd: ' + str(error), 'danger')
         return redirect('/')

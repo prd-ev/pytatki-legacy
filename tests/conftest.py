@@ -94,7 +94,7 @@ def insert_note(insert_user, insert_text_note_type, insert_test_notegroup):
     con, conn = connection()
     conn.begin()
     note_id = create_note(
-        conn, 'test', 'Test', insert_text_note_type, insert_user, insert_test_notegroup)
+        conn, 'test', 'Test', insert_text_note_type, insert_user, insert_test_notegroup, 1)
     conn.commit()
     con.close()
     conn.close()
