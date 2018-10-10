@@ -8,7 +8,7 @@ export default class NotegroupList extends Component {
       //spakowanie wyników w listę
     
     return (
-      <div>
+      <div className="lala">
         NotegroupList
         {/*wyświetlenie listy*/}
       </div>
