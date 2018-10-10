@@ -26,14 +26,16 @@ def test_notegroup_empty(insert_notegroup, insert_usergroup):
     _.close()
     conn.close()
 
-def test_remove_notegroup(insert_notegroup):
+def test_remove_notegroup(insert_notegroup, insert_usergroup):
     _, conn = connection()
     conn.begin()
-    remove_notegroup(conn, insert_notegroup)
+    notegroup_id = insert_notegroup(conn, 'test_remove', insert_usergroup)
+    remove_notegroup(conn, notegroup_id)
     conn.commit()
-    _.execute("SELECT * FROM notegroup WHERE idnotegroup = 1")
+    _.execute("SELECT * FROM notegroup WHERE idnotegroup = %s", pymysql.escape_string(str(notegroup_id)))
     notegroup = _.fetchone()
     if notegroup:
+        print(notegroup)
         raise AssertionError()
     _.close()
     conn.close()

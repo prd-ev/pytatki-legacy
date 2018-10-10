@@ -231,7 +231,7 @@ def delete_notegroup(identifier):
         remove_notegroup(conn, identifier)
         conn.commit()
     else:
-        flash("Notegroup is not empty")
+        flash("Notegroup is not empty", 'warning')
     con.close()
     conn.close()
     return redirect('/')

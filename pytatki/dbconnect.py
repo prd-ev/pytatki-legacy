@@ -70,7 +70,9 @@ def notegroup_empty(conn, idnotegroup):
 def remove_notegroup(conn, idnotegroup):
     """Important function"""
     if notegroup_empty(conn, idnotegroup):
+        print("x")
         c = conn.cursor()
+        c.execute("DELETE FROM usergroup_has_notegroup WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))
         c.execute("DELETE FROM notegroup WHERE idnotegroup = %s",
                   pymysql.escape_string(str(idnotegroup)))
         return True
