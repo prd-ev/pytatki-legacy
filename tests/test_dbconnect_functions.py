@@ -1,9 +1,6 @@
-import pytest
-import pymysql
-from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, notegroup_empty, remove_notegroup
-from passlib.hash import sha256_crypt
+from pytatki.dbconnect import connection, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, notegroup_empty, remove_notegroup
 from pytatki.views import has_access_to_note, type_id, has_access_to_usergroup
-from init_db import parse_sql, db_init
+from init_db import db_init
 
 def test_user_has_access_to_note(insert_note):
     if has_access_to_note(1, 1) != True:

@@ -1,4 +1,3 @@
-import pytest
 from pytatki.views import get_usergroups_of_user
 
 def test_get_usergroups_of_user(insert_usergroup):

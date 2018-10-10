@@ -1,10 +1,9 @@
 from pytatki.main import create_app
 import pytest
 import pymysql
-from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, notegroup_empty, remove_notegroup
-from passlib.hash import sha256_crypt
-from pytatki.views import has_access_to_note, type_id, has_access_to_usergroup
-from init_db import parse_sql, db_init
+from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, remove_notegroup
+from pytatki.views import type_id, has_access_to_usergroup
+from init_db import parse_sql
 
 
 @pytest.fixture(scope='session', autouse=True)
