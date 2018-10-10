@@ -6,11 +6,8 @@
 
 USE pytatki;
 
-ALTER TABLE note ADD status_id INT NOT NULL;
-ALTER TABLE note ADD INDEX fk_note_status1_idx (status_id ASC);
-ALTER TABLE note ADD  
-  CONSTRAINT fk_note_status1
-    FOREIGN KEY (status_id)
-    REFERENCES pytatki.status (idstatus)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION;
+ALTER TABLE note 
+ADD status_id INT NOT NULL DEFAULT 1;
+ALTER TABLE note
+ADD INDEX fk_note_status1_idx (status_id ASC),
+ADD CONSTRAINT fk_note_status_id1 FOREIGN KEY (status_id) REFERENCES status(idstatus);
