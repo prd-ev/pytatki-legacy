@@ -14,8 +14,6 @@ src/.DS_Store
 docs/database-schema.mwb.bak
 config/__init__.py
 node_modules
-pytatki/static/bundle.js
 pytatki/static/bundle.js.map
-pytatki/static/styles.css
 pytatki/static/styles.css.map
 config.ini
