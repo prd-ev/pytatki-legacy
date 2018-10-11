@@ -452,7 +452,6 @@ def download(identifier):
             conn.close()
             if note['note_type'] == "file":
                 return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
-            else:
                 return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
