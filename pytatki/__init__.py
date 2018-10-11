@@ -1,2 +1,2 @@
 name = "pytatki"
-__version__ = "1.0a9"
+__version__ = "1.0b0"

@@ -9,6 +9,7 @@ from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLObject
 from graphql.type.scalars import GraphQLString, GraphQLInt
 from graphql.type.schema import GraphQLSchema
 from itsdangerous import TimedJSONWebSignatureSerializer, BadSignature, SignatureExpired
+from pymysql import escape_string
 
 
 def generate_access_token(id_user, expiration=3600):
@@ -33,9 +34,9 @@ def auth(func, token):
 def resolve_raises(*_):
     raise Exception("Throws!")
 
-def executeSQL(query):
+def executeSQL(query, *args, **kwargs):
     con, conn = connection()
-    con.execute(escape_string(query))
+    con.execute(query, *args, **kwargs)
     result = con.fetchone()
     con.close()
     conn.close()
@@ -45,6 +46,20 @@ def executeSQL(query):
 QueryRootType = GraphQLObjectType(
     name='QueryRoot',
     fields={
+        'getUser': GraphQLField(
+            type=GraphQLString,
+            args={
+                'ident': GraphQLArgument(GraphQLInt)
+            },
+            resolver=lambda obj, info, ident: executeSQL("SELECT * FROM user WHERE iduser = %s", escape_string(str(ident)))
+        ),
+        'getNoteByParentId': GraphQLField(
+            type=GraphQLString,
+            args={
+                'parent_id': GraphQLArgument(GraphQLInt)
+            },
+            resolver=lambda obj, info, parent_id: executeSQL("SELECT title FROM note_view WHERE parent_id = %s", escape_string(str(parent_id)))
+        ),
         'getContent': GraphQLField(
             type=GraphQLString,
             args={

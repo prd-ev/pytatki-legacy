@@ -4,6 +4,8 @@ import pymysql
 from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, remove_notegroup
 from pytatki.views import type_id, has_access_to_usergroup
 from init_db import parse_sql
+from shutil import copy
+from pytatki.config import parse_config
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -17,6 +19,11 @@ def create_db():
         raise Warning("Database exists")
     for query in parse_sql('sql/create-database.sql'):
         cursor.execute(query)
+    cursor.execute("SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
+    user_exists = cursor.fetchone()
+    if not user_exists:
+        cursor.execute("CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
+    cursor.execute("GRANT ALL ON pytatki.* TO \'pytatki\'@\'127.0.0.1\'")
     conn.close()
 
 
