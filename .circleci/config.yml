@@ -20,6 +20,10 @@ jobs:
           name: Copy config.ini
           command: |
             cp examples/config.ini .
+      -run:
+          name: Install MariaDB
+          command: |
+          apt-get install mariadb-client mariadb-server
       - run:
           command: |
             . venv/bin/activate
