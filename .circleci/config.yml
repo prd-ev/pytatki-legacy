@@ -20,7 +20,7 @@ jobs:
           name: Copy config.ini
           command: |
             cp examples/config.ini .
-      -run:
+      - run:
           name: Install MariaDB
           command: |
             apt-get install mariadb-client mariadb-server
