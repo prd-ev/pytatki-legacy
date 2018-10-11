@@ -7,6 +7,11 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
+      - image: circleci/mariadb:10.2
+        environment:
+        - MYSQL_USER: root
+        - MYSQL_HOST: 127.0.0.1
+        - MYSQL_ALLOW_EMPTY_PASSWORD: true
       
     steps:
       - checkout
@@ -20,10 +25,6 @@ jobs:
           name: Copy config.ini
           command: |
             cp examples/config.ini .
-      - run:
-          name: Install MariaDB
-          command: |
-            apt-get install mariadb-client mariadb-server
       - run:
           command: |
             . venv/bin/activate
