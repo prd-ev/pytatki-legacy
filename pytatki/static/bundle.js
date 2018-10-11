@@ -22205,7 +22205,6 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "openNote", function (e) {
-      console.log("Jak wyświetlić notatkę?");
       var id = e.target.id.slice(4);
       window.open(siteUrl + "/download/".concat(id));
     });
@@ -22366,8 +22365,8 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "deleteNote", function (e) {
-      var note_id = e.target.previousSibling.id.slice(4);
-      fetch(siteUrl + '/admin/delete/note/' + note_id, {}).then(function (response) {
+      var noteId = e.target.previousSibling.id.slice(4);
+      fetch(siteUrl + '/admin/delete/note/' + noteId, {}).then(function (response) {
         return response.text();
       } // if the response is a JSON object
       ).then(function (success) {
@@ -22380,8 +22379,17 @@ function (_React$Component) {
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "deleteFolder", function (e) {
-      console.log("Jak usunąć folder?");
-      console.log(e.target.previousSibling.id);
+      var folderId = e.target.previousSibling.id;
+      fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {}).then(function (response) {
+        return response.text();
+      } // if the response is a JSON object
+      ).then(function (success) {
+        return console.log(success);
+      } // Handle the success response object
+      ).catch(function (error) {
+        return console.log(error);
+      } // Handle the error response object
+      );
     });
 
     _this.state = {
@@ -22498,13 +22506,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 
-var siteUrl = "127.0.0.1:5000";
+var siteUrl = "http://127.0.0.1:5000";
 
 var getUsergroups = function getUsergroups() {
-  fetch(siteUrl + '/api?query={getUsergroupsOfUser}').then(function (response) {
+  fetch(siteUrl + '/api?query={getToken}').then(function (response) {
     return response.json();
+  }).then(function (res) {
+    return res.data.getToken;
+  }).then(function (token) {
+    return fetch(siteUrl + '/api?query={getUsergroups(access_token:"' + token + '")}');
+  }).then(function (response) {
+    return console.log(response.json());
   }).then(function (myJson) {
-    return JSON.parse(myJson.data.getContent);
+    return JSON.parse(myJson.data.getUsergroups);
   }).then(function (innerJson) {
     var usergroups = [];
     var _iteratorNormalCompletion = true;
@@ -22517,6 +22531,8 @@ var getUsergroups = function getUsergroups() {
         var object = {};
         object["key"] = usergroup.idusergroup;
         object["name"] = usergroup.name;
+        object["color"] = usergroup.color;
+        object["imagePath"] = usergroup.image_path;
         usegroups.push(object);
       }
     } catch (err) {

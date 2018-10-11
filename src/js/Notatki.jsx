@@ -96,8 +96,6 @@ class Notatki extends React.Component {
   };
 
   openNote = (e) => {
-    console.log("Jak wyświetlić notatkę?");
-
     let id = e.target.id.slice(4);
     window.open(siteUrl + `/download/${id}`);
   }
@@ -200,8 +198,8 @@ class Notatki extends React.Component {
   }
 
   deleteNote = (e) => {
-    let note_id = e.target.previousSibling.id.slice(4);
-    fetch(siteUrl + '/admin/delete/note/' + note_id, {
+    let noteId = e.target.previousSibling.id.slice(4);
+    fetch(siteUrl + '/admin/delete/note/' + noteId, {
     }).then(
       response => response.text() // if the response is a JSON object
     ).then(
@@ -212,8 +210,15 @@ class Notatki extends React.Component {
   }
 
   deleteFolder = (e) => {
-    console.log("Jak usunąć folder?")
-    console.log(e.target.previousSibling.id);
+    let folderId = e.target.previousSibling.id;
+    fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
+    }).then(
+      response => response.text() // if the response is a JSON object
+    ).then(
+      success => console.log(success) // Handle the success response object
+    ).catch(
+      error => console.log(error) // Handle the error response object
+    );
   }
 
   render() {
