@@ -1,7 +1,7 @@
 from pytatki.main import create_app
 import pytest
 import pymysql
-from pytatki.dbconnect import create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, remove_notegroup
+from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, remove_notegroup
 from pytatki.views import type_id, has_access_to_usergroup
 from init_db import parse_sql
 from shutil import copy
@@ -9,7 +9,7 @@ from pytatki.config import parse_config
 
 
 @pytest.fixture(scope='session', autouse=True)
-def create_db(create_config):
+def create_db():
     conn = pymysql.connect(host='127.0.0.1', user='root',
                            charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
     cursor = conn.cursor()
