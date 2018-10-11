@@ -86,10 +86,10 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/test.scss":
-/*!**********************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/test.scss ***!
-  \**********************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/AddContent.scss":
+/*!****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/AddContent.scss ***!
+  \****************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -98,11 +98,32 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".lala---uqxSP {\n  color: red; }\n", ""]);
+exports.push([module.i, ".form---23KHH {\n  background-color: aquamarine; }\n", ""]);
 
 // exports
 exports.locals = {
-	"lala": "lala---uqxSP"
+	"form": "form---23KHH"
+};
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/EditMode.scss":
+/*!**************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/EditMode.scss ***!
+  \**************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".btn---Kk3aa {\n  border: 3px solid black;\n  border-radius: 0;\n  background-color: white;\n  text-transform: uppercase;\n  outline: none; }\n  .btn---Kk3aa:focus, .btn---Kk3aa:active {\n    border-color: #aaaaaa; }\n", ""]);
+
+// exports
+exports.locals = {
+	"btn": "btn---Kk3aa"
 };
 
 /***/ }),
@@ -21922,6 +21943,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AddFolder; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../scss/AddContent.scss */ "./src/scss/AddContent.scss");
+/* harmony import */ var _scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -21942,19 +21965,16 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 var AddFolder =
 /*#__PURE__*/
 function (_Component) {
   _inherits(AddFolder, _Component);
 
   function AddFolder(props) {
-    var _this;
-
     _classCallCheck(this, AddFolder);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(AddFolder).call(this, props));
-    _this.state = {};
-    return _this;
+    return _possibleConstructorReturn(this, _getPrototypeOf(AddFolder).call(this, props));
   }
 
   _createClass(AddFolder, [{
@@ -21962,14 +21982,15 @@ function (_Component) {
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
         id: "addFolderForm",
+        className: _scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1___default.a.form,
         onSubmit: this.props.addFolder
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", null, " Dodaj folder w aktualnej lokalizacji "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         required: true,
         name: "title",
         type: "text"
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "submit",
-        value: "Dodaj folder w aktualnej lokalizacji"
+        value: "Dodaj"
       }));
     }
   }]);
@@ -21992,13 +22013,17 @@ function (_Component) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../scss/AddContent.scss */ "./src/scss/AddContent.scss");
+/* harmony import */ var _scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 var AddNote = function AddNote(props) {
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
     id: "form",
+    className: _scss_AddContent_scss__WEBPACK_IMPORTED_MODULE_1___default.a.form,
     onSubmit: props.uploadNote
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, "Dodaj notatk\u0119 w aktualnym folderze"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, "Dodaj notatk\u0119 w aktualnym folderze "), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
     required: true,
     type: "text",
     name: "title"
@@ -22027,16 +22052,21 @@ var AddNote = function AddNote(props) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _scss_EditMode_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../scss/EditMode.scss */ "./src/scss/EditMode.scss");
+/* harmony import */ var _scss_EditMode_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scss_EditMode_scss__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 var EditMode = function EditMode(props) {
   if (props.isOn) {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      className: _scss_EditMode_scss__WEBPACK_IMPORTED_MODULE_1___default.a.btn,
       onClick: props.changeMode
     }, "Wyjd\u017A z trybu edycji"));
   }
 
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    className: _scss_EditMode_scss__WEBPACK_IMPORTED_MODULE_1___default.a.btn,
     onClick: props.changeMode
   }, "W\u0142\u0105cz tryb edycji"));
 };
@@ -22467,9 +22497,6 @@ function (_React$Component) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _scss_test_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../scss/test.scss */ "./src/scss/test.scss");
-/* harmony import */ var _scss_test_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scss_test_scss__WEBPACK_IMPORTED_MODULE_1__);
-
 
 var siteUrl = "127.0.0.1:5000";
 
@@ -22515,9 +22542,7 @@ var getUsergroups = function getUsergroups() {
 };
 
 var NotegroupList = function NotegroupList() {
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: _scss_test_scss__WEBPACK_IMPORTED_MODULE_1___default.a.lala
-  }, "NotegroupList", getUsergroups());
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "NotegroupList", getUsergroups());
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (NotegroupList);
@@ -22545,15 +22570,45 @@ react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_
 
 /***/ }),
 
-/***/ "./src/scss/test.scss":
-/*!****************************!*\
-  !*** ./src/scss/test.scss ***!
-  \****************************/
+/***/ "./src/scss/AddContent.scss":
+/*!**********************************!*\
+  !*** ./src/scss/AddContent.scss ***!
+  \**********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./test.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/test.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./AddContent.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/AddContent.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./src/scss/EditMode.scss":
+/*!********************************!*\
+  !*** ./src/scss/EditMode.scss ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./EditMode.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/EditMode.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 

@@ -1,18 +1,17 @@
 import React, { Component } from 'react'
+import ComponentStyle from '../scss/AddContent.scss'
 
 export default class AddFolder extends Component {
     constructor(props) {
       super(props)
-    
-      this.state = {
-      }
     }
     
   render() {
     return (
-      <form id="addFolderForm" onSubmit={this.props.addFolder}>
+      <form id="addFolderForm" className={ComponentStyle.form} onSubmit={this.props.addFolder}>
+          <label> Dodaj folder w aktualnej lokalizacji </label>
           <input required name="title" type="text"/>
-          <input type="submit" value="Dodaj folder w aktualnej lokalizacji"/>
+          <input type="submit" value="Dodaj"/>
       </form>
     )
   }
