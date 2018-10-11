@@ -23,7 +23,7 @@ jobs:
       -run:
           name: Install MariaDB
           command: |
-          apt-get install mariadb-client mariadb-server
+            apt-get install mariadb-client mariadb-server
       - run:
           command: |
             . venv/bin/activate
