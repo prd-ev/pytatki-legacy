@@ -9,30 +9,6 @@ from pytatki.config import parse_config
 
 
 @pytest.fixture(scope='session', autouse=True)
-def create_config():
-    copy('examples/config.ini', 'config.ini')
-
-@pytest.fixture(scope='session', autouse=True)
-def config(create_config):
-    CONFIG = parse_config('config.ini', check_db_configuration=False)
-    return CONFIG
-
-@pytest.fixture(scope='session', autouse=True)
-def connection(config):
-    def connect(host=config['DATABASE']['DB_HOST'], user=config['DATABASE']['DB_USER'],
-                password=config['DATABASE']['DB_PASSWORD'], db=config['DATABASE']['DB_NAME'],
-                charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor):
-        conn = pymysql.connect(host=host,
-                            user=user,
-                            password=password,
-                            db=db,
-                            charset=charset,
-                            cursorclass=cursorclass)
-        c = conn.cursor()
-        return c, conn
-    return connect
-
-@pytest.fixture(scope='session', autouse=True)
 def create_db(create_config):
     conn = pymysql.connect(host='127.0.0.1', user='root',
                            charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
@@ -52,7 +28,7 @@ def create_db(create_config):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_status(create_db, connection):
+def insert_status(create_db):
     _, conn = connection()
     conn.begin()
     create_status(conn, 'active', 'Record is active')
@@ -62,7 +38,7 @@ def insert_status(create_db, connection):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_user(insert_status, connection):
+def insert_user(insert_status):
     _, conn = connection()
     conn.begin()
     user_id = create_user(conn, 'test', 'test', 'test@test', 1)
@@ -73,7 +49,7 @@ def insert_user(insert_status, connection):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_usergroup(insert_user, connection):
+def insert_usergroup(insert_user):
     _, conn = connection()
     conn.begin()
     usergroup_id = create_usergroup(conn, 'test', 'test')
@@ -85,7 +61,7 @@ def insert_usergroup(insert_user, connection):
 
 
 @pytest.fixture(scope='function', autouse=True)
-def insert_notegroup(insert_usergroup, insert_user, connection):
+def insert_notegroup(insert_usergroup, insert_user):
     def _insert(*args, **kwargs):
         _, conn = connection()
         conn.begin()
@@ -98,7 +74,7 @@ def insert_notegroup(insert_usergroup, insert_user, connection):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_test_notegroup(insert_usergroup, insert_user, connection):
+def insert_test_notegroup(insert_usergroup, insert_user):
     _, conn = connection()
     conn.begin()
     notegroup_id = create_notegroup(conn, 'test', insert_usergroup)
@@ -109,7 +85,7 @@ def insert_test_notegroup(insert_usergroup, insert_user, connection):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_text_note_type(create_db, connection):
+def insert_text_note_type(create_db):
     _, conn = connection()
     conn.begin()
     note_type_id = create_note_type(conn, 'text', 'Text')
@@ -120,7 +96,7 @@ def insert_text_note_type(create_db, connection):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_note(insert_user, insert_text_note_type, insert_test_notegroup, connection):
+def insert_note(insert_user, insert_text_note_type, insert_test_notegroup):
     """Insert new note"""
     con, conn = connection()
     conn.begin()

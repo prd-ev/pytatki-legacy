@@ -17,6 +17,10 @@ jobs:
             . venv/bin/activate
             pip install -r requirements/dev.txt
       - run:
+          name: Copy config.ini
+          command: |
+            cp examples/config.ini .
+      - run:
           command: |
             . venv/bin/activate
             pytest
