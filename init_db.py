@@ -3,7 +3,6 @@ __author__ = "Patryk Niedźwiedziński"
 
 import configparser
 from pymysql import escape_string, connect
-from passlib.hash import sha256_crypt
 from pytatki.dbconnect import connection, create_usergroup, create_status, create_note_type, create_user
 
 def parse_sql(filename):
@@ -12,7 +11,7 @@ def parse_sql(filename):
     DELIMITER = ';'
     stmt = ''
 
-    for lineno, line in enumerate(data):
+    for _, line in enumerate(data):
         if not line.strip():
             continue
 
@@ -55,7 +54,6 @@ def save_to_config(config_dict):
 
 def db_init(host=None, user=None, password=None):
     """""Create database from sql/create-database"""
-    
     host = input("DB host: [127.0.0.1]") if not host else host
     host = '127.0.0.1' if host == '' else host
     user = input("DB user: [root] ") if not user else user
