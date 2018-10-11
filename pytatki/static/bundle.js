@@ -86,10 +86,10 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/test.scss":
-/*!*********************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/test.scss ***!
-  \*********************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/test.scss":
+/*!**********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/test.scss ***!
+  \**********************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -98,10 +98,12 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".lala {\n  color: red; }\n", ""]);
+exports.push([module.i, ".lala---uqxSP {\n  color: red; }\n", ""]);
 
 // exports
-
+exports.locals = {
+	"lala": "lala---uqxSP"
+};
 
 /***/ }),
 
@@ -22469,6 +22471,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _scss_test_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scss_test_scss__WEBPACK_IMPORTED_MODULE_1__);
 
 
+var siteUrl = "127.0.0.1:5000";
 
 var getUsergroups = function getUsergroups() {
   fetch(siteUrl + '/api?query={getUsergroupsOfUser}').then(function (response) {
@@ -22550,7 +22553,7 @@ react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./test.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/test.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./test.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/test.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 

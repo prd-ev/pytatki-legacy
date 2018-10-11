@@ -1,6 +1,8 @@
 import React from 'react'
 import styles from "../scss/test.scss";
 
+const siteUrl = "127.0.0.1:5000"
+
 const getUsergroups = () => {
   fetch(siteUrl + '/api?query={getUsergroupsOfUser}')
     .then(response => response.json())

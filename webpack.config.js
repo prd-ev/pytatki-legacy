@@ -26,7 +26,7 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           use: [
             devMode ? "style-loader" : MiniCssExtractPlugin.loader,
-            "css-loader",
+            "css-loader?modules&localIdentName=[local]---[hash:base64:5]",
             "sass-loader",
             "postcss-loader"
           ]
