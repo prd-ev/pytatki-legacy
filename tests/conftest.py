@@ -18,6 +18,7 @@ def create_db():
     if db_exists:
         raise Warning("Database exists")
     for query in parse_sql('sql/create-database.sql'):
+        print(query)
         cursor.execute(query)
     cursor.execute("SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
     user_exists = cursor.fetchone()
@@ -28,7 +29,7 @@ def create_db():
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_status(create_db):
+def insert_active_status(create_db):
     _, conn = connection()
     conn.begin()
     create_status(conn, 'active', 'Record is active')
@@ -38,7 +39,17 @@ def insert_status(create_db):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def insert_user(insert_status):
+def insert_removed_status(insert_active_status):
+    c, conn = connection()
+    conn.begin()
+    create_status(conn, 'removed', 'Record is removed')
+    conn.commit()
+    c.close()
+    conn.close()
+
+
+@pytest.fixture(scope='session', autouse=True)
+def insert_user(insert_active_status):
     _, conn = connection()
     conn.begin()
     user_id = create_user(conn, 'test', 'test', 'test@test', 1)
