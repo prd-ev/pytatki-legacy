@@ -39,16 +39,19 @@ class Notatki extends React.Component {
         for (const notegroup of innerJson) {
           let object = {};
           if (notegroup.idnote) {
-            object["title"] = notegroup.name;
-            object["key"] = "note" + notegroup.idnote;
-            object["is_note"] = true;
+            if (notegroup.status_id == 1) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+              folderContent.push(object);
+            }
           }
           else {
             object["title"] = notegroup.folder_name;
             object["key"] = notegroup.idnotegroup;
             object["is_note"] = false;
+            rootFolders.push(object);
           }
-          rootFolders.push(object);
         };
         let updated_data = that.state.data;
         updated_data[0] = rootFolders;
@@ -67,16 +70,19 @@ class Notatki extends React.Component {
       for (const notegroup of innerJson) {
         let object = {};
         if (notegroup.idnote) {
-          object["title"] = notegroup.name;
-          object["key"] = "note" + notegroup.idnote;
-          object["is_note"] = true;
+          if (notegroup.status_id == 1) {
+            object["title"] = notegroup.name;
+            object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
+            folderContent.push(object);
+          }
         }
         else {
           object["title"] = notegroup.folder_name;
           object["key"] = notegroup.idnotegroup;
           object["is_note"] = false;
+          folderContent.push(object);
         }
-        folderContent.push(object);
       }
       ;
       let updated_data = that.state.data;
@@ -246,16 +252,19 @@ class Notatki extends React.Component {
         for (const notegroup of innerJson) {
           let object = {};
           if (notegroup.idnote) {
-            object["title"] = notegroup.name;
-            object["key"] = "note" + notegroup.idnote;
-            object["is_note"] = true;
+            if (notegroup.status_id == 1) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+              folderContent.push(object);
+            }
           }
           else {
             object["title"] = notegroup.folder_name;
             object["key"] = notegroup.idnotegroup;
             object["is_note"] = false;
+            folderContent.push(object);
           }
-          folderContent.push(object);
         }
         let updated_data = that.state.data;
         updated_data[that.state.currentDepth] = folderContent;

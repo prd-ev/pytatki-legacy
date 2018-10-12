@@ -31306,16 +31306,18 @@ function (_React$Component) {
             var object = {};
 
             if (notegroup.idnote) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
+              if (notegroup.status_id == 1) {
+                object["title"] = notegroup.name;
+                object["key"] = "note" + notegroup.idnote;
+                object["is_note"] = true;
+                folderContent.push(object);
+              }
             } else {
               object["title"] = notegroup.folder_name;
               object["key"] = notegroup.idnotegroup;
               object["is_note"] = false;
+              folderContent.push(object);
             }
-
-            folderContent.push(object);
           }
         } catch (err) {
           _didIteratorError = true;
@@ -31589,16 +31591,18 @@ function (_React$Component) {
           var object = {};
 
           if (notegroup.idnote) {
-            object["title"] = notegroup.name;
-            object["key"] = "note" + notegroup.idnote;
-            object["is_note"] = true;
+            if (notegroup.status_id == 1) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+              folderContent.push(object);
+            }
           } else {
             object["title"] = notegroup.folder_name;
             object["key"] = notegroup.idnotegroup;
             object["is_note"] = false;
+            rootFolders.push(object);
           }
-
-          rootFolders.push(object);
         }
       } catch (err) {
         _didIteratorError4 = true;
@@ -31661,16 +31665,18 @@ function (_React$Component) {
             var object = {};
 
             if (notegroup.idnote) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
+              if (notegroup.status_id == 1) {
+                object["title"] = notegroup.name;
+                object["key"] = "note" + notegroup.idnote;
+                object["is_note"] = true;
+                folderContent.push(object);
+              }
             } else {
               object["title"] = notegroup.folder_name;
               object["key"] = notegroup.idnotegroup;
               object["is_note"] = false;
+              folderContent.push(object);
             }
-
-            folderContent.push(object);
           }
         } catch (err) {
           _didIteratorError5 = true;
