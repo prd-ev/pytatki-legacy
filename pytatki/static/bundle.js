@@ -31476,6 +31476,8 @@ function (_React$Component) {
         return console.log(error);
       } // Handle the error response object
       );
+
+      _this.updateContent();
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "addFolder", function (e) {
@@ -31498,6 +31500,8 @@ function (_React$Component) {
         return console.log(error);
       } // Handle the error response object
       );
+
+      _this.updateContent();
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "changeMode", function (e) {
@@ -31522,6 +31526,8 @@ function (_React$Component) {
         return console.log(error);
       } // Handle the error response object
       );
+
+      _this.updateContent();
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "deleteFolder", function (e) {
@@ -31536,6 +31542,8 @@ function (_React$Component) {
         return console.log(error);
       } // Handle the error response object
       );
+
+      _this.updateContent();
     });
 
     _this.state = {
@@ -31579,12 +31587,15 @@ function (_React$Component) {
         for (var _iterator4 = innerJson[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
           var notegroup = _step4.value;
           var object = {};
-          object["title"] = notegroup.folder_name;
 
           if (notegroup.idnote) {
+            object["title"] = notegroup.name;
             object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
           } else {
+            object["title"] = notegroup.folder_name;
             object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
           }
 
           rootFolders.push(object);
@@ -31632,6 +31643,55 @@ function (_React$Component) {
         return JSON.parse(myJson.data.getContent);
       }).catch(function (error) {
         return console.log(error);
+      });
+    }
+  }, {
+    key: "updateContent",
+    value: function updateContent() {
+      var that = this;
+      this.getContent(this.state.currentDirId[this.state.currentDirId.length - 1]).then(function (innerJson) {
+        var folderContent = [];
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+          for (var _iterator5 = innerJson[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var notegroup = _step5.value;
+            var object = {};
+
+            if (notegroup.idnote) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+            } else {
+              object["title"] = notegroup.folder_name;
+              object["key"] = notegroup.idnotegroup;
+              object["is_note"] = false;
+            }
+
+            folderContent.push(object);
+          }
+        } catch (err) {
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
+              _iterator5.return();
+            }
+          } finally {
+            if (_didIteratorError5) {
+              throw _iteratorError5;
+            }
+          }
+        }
+
+        var updated_data = that.state.data;
+        updated_data[that.state.currentDepth] = folderContent;
+        that.setState({
+          data: updated_data
+        });
       });
     }
   }, {

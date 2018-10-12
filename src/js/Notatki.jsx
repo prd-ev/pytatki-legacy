@@ -38,11 +38,15 @@ class Notatki extends React.Component {
         let rootFolders = [];
         for (const notegroup of innerJson) {
           let object = {};
-          object["title"] = notegroup.folder_name;
           if (notegroup.idnote) {
+            object["title"] = notegroup.name;
             object["key"] = "note" + notegroup.idnote;
-          } else {
+            object["is_note"] = true;
+          }
+          else {
+            object["title"] = notegroup.folder_name;
             object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
           }
           rootFolders.push(object);
         };
@@ -178,6 +182,7 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
   addFolder = (e) => {
@@ -196,6 +201,7 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
   changeMode = (e) => {
@@ -215,6 +221,7 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
   deleteFolder = (e) => {
@@ -227,8 +234,36 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
+
+  updateContent() {
+    const that = this;
+    this.getContent(this.state.currentDirId[this.state.currentDirId.length - 1])
+      .then(innerJson => {
+        let folderContent = [];
+        for (const notegroup of innerJson) {
+          let object = {};
+          if (notegroup.idnote) {
+            object["title"] = notegroup.name;
+            object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
+          }
+          else {
+            object["title"] = notegroup.folder_name;
+            object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
+          }
+          folderContent.push(object);
+        }
+        let updated_data = that.state.data;
+        updated_data[that.state.currentDepth] = folderContent;
+        that.setState({
+          data: updated_data,
+        });
+      });
+  }
 
   render() {
     return (
