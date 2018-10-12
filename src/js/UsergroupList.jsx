@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-export default class NotegroupList extends Component {
+export default class UsergroupList extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -8,10 +8,6 @@ export default class NotegroupList extends Component {
     }
     this.getUsergroups();
   }
-  
-  
-  
-  
   
   getUsergroups = () => {
     const siteUrl = "http://127.0.0.1:5000"
@@ -49,10 +45,9 @@ export default class NotegroupList extends Component {
   render() {
     return (
       <div>
-        NotegroupList
+        UsergroupList
       {this.state.usergroups}
       </div>
     )
   }
-
 }

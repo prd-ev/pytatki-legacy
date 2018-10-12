@@ -2,7 +2,7 @@ import React from "react";
 import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
-import NotegroupList from './NotegroupList.jsx'
+import NotegroupList from './UsergroupList.jsx'
 
 const siteUrl = "http://127.0.0.1:5000";
 

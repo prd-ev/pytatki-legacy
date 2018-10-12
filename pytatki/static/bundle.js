@@ -31247,7 +31247,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AddNote.jsx */ "./src/js/AddNote.jsx");
 /* harmony import */ var _AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AddFolder.jsx */ "./src/js/AddFolder.jsx");
 /* harmony import */ var _EditMode_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./EditMode.jsx */ "./src/js/EditMode.jsx");
-/* harmony import */ var _NotegroupList_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./NotegroupList.jsx */ "./src/js/NotegroupList.jsx");
+/* harmony import */ var _UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./UsergroupList.jsx */ "./src/js/UsergroupList.jsx");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -31637,7 +31637,7 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_NotegroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
         uploadNote: this.uploadNote
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
         addFolder: this.addFolder
@@ -31657,16 +31657,16 @@ function (_React$Component) {
 
 /***/ }),
 
-/***/ "./src/js/NotegroupList.jsx":
+/***/ "./src/js/UsergroupList.jsx":
 /*!**********************************!*\
-  !*** ./src/js/NotegroupList.jsx ***!
+  !*** ./src/js/UsergroupList.jsx ***!
   \**********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return NotegroupList; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UsergroupList; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -31691,17 +31691,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var NotegroupList =
+var UsergroupList =
 /*#__PURE__*/
 function (_Component) {
-  _inherits(NotegroupList, _Component);
+  _inherits(UsergroupList, _Component);
 
-  function NotegroupList(props) {
+  function UsergroupList(props) {
     var _this;
 
-    _classCallCheck(this, NotegroupList);
+    _classCallCheck(this, UsergroupList);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(NotegroupList).call(this, props));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(UsergroupList).call(this, props));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "getUsergroups", function () {
       var siteUrl = "http://127.0.0.1:5000";
@@ -31796,14 +31796,14 @@ function (_Component) {
     return _this;
   }
 
-  _createClass(NotegroupList, [{
+  _createClass(UsergroupList, [{
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "NotegroupList", this.state.usergroups);
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "UsergroupList", this.state.usergroups);
     }
   }]);
 
-  return NotegroupList;
+  return UsergroupList;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
 
 
