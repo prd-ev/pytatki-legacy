@@ -58,42 +58,50 @@ class Notatki extends React.Component {
     let selected_dir_id = e.target.id;
     let selected_dir_name = e.target.innerText;
     const that = this;
-    fetch(siteUrl + '/api?query={getToken}')
+    this.getContent(selected_dir_id).then(innerJson => {
+      let folderContent = [];
+      for (const notegroup of innerJson) {
+        let object = {};
+        if (notegroup.idnote) {
+          object["title"] = notegroup.name;
+          object["key"] = "note" + notegroup.idnote;
+          object["is_note"] = true;
+        }
+        else {
+          object["title"] = notegroup.folder_name;
+          object["key"] = notegroup.idnotegroup;
+          object["is_note"] = false;
+        }
+        folderContent.push(object);
+      }
+      ;
+      let updated_data = that.state.data;
+      updated_data[that.state.currentDepth + 1] = folderContent;
+      let updated_path = that.state.currentPath;
+      updated_path[that.state.currentDepth] = selected_dir_name;
+      let updated_dir_id = that.state.currentDirId;
+      updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
+      that.setState(prevState => ({
+        data: updated_data,
+        currentDepth: prevState.currentDepth + 1,
+        currentPath: updated_path,
+        currentDirId: updated_dir_id
+      }));
+    }
+    );
+  };
+
+  getContent(dir_id) {
+    return fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}'))
+      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + dir_id + ',access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
-      .then(function (innerJson) {
-        let folderContent = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          if (notegroup.idnote) {
-            object["title"] = notegroup.name;
-            object["key"] = "note" + notegroup.idnote;
-            object["is_note"] = true;
-          } else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
-          }
-          folderContent.push(object);
-        };
-        let updated_data = that.state.data;
-        updated_data[that.state.currentDepth + 1] = folderContent;
-        let updated_path = that.state.currentPath;
-        updated_path[that.state.currentDepth] = selected_dir_name;
-        let updated_dir_id = that.state.currentDirId;
-        updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
-        that.setState(prevState => ({
-          data: updated_data,
-          currentDepth: prevState.currentDepth + 1,
-          currentPath: updated_path,
-          currentDirId: updated_dir_id
-        }));
-      })
+
       .catch(error => console.log(error));
-  };
+  }
+
 
   openNote = (e) => {
     let id = e.target.id.slice(4);
@@ -220,6 +228,7 @@ class Notatki extends React.Component {
       error => console.log(error) // Handle the error response object
     );
   }
+
 
   render() {
     return (

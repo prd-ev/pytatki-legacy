@@ -185,7 +185,7 @@ def get_usergroups_of_user(iduser):
     usergroups = con.fetchall()
     con.close()
     conn.close()
-    return usergroups
+    return json.dumps(usergroups, ensure_ascii=False)
 
 
 @APP.route('/')
