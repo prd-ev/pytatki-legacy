@@ -225,7 +225,7 @@ def delete_note(identifier):
         con, conn = connection()
         if note_exists(conn, identifier):
             conn.begin()
-            remove_note(conn, identifier)
+            remove_note(conn, identifier, current_user['iduser'])
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
