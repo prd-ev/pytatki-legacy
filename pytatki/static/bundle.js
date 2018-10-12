@@ -31548,91 +31548,49 @@ function (_React$Component) {
       _this.updateContent();
     });
 
+    _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "updateCurrentUsergroup", function (e) {
+      _this.getUsergroupRoot(e.target.id);
+
+      _this.setState({
+        currentDepth: 0,
+        currentDirId: [],
+        currentPath: []
+      });
+    });
+
     _this.state = {
       currentDepth: 0,
       data: [],
       currentPath: [],
       currentDirId: [],
-      editModeOn: false,
-      current_usergroup_id: "1"
+      editModeOn: false
     }; //Download root folders and set state of data[0] to array of folder objects
 
-    var _that = _assertThisInitialized(_assertThisInitialized(_this));
-
-    fetch(siteUrl + '/api?query={getToken}').then(function (response) {
-      return response.json();
-    }).then(function (res) {
-      return res.data.getToken;
-    }).then(function (token) {
-      return fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + _that.state.current_usergroup_id + ',access_token:"' + token + '")}').then(function (response) {
-        return response.json();
-      }).then(function (myJson) {
-        return Number(myJson.data.getRootId);
-      }).then(function (rootId) {
-        _that.setState({
-          currentDirId: [rootId]
-        });
-
-        return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}');
-      }).then(function (response) {
-        return response.json();
-      }).then(function (myJson) {
-        return JSON.parse(myJson.data.getContent);
-      });
-    }).then(function (innerJson) {
-      var rootFolders = [];
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = innerJson[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var notegroup = _step4.value;
-          var object = {};
-
-          if (notegroup.idnote) {
-            if (notegroup.status_id == 1) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
-              folderContent.push(object);
-            }
-          } else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
-            rootFolders.push(object);
-          }
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
-
-      ;
-      var updated_data = _that.state.data;
-      updated_data[0] = rootFolders;
-
-      _that.setState({
-        data: updated_data
-      });
-    }).catch(function (error) {
-      return console.log(error);
-    });
     return _this;
   }
 
   _createClass(Notatki, [{
+    key: "getUsergroupRoot",
+    value: function getUsergroupRoot(usergroup) {
+      var that = this;
+      fetch(siteUrl + '/api?query={getToken}').then(function (response) {
+        return response.json();
+      }).then(function (res) {
+        return res.data.getToken;
+      }).then(function (token) {
+        return fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroup + ',access_token:"' + token + '")}').then(function (response) {
+          return response.json();
+        }).then(function (myJson) {
+          return Number(myJson.data.getRootId);
+        }).then(function (rootId) {
+          that.setState({
+            currentDirId: [rootId]
+          });
+          that.updateContent(rootId);
+        });
+      });
+    }
+  }, {
     key: "getContent",
     value: function getContent(dir_id) {
       return fetch(siteUrl + '/api?query={getToken}').then(function (response) {
@@ -31655,13 +31613,13 @@ function (_React$Component) {
       var that = this;
       this.getContent(this.state.currentDirId[this.state.currentDirId.length - 1]).then(function (innerJson) {
         var folderContent = [];
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
 
         try {
-          for (var _iterator5 = innerJson[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var notegroup = _step5.value;
+          for (var _iterator4 = innerJson[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var notegroup = _step4.value;
             var object = {};
 
             if (notegroup.idnote) {
@@ -31679,16 +31637,16 @@ function (_React$Component) {
             }
           }
         } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return != null) {
-              _iterator5.return();
+            if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+              _iterator4.return();
             }
           } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
+            if (_didIteratorError4) {
+              throw _iteratorError4;
             }
           }
         }
@@ -31703,7 +31661,9 @@ function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        updateUsergroup: this.updateCurrentUsergroup
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
         uploadNote: this.uploadNote
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
         addFolder: this.addFolder
@@ -31827,7 +31787,9 @@ function (_Component) {
           for (var _iterator2 = plainGroups[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var group = _step2.value;
             groups.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
-              key: group.key
+              onClick: _this.props.updateUsergroup,
+              key: group.key,
+              id: group.key
             }, group.name));
           }
         } catch (err) {

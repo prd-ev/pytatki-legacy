@@ -33,7 +33,7 @@ export default class UsergroupList extends Component {
       .then(plainGroups => {
         let groups = []
         for (const group of plainGroups) {
-          groups.push(<h1 key={group.key}>{group.name}</h1>);
+          groups.push(<h1 onClick={this.props.updateUsergroup} key={group.key} id={group.key}>{group.name}</h1>);
         }
         that.setState({
           usergroups: groups

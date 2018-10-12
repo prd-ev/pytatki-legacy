@@ -15,49 +15,8 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
-      current_usergroup_id: "1"
     };
     //Download root folders and set state of data[0] to array of folder objects
-    const that = this;
-    fetch(siteUrl + '/api?query={getToken}')
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + that.state.current_usergroup_id + ',access_token:"' + token + '")}')
-        .then(response => response.json())
-        .then(myJson => Number(myJson.data.getRootId))
-        .then(rootId => {
-          that.setState({
-            currentDirId: [rootId]
-          })
-          return fetch(siteUrl + '/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
-        })
-        .then(response => response.json())
-        .then(myJson => JSON.parse(myJson.data.getContent))
-      )
-      .then(function (innerJson) {
-        let rootFolders = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          if (notegroup.idnote) {
-            if (notegroup.status_id == 1) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
-              folderContent.push(object);
-            }
-          }
-          else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
-            rootFolders.push(object);
-          }
-        };
-        let updated_data = that.state.data;
-        updated_data[0] = rootFolders;
-        that.setState({ data: updated_data });
-      })
-      .catch(error => console.log(error));
   }
 
   changeCurrentDirectory = e => {
@@ -100,6 +59,22 @@ class Notatki extends React.Component {
     }
     );
   };
+
+  getUsergroupRoot(usergroup) {
+    const that = this;
+    fetch(siteUrl + '/api?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroup + ',access_token:"' + token + '")}')
+        .then(response => response.json())
+        .then(myJson => Number(myJson.data.getRootId))
+        .then(rootId => {
+          that.setState({
+            currentDirId: [rootId]
+          });
+          that.updateContent(rootId);
+        }));
+  }
 
   getContent(dir_id) {
     return fetch(siteUrl + '/api?query={getToken}')
@@ -274,10 +249,19 @@ class Notatki extends React.Component {
       });
   }
 
+  updateCurrentUsergroup = e => {
+    this.getUsergroupRoot(e.target.id)
+    this.setState({
+      currentDepth: 0,
+      currentDirId: [],
+      currentPath: []
+    })
+  }
+
   render() {
     return (
       <div>
-        <NotegroupList></NotegroupList>
+        <NotegroupList updateUsergroup={this.updateCurrentUsergroup}></NotegroupList>
         <AddNote uploadNote={this.uploadNote}></AddNote>
         <AddFolder addFolder={this.addFolder}></AddFolder>
         <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
