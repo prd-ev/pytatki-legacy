@@ -344,11 +344,11 @@ def add():
         conn.begin()
         note_id = create_note(
             conn,
-            str(os.path.join(form['topic'], filename)),
+            str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
             CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'],
             current_user['iduser'],
-            form['topic'],
+            form['notegroup_id'],
             CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID'])
         conn.commit()
         con.close()
