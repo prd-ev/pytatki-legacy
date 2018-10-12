@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 
 from pytatki import __version__
 from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
-                               remove_note, remove_notegroup)
+                               remove_note, remove_notegroup, create_note)
 from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
@@ -332,17 +332,15 @@ def add():
             flash('Nieobslugiwane rozszerzenie', 'warning')
             return redirect(request.url)
         con, conn = connection()
-        con.execute(
-            "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, "
-            "%s)",
-            (escape_string(str(os.path.join(form['topic'], filename))), escape_string(form['title']),
-             escape_string(str(CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'])), escape_string(str(current_user['iduser'])),
-             escape_string(form['topic'])))
-        conn.commit()
-        note_id = con.lastrowid
-        con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (
-            escape_string(str(current_user['iduser'])), escape_string(str(note_id)),
-            escape_string(str(datetime.now()))))
+        conn.begin()
+        note_id = create_note(
+            conn,
+            str(os.path.join(form['topic'], filename)),
+            form['title'],
+            CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'],
+            current_user['iduser'],
+            form['topic'],
+            CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID'])
         conn.commit()
         con.close()
         conn.close()
