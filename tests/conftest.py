@@ -18,7 +18,6 @@ def create_db():
     if db_exists:
         raise Warning("Database exists")
     for query in parse_sql('sql/create-database.sql'):
-        print(query)
         cursor.execute(query)
     cursor.execute("SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
     user_exists = cursor.fetchone()
