@@ -1,20 +1,21 @@
 """Widoki aplikacji"""
-import os
 import gc
+import json
+import os
 from datetime import datetime
-from flask import render_template, redirect, request, session, flash, send_file, g
+
+from flask import (flash, g, redirect, render_template, request, send_file,
+                   session, jsonify)
+from flask_login import current_user, logout_user
+from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
-from werkzeug.datastructures import ImmutableMultiDict
-
-from flask_login import logout_user, current_user
+from pytatki import __version__
+from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
+                               remove_note, remove_notegroup, create_note)
 from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
-from pytatki import __version__
-from pytatki.dbconnect import connection, note_exists, remove_note, notegroup_empty, remove_notegroup
-from pymysql import escape_string
-import json
 
 __author__ = 'Patryk Niedzwiedzinski'
 
@@ -78,34 +79,6 @@ def find_notegroup_children(id_notegroup, id_user):
             for note in notes:
                 children.append(note)
     return json.dumps(children, ensure_ascii=False)
-
-
-def has_access_to_note(id_note, id_user):
-    """Check if user has access to note"""
-    con, conn = connection()
-    con.execute("SELECT notegroup_id FROM note WHERE idnote = %s",
-                escape_string(str(id_note)))
-    note = con.fetchone()
-    con.execute("SELECT 1 FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                (escape_string(str(id_user)), escape_string(str(note['notegroup_id']))))
-    has_access = con.fetchone()
-    con.close()
-    conn.close()
-    if has_access:
-        return True
-    return False
-
-
-def get_note(id_note, id_user):
-    """Get note by id"""
-    if has_access_to_note(id_note, id_user):
-        con, conn = connection()
-        con.execute("SELECT * FROM note_view WHERE idnote = %s",
-                    escape_string(str(id_note)))
-        note = con.fetchone()
-        con.close()
-        conn.close()
-        return note
 
 
 def get_root_id(id_usergroup, id_user):
@@ -237,12 +210,12 @@ def delete_notegroup(identifier):
         conn.begin()
         remove_notegroup(conn, identifier)
         conn.commit()
-    else:
-        flash("Notegroup is not empty", 'warning')
+        con.close()
+        conn.close()
+        return jsonify({'data': 'success'})
     con.close()
     conn.close()
-    return redirect('/')
-
+    return jsonify({'data': 'notegroup not empty'})
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
@@ -252,7 +225,7 @@ def delete_note(identifier):
         con, conn = connection()
         if note_exists(conn, identifier):
             conn.begin()
-            remove_note(conn, identifier)
+            remove_note(conn, identifier, current_user['iduser'])
             conn.commit()
             flash('Notatka zostala usunieta!', 'success')
         else:
@@ -300,7 +273,7 @@ def give_admin(identifier):
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 user['login']), 'success')
         except Exception as error:
-            flash("Blad: " + str(error), 'danger')
+            flash("Error: " + str(error), 'danger')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
@@ -321,7 +294,7 @@ def take_admin(identifier):
                 flash('Odebrano uprawnienia administratora uzytkownikowi ' +
                       user['login'], 'success')
             except Exception as error:
-                flash("Blad: " + str(error), 'danger')
+                flash("Error: " + str(error), 'danger')
         else:
             flash("Nie mozesz tego zrobic", 'warning')
         con.close()
@@ -345,7 +318,7 @@ def add():
     if request.method == 'POST':
         form = request.form
         if 'file' not in request.files:
-            flash('Blad: No file part', 'danger')
+            flash('Error: No file part', 'danger')
             return redirect(request.url)
         request_file = request.files['file']
         if request_file.filename == '':
@@ -368,19 +341,15 @@ def add():
             flash('Nieobslugiwane rozszerzenie', 'warning')
             return redirect(request.url)
         con, conn = connection()
-        con.execute(
-            "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, "
-            "%s)",
-            (escape_string(str(os.path.join(form['notegroup_id'], filename))), escape_string(form['title']),
-             escape_string(str(CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'])), escape_string(
-                 str(current_user['iduser'])),
-             escape_string(form['notegroup_id'])))
-        conn.commit()
-        note_id = con.lastrowid
-        con.execute("INSERT INTO action (content, user_id, note_id, date) VALUES (\"Create note\", %s, %s, %s)", (
-            escape_string(str(current_user['iduser'])), escape_string(
-                str(note_id)),
-            escape_string(str(datetime.now()))))
+        conn.begin()
+        note_id = create_note(
+            conn,
+            str(os.path.join(form['notegroup_id'], filename)),
+            form['title'],
+            CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'],
+            current_user['iduser'],
+            form['notegroup_id'],
+            CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID'])
         conn.commit()
         con.close()
         conn.close()
@@ -467,7 +436,7 @@ def download(identifier):
             conn.close()
             if note['note_type'] == "file":
                 return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
-                return note['value']
+            return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
