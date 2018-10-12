@@ -25,7 +25,8 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 
 
 def type_id(type_name):
     con, conn = connection()
-    con.execute("SELECT idnote_type FROM note_type WHERE name = %s", escape_string(type_name))
+    con.execute("SELECT idnote_type FROM note_type WHERE name = %s",
+                escape_string(type_name))
     file_type = con.fetchone()
     con.close()
     conn.close()
@@ -104,7 +105,8 @@ def add_tag_to_note(tag, id_note, id_user):
         tag = con.fetchone()
         if not tag:
             conn.begin()
-            con.execute("INSERT INTO tag (name) VALUES (%s)", escape_string(tag))
+            con.execute("INSERT INTO tag (name) VALUES (%s)",
+                        escape_string(tag))
             tag_id = con.lastrowid
             conn.commit()
         else:
@@ -113,7 +115,8 @@ def add_tag_to_note(tag, id_note, id_user):
         con.execute("INSERT INTO tagging (note_id, tag_id) VALUES (%s, %s)",
                     (escape_string(str(id_note)), escape_string(str(tag_id))))
         conn.commit()
-        con.execute("SELECT * FROM note_tags WHERE idnote = %s", escape_string(str(id_note)))
+        con.execute("SELECT * FROM note_tags WHERE idnote = %s",
+                    escape_string(str(id_note)))
         note = con.fetchone()
         con.close()
         conn.close()
@@ -136,13 +139,15 @@ def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user
         return "Cannot add note: used title"
     conn.begin()
     con.execute("INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, %s)", (
-        escape_string(value), escape_string(title), escape_string(str(type_id(type_name))), escape_string(str(id_user)),
+        escape_string(value), escape_string(title), escape_string(
+            str(type_id(type_name))), escape_string(str(id_user)),
         escape_string(str(id_notegroup))))
     note_id = con.lastrowid
     con.execute("INSERT INTO action (content, user_id, note_id) VALUES (\"Create\", %s, %s)", (
         escape_string(str(id_user)), escape_string(str(note_id))))
     conn.commit()
-    con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(str(note_id)))
+    con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                escape_string(str(note_id)))
     note = con.fetchone()
     return note
 
@@ -257,7 +262,8 @@ def user_list():
 def give_admin(identifier):
     """Give admin"""
     con, conn = connection()
-    con.execute("SELECT * FROM user WHERE iduser = %s", escape_string(identifier))
+    con.execute("SELECT * FROM user WHERE iduser = %s",
+                escape_string(identifier))
     user = con.fetchone()
     if current_user.is_admin and user and user['iduser'] != current_user:
         try:
@@ -285,7 +291,8 @@ def take_admin(identifier):
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
                             (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))))
                 conn.commit()
-                flash('Odebrano uprawnienia administratora uzytkownikowi ' + user['login'], 'success')
+                flash('Odebrano uprawnienia administratora uzytkownikowi ' +
+                      user['login'], 'success')
             except Exception as error:
                 flash("Error: " + str(error), 'danger')
         else:
@@ -324,10 +331,12 @@ def add():
                 flash("File unsecure")
                 return redirect('/')
             print(filename)
-            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename)):
-                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'])):
-                    os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic']))
-                request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], form['topic'], filename))
+            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
+                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
+                    os.makedirs(os.path.join(
+                        APP.config['UPLOAD_FOLDER'], form['notegroup_id']))
+                request_file.save(os.path.join(
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
         else:
             flash('Nieobslugiwane rozszerzenie', 'warning')
             return redirect(request.url)
@@ -345,7 +354,7 @@ def add():
         con.close()
         conn.close()
         flash('Notatka zostala dodana!', 'success')
-        return redirect(request.args.get('next') if 'next' in request.args else '/#' + str(form['topic']))
+        return redirect(request.args.get('next') if 'next' in request.args else '/#' + str(form['notegroup_id']))
     else:
         con, conn = connection()
         con.execute(
@@ -401,7 +410,8 @@ def admin_add_get():
         con.execute("SELECT idnotegroup, folder_name, parent_id FROM notegroup_view WHERE iduser = %s",
                     escape_string(str(current_user['iduser'])))
         subjects = con.fetchall()
-        con.execute("SELECT idusergroup, name FROM usergroup_membership WHERE iduser = %s ", escape_string(str(current_user['iduser'])))
+        con.execute("SELECT idusergroup, name FROM usergroup_membership WHERE iduser = %s ",
+                    escape_string(str(current_user['iduser'])))
         classes = con.fetchall()
         con.close()
         conn.close()
@@ -419,7 +429,8 @@ def download(identifier):
     if current_user.is_authenticated:
         if has_access_to_note(identifier, current_user['iduser']):
             con, conn = connection()
-            con.execute("SELECT * FROM note_view WHERE idnote = %s", escape_string(identifier))
+            con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                        escape_string(identifier))
             note = con.fetchone()
             con.close()
             conn.close()
