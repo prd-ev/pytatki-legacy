@@ -30,15 +30,21 @@ def create_usergroup(conn, name, description, parent_id='0'):
 
 def note_exists(conn, idnote):
     """Checks if note exists"""
+    #TODO: is active!
     note_exists = conn.cursor().execute(
         "SELECT * FROM note_view WHERE idnote = %s", pymysql.escape_string(str(idnote)))
     return True if note_exists else False
 
+def create_action(conn, content, iduser, idnote):
+    #TODO: add action
+    pass
 
 def remove_note(conn, idnote):
     """Removes a note"""
-    conn.cursor().execute("DELETE FROM note WHERE idnote = %s",
-                          pymysql.escape_string(str(idnote)))
+    #TODO: move to note-history
+    conn.cursor().execute("UPDATE note SET status_id = %s WHERE idnote = %s",
+                          (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote))))
+    #TODO: action about remove
 
 
 def add_user_to_usergroup(conn, iduser, idusergroup):
@@ -61,6 +67,7 @@ def create_notegroup(conn, name, idusergroup, parent_id='0'):
 
 
 def notegroup_empty(conn, idnotegroup):
+    #TODO: removed notes
     """Chcecks if notegroup is empty"""
     not_empty = conn.cursor().execute(
         "SELECT * FROM note WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))

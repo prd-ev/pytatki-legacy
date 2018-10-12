@@ -234,6 +234,7 @@ def delete_notegroup(identifier):
         flash("Notegroup is not empty", 'warning')
     con.close()
     conn.close()
+    #TODO: return json
     return redirect('/')
 
 
