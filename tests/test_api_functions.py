@@ -1,13 +1,22 @@
-import pytest
 import pymysql
-from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, notegroup_empty, remove_notegroup, note_exists, remove_note, remove_notegroup
+import pytest
 from passlib.hash import sha256_crypt
-from pytatki.views import has_access_to_note, type_id, has_access_to_usergroup
-from init_db import parse_sql, db_init
+
+from init_db import db_init, parse_sql
+from pytatki.dbconnect import (add_user_to_usergroup, connection, create_note,
+                               create_note_type, create_notegroup,
+                               create_status, create_user, create_usergroup,
+                               has_access_to_note, note_exists,
+                               notegroup_empty, remove_note, remove_notegroup, create_action, get_note)
+from pytatki.views import type_id, has_access_to_notegroup, has_access_to_usergroup
 
 
 def test_user_has_access_to_note(insert_note):
     if has_access_to_note(1, 1) != True:
+        raise AssertionError()
+
+def test_get_note(insert_note):
+    if get_note(1, 1) != {'idnote': 1, 'value': 'test', 'title': 'Test', 'status_id': 1, 'note_type': 'text', 'creator_id': 1, 'creator_login': 'test', 'notegroup_id': 1, 'notegroup_name': 'test'}:
         raise AssertionError()
 
 def test_type_id(insert_text_note_type):
@@ -47,9 +56,16 @@ def test_note_exists(insert_note):
     _.close()
     conn.close()
 
+def test_create_action(insert_user):
+    _, conn = connection()
+    _.execute("SELECT * FROM action WHERE content=\"create note Test\"")
+    exists = _.fetchone()
+    if not exists:
+        raise AssertionError()
+
 def test_remove_note(insert_note):
     _, conn = connection()
-    remove_note(conn, 1)
+    remove_note(conn, 1, 1)
     if note_exists(conn, 1) != False:
         raise AssertionError()
     _.close()

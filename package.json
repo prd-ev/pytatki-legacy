@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "watch": "webpack --watch",
-    "dev_start": "python3 wsgi.py",
+    "dev_start": "python3 run.py",
     "start": "uwsgi --ini uwsgi.ini"
   },
   "author": "Filip Wachowiak",

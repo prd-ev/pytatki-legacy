@@ -28,23 +28,58 @@ def create_usergroup(conn, name, description, parent_id='0'):
     return c.lastrowid
 
 
+def has_access_to_note(id_note, id_user):
+    """Check if user has access to note"""
+    con, conn = connection()
+    con.execute("SELECT notegroup_id FROM note WHERE idnote = %s",
+                pymysql.escape_string(str(id_note)))
+    note = con.fetchone()
+    con.execute("SELECT 1 FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (pymysql.escape_string(str(id_user)), pymysql.escape_string(str(note['notegroup_id']))))
+    has_access = con.fetchone()
+    con.close()
+    conn.close()
+    if has_access:
+        return True
+    return False
+
+
+def get_note(id_note, id_user):
+    """Get note by id"""
+    if has_access_to_note(id_note, id_user):
+        con, conn = connection()
+        con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                    pymysql.escape_string(str(id_note)))
+        note = con.fetchone()
+        con.close()
+        conn.close()
+        return note
+    return False
+
+
 def note_exists(conn, idnote):
     """Checks if note exists"""
-    #TODO: is active!
     note_exists = conn.cursor().execute(
-        "SELECT * FROM note_view WHERE idnote = %s", pymysql.escape_string(str(idnote)))
+        "SELECT * FROM note_view WHERE idnote = %s AND status_id = 1", pymysql.escape_string(str(idnote)))
     return True if note_exists else False
 
 def create_action(conn, content, iduser, idnote):
-    #TODO: add action
-    pass
+    conn.cursor().execute(
+        "INSERT INTO action (content, note_id, user_id) VALUES (%s, %s, %s)",
+        (
+            pymysql.escape_string(content),
+            pymysql.escape_string(str(idnote)),
+            pymysql.escape_string(str(iduser))
+        )
+    )
 
-def remove_note(conn, idnote):
+def remove_note(conn, idnote, iduser):
     """Removes a note"""
-    #TODO: move to note-history
-    conn.cursor().execute("UPDATE note SET status_id = %s WHERE idnote = %s",
-                          (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote))))
-    #TODO: action about remove
+    conn.cursor().execute(
+        "UPDATE note SET status_id = %s WHERE idnote = %s",
+        (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote)))
+    )
+    create_action(conn, 'removes a note \'{}\''.format(str(idnote)), iduser, idnote)
 
 
 def add_user_to_usergroup(conn, iduser, idusergroup):
@@ -67,10 +102,9 @@ def create_notegroup(conn, name, idusergroup, parent_id='0'):
 
 
 def notegroup_empty(conn, idnotegroup):
-    #TODO: removed notes
-    """Chcecks if notegroup is empty"""
+    """Checks if notegroup is empty"""
     not_empty = conn.cursor().execute(
-        "SELECT * FROM note WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))
+        "SELECT * FROM note WHERE notegroup_id = %s AND status_id = 1", pymysql.escape_string(str(idnotegroup)))
     return False if not_empty else True
 
 
@@ -125,4 +159,6 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
             pymysql.escape_string(str(status_id))
         )
     )
-    return c.lastrowid
+    id = c.lastrowid
+    create_action(conn, "create note {}".format(title), user_id, id)
+    return id
