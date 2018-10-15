@@ -372,8 +372,11 @@ def admin_add_post():
     """Admin add"""
     if current_user.is_admin:
         con, conn = connection()
-        con.execute("SELECT idnotegroup FROM notegroup WHERE lower(name) = lower(%s)",
-                    escape_string(request.form['title']))
+        con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
+                    (escape_string(request.form['title']),
+                    escape_string(request.form['class']),
+                    escape_string(request.form['parent_id']))
+                    )
         if con.fetchone():
             flash("Dany przedmiot juz istnieje", 'warning')
         else:
