@@ -12,7 +12,8 @@ from werkzeug.utils import secure_filename
 
 from pytatki import __version__
 from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
-                               remove_note, remove_notegroup, create_note)
+                               remove_note, remove_notegroup, create_note,
+                               has_access_to_note)
 from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
