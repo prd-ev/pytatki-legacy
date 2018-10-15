@@ -1,7 +1,10 @@
 # pytatki
+![Version](https://img.shields.io/badge/version-1.0b1-orange.svg)
 [![CodeFactor](https://www.codefactor.io/repository/github/PRD-ev/pytatki/badge)](https://www.codefactor.io/repository/github/PRD-ev/pytatki)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=butterfly-pn/pytatki&amp;utm_campaign=Badge_Grade)
 [![CircleCI](https://circleci.com/gh/PRD-ev/pytatki/tree/master.svg?style=svg)](https://circleci.com/gh/PRD-ev/pytatki/tree/master)
+[![Issues](https://img.shields.io/github/issues/PRD-ev/pytatki.svg)](https://github.com/PRD-ev/pytatki/issues)
+![Snakes](https://img.shields.io/badge/w%C4%99%C5%BCe%20s%C4%85-jadowite-blue.svg)
 
 Notatki we flasku
 
@@ -9,47 +12,37 @@ Notatki we flasku
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Wymagania
+### Instalation
 
-Aby uruchomić aplikację potrzebne są odpowiednie moduły python'a. Można je pobrać za pomocą pip'a wpisując następujące komendy:
-
-```
-pip install -r requirements/common.txt
-```
-
-### Instalacja
-
-Sklonuj to repozytorium na komputer, na którym chcesz uruchomić aplikację
+Clone this repo
 ```
 git clone https://github.com/PRD-ev/pytatki.git
 ```
-Następnie otwórz plik config/\_\_init\_\_.py. Pytatki pozwalają zapisać dwa presety ustawień `Localhost` i `Server`. Dzięki temu możesz testować aplikację lokalnie, a gdy wszystko będzie gotowe wystarczy zmienić tylko jedną linijką, żeby udostępnić światu aplikację :).
+Install dependencies
+```
+pip install -r requirements/common.txt
+```
+### Configuration
+Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
 
 
 ```
-class Localhost:
-    '''Do testowania na komputerze lokalnym'''
-    secret_key = str()
-    DEBUG = True #True oznacza, że aplikacja będzie sprawdzać zmiany w plikach
-    HOST = "127.0.0.1" #Tutaj wpisujemy adres, na którym chcemy postawić stronę
-    PORT = 5000 #Tutaj wpisujemy port, na którym ma działać aplikacja
-    EMAIL = "twoj@email" #Z tego maila wysyłane będą powiadomienia do użytkowników
-    EMAIL_PASSWORD = "haslo_do_twojego_maila" #Hasło do maila
-    
-    (...)
-    
-CONFIG = Localhost("sekretny_klucz") #W nawiasie wpisujemy klucz do szyfrowania haseł w bazie danych
-# NIE ZATRZYMUJ WARTOŚCI DOMYŚLNEJ!
+[DEFAULT]
+secret_key = "your_own_secret_key" # Don't leave default value
+DEBUG = True
+HOST = 127.0.0.1
+PORT = 5000
+
+[DATABASE]
+DB_HOST = '127.0.0.1'
+DB_USER = 'pytatki'
+DB_PASSWORD = 'pytatki'
+DB_NAME = 'pytatki'
 ```
 
-Żeby uruchomić aplikację wpisz:
+To configure database run `init_db.py` script.
 
-```
-python main.py
-```
-
-
-## Testowanie
+## Testing
 ### 
 ```
 pytest
@@ -77,8 +70,8 @@ Zobacz również listę [współautorów](https://github.com/butterfly-pn/pytatk
 
 ## TODO
 
-1. Dodawanie plików/notatek (dodanie tagów, przedmiotu itd.)
-2. Logowanie i rejestracja + admin
-3. Wyszukiwanie notatek
-4. Zarządzanie notatkami (usuń, ukryj itp.)
-5. Podział użytkowników na klasy
+- [ ] Dodawanie plików/notatek (dodanie tagów, przedmiotu itd.)
+- [x] Logowanie i rejestracja + admin
+- [ ] Wyszukiwanie notatek
+- [ ] Zarządzanie notatkami (usuń, ukryj itp.)
+- [x] Podział użytkowników na grupy

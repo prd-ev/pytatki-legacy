@@ -1,0 +1,24 @@
+{% extends "_header.html" %} {% set page_id = 'auth' %} {% block content %}
+<div class="row login-row" style="text-align: center">
+    <div class="col-lg-4">
+    </div>
+    <div class="col-lg-4 bg-white rounded m-2" style="padding:15px;">
+        <h3>Autoryzacja</h3><br/>
+        <p>
+            Aplikacja <b>{{app['name']}}</b> otrzyma uprawnienia do:<br/>
+            {% if app['access'] == 'rw' %}wyświetlania i edycji{% elif app['access'] == 'r' %}wyświetlania{% elif app['access'] == 'w' %}edycji{% endif %}
+        </p><br/>
+        {% if not current_user.is_authenticated %}
+            <a href="/login?next={{request.url}}"><div class="btn btn-primary btn-block">Zaloguj się</div></a>
+        {% else %}
+        <form method="POST" action="{{request.url}}"><input type="submit" class="btn btn-primary btn-block" value="Kontunuuj jako {{current_user['login']}}">
+        </input>
+        </form>
+        <a href="/logout/?next={{request.url}}"><small>To nie ja</small></a>
+        {% endif %}
+
+    </div>
+    <div class="col-lg-4">
+    </div>
+</div>
+{% endblock %}

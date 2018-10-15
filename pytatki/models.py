@@ -2,11 +2,11 @@
 """Database tables models"""
 from flask_login._compat import unicode
 from passlib.hash import sha256_crypt
-from main import LM
-from dbconnect import connection
+from pytatki.main import LM
+from pytatki.dbconnect import connection
 from pymysql import escape_string
 import gc
-from config import Config as CONFIG
+from pytatki.main import CONFIG as Config
 
 
 @LM.user_loader
@@ -24,6 +24,7 @@ def user_load(user_id):
         return user
     except:
         return None
+
 
 class User(dict):
 
@@ -93,7 +94,10 @@ class User(dict):
 
     def is_admin(self):
         con, conn = connection()
-        query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s", (escape_string(self['userid']), escape_string(CONFIG.admin_id)))
+        query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                            (escape_string(self['userid']), escape_string(Config.json()['admin_group_id'])))
+        con.close()
+        conn.close()
         if query:
             return True
         return False

@@ -1,9 +1,9 @@
-### Krótki opis
-Ten pull request naprawia #
+### Short description
+This PR
 
-### Zmiany i ulepszenia
+### Changes, fixes and new features
 -
 -
 -
 
-### Inne
+### Other

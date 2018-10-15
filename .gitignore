@@ -1,5 +1,6 @@
 .idea
 __pycache__
+*/__pycache__
 test.db
 records
 files
@@ -12,3 +13,6 @@ src/.DS_Store
 .vscode
 docs/database-schema.mwb.bak
 config/__init__.py
+node_modules
+static/bundle.js
+config.ini
