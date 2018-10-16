@@ -31674,11 +31674,11 @@ function (_React$Component) {
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], {
         updateUsergroup: this.updateCurrentUsergroup
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      }), this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
         uploadNote: this.uploadNote
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
         addFolder: this.addFolder
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_EditMode_jsx__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      }) : "", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_EditMode_jsx__WEBPACK_IMPORTED_MODULE_3__["default"], {
         changeMode: this.changeMode,
         isOn: this.state.editModeOn
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
