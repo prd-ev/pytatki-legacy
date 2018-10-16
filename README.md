@@ -17,9 +17,17 @@ Clone this repo
 ```
 git clone https://github.com/PRD-ev/pytatki.git
 ```
-Install dependencies
+Install Flask dependencies
 ```
 pip install -r requirements/common.txt
+```
+Install React dependencies
+```
+yarn add
+```
+Build bundles
+```
+yarn run build
 ```
 ### Configuration
 Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
@@ -60,7 +68,7 @@ Jesteśmy na każdą formę współpracy :). Dane kontaktowe można znaleźć w 
 ## Autorzy
 
 * **Patryk Niedźwiedziński** - *Initial work* - [butterfly-pn](https://github.com/butterfly-pn)
-* **Filip Wachowiak** - [filipw01](https://github.com/filipw01)
+* **Filip Wachowiak** - *React developer* - [filipw01](https://github.com/filipw01)
 
 Zobacz również listę [współautorów](https://github.com/butterfly-pn/pytatki/graphs/contributors), którzy przyczynili się w rozwoju aplikacji.
 

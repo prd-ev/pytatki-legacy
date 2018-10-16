@@ -2,9 +2,9 @@ import React from "react";
 import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
-import NotegroupList from './NotegroupList.jsx'
+import NotegroupList from './UsergroupList.jsx'
 
-const siteUrl = "http://127.0.0.1:5000"; 
+const siteUrl = "http://127.0.0.1:5000";
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -14,93 +14,81 @@ class Notatki extends React.Component {
       data: [],
       currentPath: [],
       currentDirId: [],
-      editModeOn: false
+      editModeOn: false,
     };
-  }
-
-  componentWillMount() {
     //Download root folders and set state of data[0] to array of folder objects
-    const that = this;
-    fetch(siteUrl + '/api?query={getToken}')
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:1,access_token:"' + token + '")}')
-        .then(response => response.json())
-        .then(myJson => Number(myJson.data.getRootId))
-        .then(rootId => {
-          that.setState({
-            currentDirId: [rootId]
-          })
-          return fetch(siteUrl+'/api?query={getContent(id_notegroup:' + rootId + ',access_token:"' + token + '")}')
-        })
-        .then(response => response.json())
-        .then(myJson => JSON.parse(myJson.data.getContent))
-      )
-      .then(function (innerJson) {
-        let rootFolders = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          object["title"] = notegroup.folder_name;
-          if (notegroup.idnote) {
-            object["key"] = "note" + notegroup.idnote;
-          } else {
-            object["key"] = notegroup.idnotegroup;
-          }
-          rootFolders.push(object);
-        };
-        let updated_data = that.state.data;
-        updated_data[0] = rootFolders;
-        that.setState({ data: updated_data });
-      })
-      .catch(error => console.log(error));
   }
-
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
     let selected_dir_id = e.target.id;
     let selected_dir_name = e.target.innerText;
     const that = this;
-    fetch(siteUrl + '/api?query={getToken}')
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + selected_dir_id + ',access_token:"' + token + '")}'))
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getContent))
-      .then(function (innerJson) {
-        let folderContent = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          if (notegroup.idnote) {
+    this.getContent(selected_dir_id).then(innerJson => {
+      let folderContent = [];
+      for (const notegroup of innerJson) {
+        let object = {};
+        if (notegroup.idnote) {
+          if (notegroup.status_id != 2) {
             object["title"] = notegroup.name;
             object["key"] = "note" + notegroup.idnote;
             object["is_note"] = true;
-          } else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
+            folderContent.push(object);
           }
+        }
+        else {
+          object["title"] = notegroup.folder_name;
+          object["key"] = notegroup.idnotegroup;
+          object["is_note"] = false;
           folderContent.push(object);
-        };
-        let updated_data = that.state.data;
-        updated_data[that.state.currentDepth + 1] = folderContent;
-        let updated_path = that.state.currentPath;
-        updated_path[that.state.currentDepth] = selected_dir_name;
-        let updated_dir_id = that.state.currentDirId;
-        updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
-        that.setState(prevState => ({
-          data: updated_data,
-          currentDepth: prevState.currentDepth + 1,
-          currentPath: updated_path,
-          currentDirId: updated_dir_id
-        }));
-      })
-      .catch(error => console.log(error));
+        }
+      }
+      ;
+      let updated_data = that.state.data;
+      updated_data[that.state.currentDepth + 1] = folderContent;
+      let updated_path = that.state.currentPath;
+      updated_path[that.state.currentDepth] = selected_dir_name;
+      let updated_dir_id = that.state.currentDirId;
+      updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
+      that.setState(prevState => ({
+        data: updated_data,
+        currentDepth: prevState.currentDepth + 1,
+        currentPath: updated_path,
+        currentDirId: updated_dir_id
+      }));
+    }
+    );
   };
 
-  openNote = (e) => {
-    console.log("Jak wyświetlić notatkę?");
+  getUsergroupRoot(usergroup) {
+    const that = this;
+    fetch(siteUrl + '/api?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroup + ',access_token:"' + token + '")}')
+        .then(response => response.json())
+        .then(myJson => Number(myJson.data.getRootId))
+        .then(rootId => {
+          that.setState({
+            currentDirId: [rootId]
+          });
+          that.updateContent(rootId);
+        }));
+  }
 
+  getContent(dir_id) {
+    return fetch(siteUrl + '/api?query={getToken}')
+      .then(response => response.json())
+      .then(res => res.data.getToken)
+      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + dir_id + ',access_token:"' + token + '")}'))
+      .then(response => response.json())
+      .then(myJson => JSON.parse(myJson.data.getContent))
+
+      .catch(error => console.log(error));
+  }
+
+
+  openNote = (e) => {
     let id = e.target.id.slice(4);
     window.open(siteUrl + `/download/${id}`);
   }
@@ -134,7 +122,7 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(<div><h1 onClick={this.openNote} id={value.key} key={value.key}>
+          content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
             {"Notatka " + value.title}
           </h1>
             <span onClick={this.deleteNote}>
@@ -142,7 +130,7 @@ class Notatki extends React.Component {
             </span>
           </div>);
         } else {
-          content.push(<div><h1 onClick={this.changeCurrentDirectory} id={value.key} key={value.key}>
+          content.push(<div key={value.key}><h1 onClick={this.changeCurrentDirectory} id={value.key} >
             {value.title}
           </h1>
             <span onClick={this.deleteFolder}>
@@ -175,6 +163,7 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
   addFolder = (e) => {
@@ -193,6 +182,7 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
   changeMode = (e) => {
@@ -201,10 +191,10 @@ class Notatki extends React.Component {
       editModeOn: !prevState.editModeOn
     }))
   }
-  
+
   deleteNote = (e) => {
-    let note_id = e.target.previousSibling.id.slice(4);
-    fetch(siteUrl + '/admin/delete/note/' + note_id, {
+    let noteId = e.target.previousSibling.id.slice(4);
+    fetch(siteUrl + '/admin/delete/note/' + noteId, {
     }).then(
       response => response.text() // if the response is a JSON object
     ).then(
@@ -212,17 +202,66 @@ class Notatki extends React.Component {
     ).catch(
       error => console.log(error) // Handle the error response object
     );
+    this.updateContent();
   }
 
   deleteFolder = (e) => {
-    console.log("Jak usunąć folder?")
-    console.log(e.target.previousSibling.id);   
+    let folderId = e.target.previousSibling.id;
+    fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
+    }).then(
+      response => response.text() // if the response is a JSON object
+    ).then(
+      success => console.log(success) // Handle the success response object
+    ).catch(
+      error => console.log(error) // Handle the error response object
+    );
+    this.updateContent();
+  }
+
+
+  updateContent() {
+    const that = this;
+    this.getContent(this.state.currentDirId[this.state.currentDirId.length - 1])
+      .then(innerJson => {
+        let folderContent = [];
+        for (const notegroup of innerJson) {
+          let object = {};
+          if (notegroup.idnote) {
+            if (notegroup.status_id != 2) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+              folderContent.push(object);
+            }
+          }
+          else {
+            object["title"] = notegroup.folder_name;
+            object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
+            folderContent.push(object);
+          }
+        }
+        let updated_data = that.state.data;
+        updated_data[that.state.currentDepth] = folderContent;
+        that.setState({
+          data: updated_data,
+        });
+      });
+  }
+
+  updateCurrentUsergroup = e => {
+    this.getUsergroupRoot(e.target.id)
+    this.setState({
+      currentDepth: 0,
+      currentDirId: [],
+      currentPath: []
+    })
   }
 
   render() {
     return (
       <div>
-        <NotegroupList></NotegroupList>
+        <NotegroupList updateUsergroup={this.updateCurrentUsergroup}></NotegroupList>
         <AddNote uploadNote={this.uploadNote}></AddNote>
         <AddFolder addFolder={this.addFolder}></AddFolder>
         <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
