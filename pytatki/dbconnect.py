@@ -162,3 +162,8 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
     id = c.lastrowid
     create_action(conn, "create note {}".format(title), user_id, id)
     return id
+
+def remove_user(conn, iduser):
+    """Removes user from database"""
+    conn.cursor().execute("DELETE FROM user WHERE iduser = %s", pymysql.escape_string(str(iduser)))
+    #TODO: other tables

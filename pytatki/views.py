@@ -12,7 +12,8 @@ from werkzeug.utils import secure_filename
 
 from pytatki import __version__
 from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
-                               remove_note, remove_notegroup, create_note)
+                               remove_note, remove_notegroup, create_note,
+                               has_access_to_note)
 from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
@@ -200,7 +201,7 @@ def admin():
 def delete_user(identifier):
     """Delete user"""
     #TODO: delete user
-    flash("This function is not avaliable in this version: \'{}\'".format(str(__version__)), 'warning')
+    return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
     return redirect('/')
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
@@ -227,14 +228,15 @@ def delete_note(identifier):
             conn.begin()
             remove_note(conn, identifier, current_user['iduser'])
             conn.commit()
-            flash('Notatka zostala usunieta!', 'success')
-        else:
-            flash('Nie ma takiej notatki', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
+            con.close()
+            conn.close()
+            return jsonify({'data': 'Notatka zostala usunieta!'})
+        con.close()
+        conn.close()
+        return jsonify({'data': 'Nie ma takiej notatki'})
     con.close()
     conn.close()
-    return redirect(request.args.get('next') if 'next' in request.args else '/')
+    return jsonify({'data': 'Nie mozesz tego zrobic!'})
 
 
 @APP.route("/admin/user-list/")
@@ -318,18 +320,15 @@ def add():
     if request.method == 'POST':
         form = request.form
         if 'file' not in request.files:
-            flash('Error: No file part', 'danger')
-            return redirect(request.url)
+            return jsonify({'data': 'No file part'})
         request_file = request.files['file']
         if request_file.filename == '':
-            flash('Nie wybrano pliku', 'warning')
-            return redirect(request.url)
+            return jsonify({'data': 'Nie wybrano pliku'})
         if request_file:
             if allowed_file(request_file.filename):
                 filename = secure_filename(request_file.filename)
             else:
-                flash("File unsecure")
-                return redirect('/')
+                return jsonify({'data': "File unsecure"})
             print(filename)
             if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
                 if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
@@ -338,8 +337,7 @@ def add():
                 request_file.save(os.path.join(
                     APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
         else:
-            flash('Nieobslugiwane rozszerzenie', 'warning')
-            return redirect(request.url)
+            return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
         con, conn = connection()
         conn.begin()
         note_id = create_note(
@@ -353,8 +351,7 @@ def add():
         conn.commit()
         con.close()
         conn.close()
-        flash('Notatka zostala dodana!', 'success')
-        return redirect(request.args.get('next') if 'next' in request.args else '/#' + str(form['notegroup_id']))
+        return jsonify({'data': 'Notatka zostala dodana!'})
     else:
         con, conn = connection()
         con.execute(
@@ -378,7 +375,7 @@ def admin_add_post():
                     escape_string(request.form['parent_id']))
                     )
         if con.fetchone():
-            flash("Dany przedmiot juz istnieje", 'warning')
+            return jsonify({'data': "Dany przedmiot juz istnieje"})
         else:
             group = None
             if 'parent_id' in request.form:
@@ -394,13 +391,12 @@ def admin_add_post():
                 con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
                             (escape_string(str(group_id)), escape_string(str(request.form['class']))))
                 conn.commit()
-                flash('Dodano przedmiot!', 'success')
-            else:
-                flash("Wystąpił błąd w zapytaniu", 'warning')
+                return jsonify({'data': 'Dodano przedmiot!'})
+            return jsonify({'data': "Wystąpił błąd w zapytaniu"})
         con.close()
         conn.close()
     else:
-        flash('Nie mozesz tego zrobic', 'warning')
+        return jsonify({'data': 'Nie mozesz tego zrobic'})
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
