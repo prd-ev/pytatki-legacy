@@ -15,6 +15,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
+      usergroupChosen: false,
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -118,6 +119,7 @@ class Notatki extends React.Component {
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
+    if(this.state.usergroupChosen){
     if (this.state.data[this.state.currentDepth]) {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
@@ -141,6 +143,9 @@ class Notatki extends React.Component {
       }
       return content;
     }
+  }else{
+    return <h1>Wybierz grupę aby kontynuować</h1>
+  }
     return null;
   };
 
@@ -157,13 +162,15 @@ class Notatki extends React.Component {
       method: 'POST',
       body: formData
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
     this.updateContent();
+    e.target.querySelector("input").value = null;
+    e.target.querySelector("#file").value = null;
   }
 
   addFolder = (e) => {
@@ -176,13 +183,14 @@ class Notatki extends React.Component {
       method: 'POST',
       body: formData
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
     this.updateContent();
+    e.target.querySelector("input").value = null;
   }
 
   changeMode = (e) => {
@@ -196,9 +204,9 @@ class Notatki extends React.Component {
     let noteId = e.target.previousSibling.id.slice(4);
     fetch(siteUrl + '/admin/delete/note/' + noteId, {
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
@@ -209,9 +217,9 @@ class Notatki extends React.Component {
     let folderId = e.target.previousSibling.id;
     fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
@@ -254,7 +262,8 @@ class Notatki extends React.Component {
     this.setState({
       currentDepth: 0,
       currentDirId: [],
-      currentPath: []
+      currentPath: [],
+      usergroupChosen: true
     })
   }
 

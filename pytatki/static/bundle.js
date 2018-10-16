@@ -31405,52 +31405,56 @@ function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "packContent", function () {
       //Show content of current depth form state (this.state.data)
-      if (_this.state.data[_this.state.currentDepth]) {
-        var content = [];
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
+      if (_this.state.usergroupChosen) {
+        if (_this.state.data[_this.state.currentDepth]) {
+          var content = [];
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
 
-        try {
-          for (var _iterator3 = _this.state.data[_this.state.currentDepth][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var value = _step3.value;
-
-            if (value.is_note) {
-              content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-                key: value.key
-              }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
-                onClick: _this.openNote,
-                id: value.key
-              }, "Notatka " + value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
-                onClick: _this.deleteNote
-              }, _this.state.editModeOn ? " x" : null)));
-            } else {
-              content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-                key: value.key
-              }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
-                onClick: _this.changeCurrentDirectory,
-                id: value.key
-              }, value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
-                onClick: _this.deleteFolder
-              }, _this.state.editModeOn ? " x " : null)));
-            }
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
           try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-              _iterator3.return();
+            for (var _iterator3 = _this.state.data[_this.state.currentDepth][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var value = _step3.value;
+
+              if (value.is_note) {
+                content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+                  key: value.key
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+                  onClick: _this.openNote,
+                  id: value.key
+                }, "Notatka " + value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+                  onClick: _this.deleteNote
+                }, _this.state.editModeOn ? " x" : null)));
+              } else {
+                content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+                  key: value.key
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+                  onClick: _this.changeCurrentDirectory,
+                  id: value.key
+                }, value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+                  onClick: _this.deleteFolder
+                }, _this.state.editModeOn ? " x " : null)));
+              }
             }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
           } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
             }
           }
-        }
 
-        return content;
+          return content;
+        }
+      } else {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "Wybierz grup\u0119 aby kontynuowa\u0107");
       }
 
       return null;
@@ -31469,10 +31473,10 @@ function (_React$Component) {
         method: 'POST',
         body: formData
       }).then(function (response) {
-        return response.text();
+        return response.json();
       } // if the response is a JSON object
       ).then(function (success) {
-        return console.log(success);
+        return alert(success.data);
       } // Handle the success response object
       ).catch(function (error) {
         return console.log(error);
@@ -31480,6 +31484,9 @@ function (_React$Component) {
       );
 
       _this.updateContent();
+
+      e.target.querySelector("input").value = null;
+      e.target.querySelector("#file").value = null;
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "addFolder", function (e) {
@@ -31493,10 +31500,10 @@ function (_React$Component) {
         method: 'POST',
         body: formData
       }).then(function (response) {
-        return response.text();
+        return response.json();
       } // if the response is a JSON object
       ).then(function (success) {
-        return console.log(success);
+        return alert(success.data);
       } // Handle the success response object
       ).catch(function (error) {
         return console.log(error);
@@ -31504,6 +31511,8 @@ function (_React$Component) {
       );
 
       _this.updateContent();
+
+      e.target.querySelector("input").value = null;
     });
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "changeMode", function (e) {
@@ -31519,10 +31528,10 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "deleteNote", function (e) {
       var noteId = e.target.previousSibling.id.slice(4);
       fetch(siteUrl + '/admin/delete/note/' + noteId, {}).then(function (response) {
-        return response.text();
+        return response.json();
       } // if the response is a JSON object
       ).then(function (success) {
-        return console.log(success);
+        return alert(success.data);
       } // Handle the success response object
       ).catch(function (error) {
         return console.log(error);
@@ -31535,10 +31544,10 @@ function (_React$Component) {
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "deleteFolder", function (e) {
       var folderId = e.target.previousSibling.id;
       fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {}).then(function (response) {
-        return response.text();
+        return response.json();
       } // if the response is a JSON object
       ).then(function (success) {
-        return console.log(success);
+        return alert(success.data);
       } // Handle the success response object
       ).catch(function (error) {
         return console.log(error);
@@ -31554,7 +31563,8 @@ function (_React$Component) {
       _this.setState({
         currentDepth: 0,
         currentDirId: [],
-        currentPath: []
+        currentPath: [],
+        usergroupChosen: true
       });
     });
 
@@ -31563,7 +31573,8 @@ function (_React$Component) {
       data: [],
       currentPath: [],
       currentDirId: [],
-      editModeOn: false
+      editModeOn: false,
+      usergroupChosen: false
     }; //Download root folders and set state of data[0] to array of folder objects
 
     return _this;
