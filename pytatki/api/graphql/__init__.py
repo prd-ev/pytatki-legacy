@@ -1,7 +1,7 @@
 from flask_graphql import GraphQLView
 from pytatki.main import APP
 
-from pytatki.dbconnect import connection, get_note
+from pytatki.dbconnect import connection, get_note, get_last_note_actions
 import gc
 from flask_login import current_user
 from pytatki.views import find_notegroup_children, get_root_id, post_note, add_tag_to_note, get_usergroups_of_user
@@ -76,6 +76,15 @@ QueryRootType = GraphQLObjectType(
                 'access_token': GraphQLArgument(GraphQLString)
             },
             resolver=lambda obj, info, id_note, access_token: get_note(
+                id_note, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'getNoteLastActions': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_note': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_note, access_token: get_last_note_actions(
                 id_note, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getRootId': GraphQLField(

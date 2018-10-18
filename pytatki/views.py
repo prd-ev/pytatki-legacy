@@ -68,7 +68,7 @@ def find_notegroup_children(id_notegroup, id_user):
         usergroups = con.fetchall()
         con.execute(
             "SELECT idnote, value, note_type, creator_login, notegroup_id, notegroup_name, title AS 'name' FROM "
-            "note_view WHERE notegroup_id = %s",
+            "note_view WHERE notegroup_id = %s AND status_id = 1",
             escape_string(str(id_notegroup)))
         notes = con.fetchall()
         con.close()

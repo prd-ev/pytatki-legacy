@@ -164,6 +164,22 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
     create_action(conn, "create note {}".format(title), user_id, id)
     return id
 
+def get_last_note_actions(idnote, iduser):
+    """Get 5 last actions of note"""
+    con, conn = connection()
+    con.execute("SELECT * FROM action WHERE note_id = %s ORDER BY date DESC", pymysql.escape_string(str(idnote)))
+    last_actions = con.fetchmany(5)
+    last_actions = [
+        {
+            'idaction': row['idaction'], 'content': row['content'], 'user_id': row['user_id'], 'date': row['date'].strftime('%I:%M %d.%m.%Y')
+        } 
+        for row in last_actions
+        ]
+    con.close()
+    conn.close()
+    print(last_actions)
+    return json.dumps(last_actions)
+
 def remove_user(conn, iduser):
     """Removes user from database"""
     conn.cursor().execute("DELETE FROM user WHERE iduser = %s", pymysql.escape_string(str(iduser)))
