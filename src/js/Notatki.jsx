@@ -1,8 +1,9 @@
 import React from "react";
 import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
-import EditMode from './EditMode.jsx'
-import NotegroupList from './UsergroupList.jsx'
+import EditMode from './EditMode.jsx';
+import NotegroupList from './UsergroupList.jsx';
+import Info from './Info.jsx';
 
 const siteUrl = "http://127.0.0.1:5000";
 
@@ -15,6 +16,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
+      note: null,
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -93,6 +95,10 @@ class Notatki extends React.Component {
     window.open(siteUrl + `/download/${id}`);
   }
 
+  infoNote = id => () => {
+    this.setState({note: id});
+  }
+
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
     let path = this.state.currentPath;
@@ -122,7 +128,7 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
+          content.push(<div key={value.key}><h1 onClick={this.infoNote(value.key.slice(4))} id={value.key} >
             {"Notatka " + value.title}
           </h1>
             <span onClick={this.deleteNote}>
@@ -259,17 +265,16 @@ class Notatki extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <NotegroupList updateUsergroup={this.updateCurrentUsergroup}></NotegroupList>
-        <AddNote uploadNote={this.uploadNote}></AddNote>
-        <AddFolder addFolder={this.addFolder}></AddFolder>
-        <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
+    return <div>
+        <NotegroupList updateUsergroup={this.updateCurrentUsergroup} />
+        <AddNote uploadNote={this.uploadNote} />
+        <AddFolder addFolder={this.addFolder} />
+        <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn} />
+        <Info note={this.state.note} />
         <h1 onClick={this.prevFolder}>Cofnij</h1>
         {this.showCurrentPath()}
         {this.packContent()}
-      </div>
-    );
+      </div>;
   };
 }
 
