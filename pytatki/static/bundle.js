@@ -86,6 +86,17 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./config.json":
+/*!*********************!*\
+  !*** ./config.json ***!
+  \*********************/
+/*! exports provided: default, uwsgi, email, database */
+/***/ (function(module) {
+
+module.exports = {"default":{"secret_key":"change_it","debug":"True","host":"127.0.0.1","port":"5000"},"uwsgi":{"http":"0.0.0.0:8001","wsgi-file":"run.py","callable":"APP","processes":"5"},"email":{"mail_server":"smtp.gmail.com","mail_port":"465","mail_use_ssl":"True","email":"your_mail@gmail.com","email_password":"your_password"},"database":{"db_host":"127.0.0.1","db_user":"pytatki","db_password":"pytatki","db_name":"pytatki"}};
+
+/***/ }),
+
 /***/ "./node_modules/@babel/polyfill/lib/index.js":
 /*!***************************************************!*\
   !*** ./node_modules/@babel/polyfill/lib/index.js ***!
@@ -31248,6 +31259,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AddFolder.jsx */ "./src/js/AddFolder.jsx");
 /* harmony import */ var _EditMode_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./EditMode.jsx */ "./src/js/EditMode.jsx");
 /* harmony import */ var _UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./UsergroupList.jsx */ "./src/js/UsergroupList.jsx");
+/* harmony import */ var _config_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../config.json */ "./config.json");
+var _config_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../../config.json */ "./config.json", 1);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -31273,7 +31286,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-var siteUrl = "http://127.0.0.1:5000";
+
+var siteUrl = "http://" + _config_json__WEBPACK_IMPORTED_MODULE_5__.default.host + ":" + _config_json__WEBPACK_IMPORTED_MODULE_5__.default.port;
 
 var Notatki =
 /*#__PURE__*/
@@ -31673,7 +31687,8 @@ function (_React$Component) {
     key: "render",
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], {
-        updateUsergroup: this.updateCurrentUsergroup
+        updateUsergroup: this.updateCurrentUsergroup,
+        siteUrl: siteUrl
       }), this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
         uploadNote: this.uploadNote
       }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -31741,7 +31756,7 @@ function (_Component) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(UsergroupList).call(this, props));
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "getUsergroups", function () {
-      var siteUrl = "http://127.0.0.1:5000";
+      var siteUrl = _this.props.siteUrl;
 
       var that = _assertThisInitialized(_assertThisInitialized(_this));
 

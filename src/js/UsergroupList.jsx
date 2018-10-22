@@ -10,7 +10,7 @@ export default class UsergroupList extends Component {
   }
   
   getUsergroups = () => {
-    const siteUrl = "http://127.0.0.1:5000"
+    const siteUrl = this.props.siteUrl;
     const that = this;
     return fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())

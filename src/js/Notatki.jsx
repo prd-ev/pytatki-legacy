@@ -3,8 +3,9 @@ import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
 import NotegroupList from './UsergroupList.jsx'
+import config from '../../config.json'
 
-const siteUrl = "http://127.0.0.1:5000";
+const siteUrl = "http://"+config.default.host+":"+config.default.port;
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -270,7 +271,7 @@ class Notatki extends React.Component {
   render() {
     return (
       <div>
-        <NotegroupList updateUsergroup={this.updateCurrentUsergroup}></NotegroupList>
+        <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         {this.state.usergroupChosen ? (
           <AddNote uploadNote={this.uploadNote}></AddNote>
         ):("")}
