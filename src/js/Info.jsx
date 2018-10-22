@@ -1,4 +1,5 @@
 import React from "react";
+import ComponentStyle from "../scss/Info.scss";
 
 const siteUrl = "http://127.0.0.1:5000";
 
@@ -7,24 +8,12 @@ class Info extends React.Component {
     super(props);
     this.state = {
       noteInfo: {},
-      noteActions: [],
-      visible: this.props.visible
+      noteActions: []
     };
-    this.hideInfo = this.hideInfo.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // You don't have to do this check first, but it can help prevent an unneeded render
-    if (nextProps.visible !== this.state.visible) {
-      this.setState({ visible: nextProps.visible });
-    }
-  }
-
-  hideInfo() {
-    this.setState({ visible: false, noteInfo: {}, noteActions: [] });
   }
 
   getNote(id) {
+    let note = null;
     fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
@@ -40,7 +29,6 @@ class Info extends React.Component {
           .then(response => {
             return response.json();
           })
-          //.then(response => response.data.json())
           .then(response => {
             return JSON.parse(response.data.getNoteById);
           })
@@ -48,11 +36,14 @@ class Info extends React.Component {
             this.setState({
               noteInfo: noteId
             });
+            note = noteId
           })
       );
+  return note
   }
 
   getNoteLastActions(id) {
+    let actions = null
     fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
@@ -66,25 +57,23 @@ class Info extends React.Component {
             '")}'
         )
           .then(response => {
-            console.log(response);
             return response.json();
           })
           //.then(response => response.data.json())
           .then(response => {
-            console.log(response);
             return response.data.getNoteLastActions;
           })
           .then(noteActions => {
-            console.log(noteActions);
             this.setState({
               noteActions: noteActions
             });
           })
       );
+  return actions
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.note !== nextProps.note) {
+    if (this.props.visible !== nextProps.visible) {
       return true;
     } else {
       if (nextState.noteActions == {} && nextState.noteInfo == {}) {
@@ -97,7 +86,7 @@ class Info extends React.Component {
           )
             return true;
         }
-        if (this.state.visible != nextState.visible) {
+    if (this.props.note !== nextProps.note) {
           return true;
         }
       }
@@ -106,8 +95,10 @@ class Info extends React.Component {
   }
 
   componentDidUpdate() {
-    this.getNote(this.props.note);
-    this.getNoteLastActions(this.props.note);
+    let note = this.getNote(this.props.note);
+    console.log(note);
+    let actions = this.getNoteLastActions(this.props.note);
+    console.log(actions)
   }
 
   openNote = e => () => {
@@ -115,18 +106,17 @@ class Info extends React.Component {
   };
 
   packNote = () => {
-    if (this.state.noteInfo.idnote != null && this.state.visible) {
+    if (this.state.noteInfo.idnote != null && this.props.visible) {
       return (
-        <div /*style="border-style: dashed"*/>
-          <button onClick={this.hideInfo}>X</button>
+        <div className={ComponentStyle.info}>
+          <i onClick={() => this.props.closeInfo()} class="fas fa-times">X</i>
           <h2>
             <b>{this.state.noteInfo.title}</b> by{" "}
             {this.state.noteInfo.creator_login}
           </h2>
-          <button onClick={this.openNote(this.state.noteInfo.idnote)}>
-            OPEN
-          </button>
-          <br />
+          <p onClick={this.openNote(this.state.noteInfo.idnote)}>
+            EDIT <i class="fas fa-edit" />
+          </p>
           <h3>Latest actions</h3>
           {this.state.noteActions}
         </div>

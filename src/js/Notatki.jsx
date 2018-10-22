@@ -109,6 +109,12 @@ class Notatki extends React.Component {
     this.setState({ note: id, infoVisible: true });
   };
 
+  closeInfo() {
+    this.setState({
+      infoVisible: false
+    })
+  }
+
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
     let path = this.state.currentPath;
@@ -302,7 +308,7 @@ class Notatki extends React.Component {
         <AddNote uploadNote={this.uploadNote} />
         <AddFolder addFolder={this.addFolder} />
         <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn} />
-        <Info note={this.state.note} visible={this.state.infoVisible} />
+        <Info note={this.state.note} visible={this.state.infoVisible} closeInfo={this.closeInfo.bind(this)} />
         <h1 onClick={this.prevFolder}>Cofnij</h1>
         {this.showCurrentPath()}
         {this.packContent()}
