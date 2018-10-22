@@ -1,0 +1,27 @@
+{
+    "default": {
+        "secret_key": "change_it",
+        "debug": "True",
+        "host": "127.0.0.1",
+        "port": "5000"
+    },
+    "uwsgi": {
+        "http": "0.0.0.0:8001",
+        "wsgi-file": "run.py",
+        "callable": "APP",
+        "processes": "5"
+    },
+    "email": {
+        "mail_server": "smtp.gmail.com",
+        "mail_port": "465",
+        "mail_use_ssl": "True",
+        "email": "your_mail@gmail.com",
+        "email_password": "your_password"
+    },
+    "database": {
+        "db_host": "127.0.0.1",
+        "db_user": "pytatki",
+        "db_password": "pytatki",
+        "db_name": "pytatki"
+    }
+}
