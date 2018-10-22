@@ -111,6 +111,7 @@ class Notatki extends React.Component {
 
   closeInfo() {
     this.setState({
+      note: null,
       infoVisible: false
     })
   }

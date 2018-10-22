@@ -7,13 +7,22 @@ class Info extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      noteInfo: {},
-      noteActions: []
+      noteInfo: null,
+      noteActions: null
     };
+  }
+
+  closeInfo(){
+    this.props.closeInfo()
+    this.setState({
+      noteInfo: null,
+      noteActions: null
+    })
   }
 
   getNote(id) {
     let note = null;
+    if (this.state.noteInfo == null && this.props.note != null){
     fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
@@ -38,12 +47,13 @@ class Info extends React.Component {
             });
             note = noteId
           })
-      );
+      );}
   return note
   }
 
   getNoteLastActions(id) {
     let actions = null
+    if (this.state.noteActions == null && this.props.note != null){
     fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
@@ -68,7 +78,7 @@ class Info extends React.Component {
               noteActions: noteActions
             });
           })
-      );
+      );}
   return actions
   }
 
@@ -79,7 +89,7 @@ class Info extends React.Component {
       if (nextState.noteActions == {} && nextState.noteInfo == {}) {
         return false;
       } else {
-        if (this.state.noteInfo !== {}) {
+        if (this.state.noteInfo !== null) {
           if (
             this.state.noteInfo.idnote !== nextState.noteInfo.idnote ||
             this.state.noteActions != nextState.noteActions
@@ -106,22 +116,23 @@ class Info extends React.Component {
   };
 
   packNote = () => {
+    if (this.state.noteInfo !== null){
     if (this.state.noteInfo.idnote != null && this.props.visible) {
       return (
         <div className={ComponentStyle.info}>
-          <i onClick={() => this.props.closeInfo()} class="fas fa-times">X</i>
+          <i onClick={() => this.closeInfo()} className="fas fa-times"></i>
           <h2>
             <b>{this.state.noteInfo.title}</b> by{" "}
             {this.state.noteInfo.creator_login}
           </h2>
           <p onClick={this.openNote(this.state.noteInfo.idnote)}>
-            EDIT <i class="fas fa-edit" />
+            EDIT <i className="fas fa-edit" />
           </p>
           <h3>Latest actions</h3>
           {this.state.noteActions}
         </div>
       );
-    }
+    }}
     return <div />;
   };
 
