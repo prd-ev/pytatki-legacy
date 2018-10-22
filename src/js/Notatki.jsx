@@ -4,8 +4,9 @@ import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
 import NotegroupList from './UsergroupList.jsx'
 import config from '../../config.json'
+import ComponentStyle from '../scss/Notatki.scss'
 
-const siteUrl = "http://"+config.default.host+":"+config.default.port;
+const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -120,33 +121,33 @@ class Notatki extends React.Component {
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
-    if(this.state.usergroupChosen){
-    if (this.state.data[this.state.currentDepth]) {
-      var content = [];
-      for (const value of this.state.data[this.state.currentDepth]) {
-        if (value.is_note) {
-          content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
-            {"Notatka " + value.title}
-          </h1>
-            <span onClick={this.deleteNote}>
-              {this.state.editModeOn ? " x" : null}
-            </span>
-          </div>);
-        } else {
-          content.push(<div key={value.key}><h1 onClick={this.changeCurrentDirectory} id={value.key} >
-            {value.title}
-          </h1>
-            <span onClick={this.deleteFolder}>
-              {this.state.editModeOn ? " x " : null}
-            </span>
-          </div>);
+    if (this.state.usergroupChosen) {
+      if (this.state.data[this.state.currentDepth]) {
+        var content = [];
+        for (const value of this.state.data[this.state.currentDepth]) {
+          if (value.is_note) {
+            content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
+              {"Notatka " + value.title}
+            </h1>
+              <span onClick={this.deleteNote}>
+                {this.state.editModeOn ? " x" : null}
+              </span>
+            </div>);
+          } else {
+            content.push(<div key={value.key}><h1 onClick={this.changeCurrentDirectory} id={value.key} >
+              {value.title}
+            </h1>
+              <span onClick={this.deleteFolder}>
+                {this.state.editModeOn ? " x " : null}
+              </span>
+            </div>);
+          }
         }
+        return content;
       }
-      return content;
+    } else {
+      return <p className={ComponentStyle.no_group_chosen}>Wybierz grupę aby kontynuować</p>
     }
-  }else{
-    return <h1>Wybierz grupę aby kontynuować</h1>
-  }
     return null;
   };
 
@@ -274,12 +275,16 @@ class Notatki extends React.Component {
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         {this.state.usergroupChosen ? (
           <AddNote uploadNote={this.uploadNote}></AddNote>
-        ):("")}
+          ) : ("")}
         {this.state.usergroupChosen ? (
           <AddFolder addFolder={this.addFolder}></AddFolder>
+          ) : ("")}
+        {this.state.usergroupChosen ? (
+          <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
         ) : ("")}
-        <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-        <h1 onClick={this.prevFolder}>Cofnij</h1>
+        {this.state.usergroupChosen ? (
+          <h1 onClick={this.prevFolder}>Cofnij</h1>
+        ) : ("")}
         {this.showCurrentPath()}
         {this.packContent()}
       </div>

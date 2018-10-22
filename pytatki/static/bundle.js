@@ -93,7 +93,7 @@
 /*! exports provided: default, uwsgi, email, database */
 /***/ (function(module) {
 
-module.exports = {"default":{"secret_key":"change_it","debug":"True","host":"127.0.0.1","port":"5000"},"uwsgi":{"http":"0.0.0.0:8001","wsgi-file":"run.py","callable":"APP","processes":"5"},"email":{"mail_server":"smtp.gmail.com","mail_port":"465","mail_use_ssl":"True","email":"your_mail@gmail.com","email_password":"your_password"},"database":{"db_host":"127.0.0.1","db_user":"pytatki","db_password":"pytatki","db_name":"pytatki"}};
+module.exports = {"default":{"secret_key":"change_it","debug":"True","host":"127.0.0.1","port":"5000"},"uwsgi":{"http":"0.0.0.0:8001","wsgi-file":"run.py","callable":"APP","processes":"5"},"email":{"mail_server":"smtp.gmail.com","mail_port":"465","mail_use_ssl":"True","email":"your_mail@gmail.com","email_password":"your_password"},"database":{"db_host":"127.0.0.1","db_user":"","db_password":"","db_name":""}};
 
 /***/ }),
 
@@ -8524,6 +8524,27 @@ exports.push([module.i, ".btn---Kk3aa {\n  border: 3px solid black;\n  border-ra
 // exports
 exports.locals = {
 	"btn": "btn---Kk3aa"
+};
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/Notatki.scss":
+/*!*************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/Notatki.scss ***!
+  \*************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".no_group_chosen---XNkXG {\n  font-size: 24px; }\n", ""]);
+
+// exports
+exports.locals = {
+	"no_group_chosen": "no_group_chosen---XNkXG"
 };
 
 /***/ }),
@@ -31261,6 +31282,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./UsergroupList.jsx */ "./src/js/UsergroupList.jsx");
 /* harmony import */ var _config_json__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../config.json */ "./config.json");
 var _config_json__WEBPACK_IMPORTED_MODULE_5___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../../config.json */ "./config.json", 1);
+/* harmony import */ var _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../scss/Notatki.scss */ "./src/scss/Notatki.scss");
+/* harmony import */ var _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -31280,6 +31303,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -31468,7 +31492,9 @@ function (_React$Component) {
           return content;
         }
       } else {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", null, "Wybierz grup\u0119 aby kontynuowa\u0107");
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+          className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.no_group_chosen
+        }, "Wybierz grup\u0119 aby kontynuowa\u0107");
       }
 
       return null;
@@ -31693,12 +31719,12 @@ function (_React$Component) {
         uploadNote: this.uploadNote
       }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
         addFolder: this.addFolder
-      }) : "", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_EditMode_jsx__WEBPACK_IMPORTED_MODULE_3__["default"], {
+      }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_EditMode_jsx__WEBPACK_IMPORTED_MODULE_3__["default"], {
         changeMode: this.changeMode,
         isOn: this.state.editModeOn
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+      }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
         onClick: this.prevFolder
-      }, "Cofnij"), this.showCurrentPath(), this.packContent());
+      }, "Cofnij") : "", this.showCurrentPath(), this.packContent());
     }
   }]);
 
@@ -31812,7 +31838,7 @@ function (_Component) {
         try {
           for (var _iterator2 = plainGroups[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var group = _step2.value;
-            groups.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+            groups.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", {
               onClick: _this.props.updateUsergroup,
               key: group.key,
               id: group.key
@@ -31853,7 +31879,7 @@ function (_Component) {
   _createClass(UsergroupList, [{
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "UsergroupList", this.state.usergroups);
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "UsergroupList", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, this.state.usergroups));
     }
   }]);
 
@@ -31924,6 +31950,36 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./EditMode.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/EditMode.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./src/scss/Notatki.scss":
+/*!*******************************!*\
+  !*** ./src/scss/Notatki.scss ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./Notatki.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/Notatki.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 

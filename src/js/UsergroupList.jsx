@@ -8,7 +8,7 @@ export default class UsergroupList extends Component {
     }
     this.getUsergroups();
   }
-  
+
   getUsergroups = () => {
     const siteUrl = this.props.siteUrl;
     const that = this;
@@ -33,7 +33,7 @@ export default class UsergroupList extends Component {
       .then(plainGroups => {
         let groups = []
         for (const group of plainGroups) {
-          groups.push(<h1 onClick={this.props.updateUsergroup} key={group.key} id={group.key}>{group.name}</h1>);
+          groups.push(<li onClick={this.props.updateUsergroup} key={group.key} id={group.key}>{group.name}</li>);
         }
         that.setState({
           usergroups: groups
@@ -46,7 +46,9 @@ export default class UsergroupList extends Component {
     return (
       <div>
         UsergroupList
-      {this.state.usergroups}
+        <ul>
+          {this.state.usergroups}
+        </ul>
       </div>
     )
   }
