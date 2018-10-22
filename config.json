@@ -20,8 +20,8 @@
     },
     "database": {
         "db_host": "127.0.0.1",
-        "db_user": "pytatki",
-        "db_password": "pytatki",
-        "db_name": "pytatki"
+        "db_user": "",
+        "db_password": "",
+        "db_name": ""
     }
 }
