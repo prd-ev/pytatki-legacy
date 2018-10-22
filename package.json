@@ -8,7 +8,7 @@
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "dev": "python3 run.py | npm run watch",
-    "start": "uwsgi --ini uwsgi.ini"
+    "start": "uwsgi --ini config.ini"
   },
   "author": "Filip Wachowiak",
   "license": "MIT",
