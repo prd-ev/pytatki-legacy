@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from docker_cluster.test_celery.celery import app
+from test_celery.celery import app
 import schedule
 import time
 
