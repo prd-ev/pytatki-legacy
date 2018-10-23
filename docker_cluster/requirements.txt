@@ -1,0 +1,2 @@
+schedule==0.5.0
+celery==4.2.1
