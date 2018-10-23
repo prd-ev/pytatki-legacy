@@ -126,20 +126,20 @@ class Notatki extends React.Component {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
-            content.push(<div className={ComponentStyle.note} key={value.key} onClick={this.openNote} id={value.key}><span>
+            content.push(<div className={ComponentStyle.noteWrapper}><div className={ComponentStyle.note} key={value.key} onClick={this.openNote} id={value.key}><p>
               {"Notatka " + value.title}
-            </span>
-              <span onClick={this.deleteNote}>
-                {this.state.editModeOn ? " x" : null}
-              </span>
+            </p></div>
+              <div className={ComponentStyle.delete} onClick={this.deleteNote}>
+                {this.state.editModeOn ? "X" : null}
+              </div>
             </div>);
           } else {
-            content.push(<div className={ComponentStyle.folder} key={value.key} onClick={this.changeCurrentDirectory} id={value.key}><span>
+            content.push(<div className={ComponentStyle.folderWrapper}><div className={ComponentStyle.folder} key={value.key} onClick={this.changeCurrentDirectory} id={value.key}><p>
               {value.title}
-            </span>
-              <span onClick={this.deleteFolder}>
-                {this.state.editModeOn ? " x " : null}
-              </span>
+            </p></div>
+              <div className={ComponentStyle.delete} onClick={this.deleteFolder}>
+                {this.state.editModeOn ? "X" : null}
+              </div>
             </div>);
           }
         }

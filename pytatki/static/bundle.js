@@ -8540,13 +8540,16 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".no_group_chosen---XNkXG {\n  font-size: 24px; }\n\n.note---36LoE {\n  background-color: rebeccapurple;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px; }\n  .note---36LoE span {\n    font-size: 18px; }\n\n.folder---2QDV- {\n  background-color: indianred;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px; }\n  .folder---2QDV- span {\n    font-size: 18px; }\n", ""]);
+exports.push([module.i, "* {\n  box-sizing: border-box; }\n\n.no_group_chosen---XNkXG {\n  font-size: 24px; }\n\n.note---36LoE {\n  background-color: rebeccapurple;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px;\n  border-radius: 10px;\n  vertical-align: top; }\n  .note---36LoE p {\n    font-size: 18px;\n    margin-left: 10px;\n    margin-right: 10px; }\n\n.folder---2QDV- {\n  background-color: indianred;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px;\n  border-radius: 10px;\n  vertical-align: top; }\n  .folder---2QDV- p {\n    font-size: 18px;\n    margin-left: 10px;\n    margin-right: 10px; }\n\n.delete---YQ14y {\n  position: absolute;\n  top: -5px;\n  right: 0px;\n  border-radius: 50%;\n  background-color: green; }\n\n.noteWrapper---10iWt,\n.folderWrapper---2GEKe {\n  position: relative;\n  display: inline-block; }\n", ""]);
 
 // exports
 exports.locals = {
 	"no_group_chosen": "no_group_chosen---XNkXG",
 	"note": "note---36LoE",
-	"folder": "folder---2QDV-"
+	"folder": "folder---2QDV-",
+	"delete": "delete---YQ14y",
+	"noteWrapper": "noteWrapper---10iWt",
+	"folderWrapper": "folderWrapper---2GEKe"
 };
 
 /***/ }),
@@ -31458,22 +31461,28 @@ function (_React$Component) {
 
               if (value.is_note) {
                 content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+                  className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.noteWrapper
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
                   className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.note,
                   key: value.key,
                   onClick: _this.openNote,
                   id: value.key
-                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, "Notatka " + value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Notatka " + value.title)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+                  className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.delete,
                   onClick: _this.deleteNote
-                }, _this.state.editModeOn ? " x" : null)));
+                }, _this.state.editModeOn ? "X" : null)));
               } else {
                 content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+                  className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.folderWrapper
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
                   className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.folder,
                   key: value.key,
                   onClick: _this.changeCurrentDirectory,
                   id: value.key
-                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, value.title)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+                  className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.delete,
                   onClick: _this.deleteFolder
-                }, _this.state.editModeOn ? " x " : null)));
+                }, _this.state.editModeOn ? "X" : null)));
               }
             }
           } catch (err) {
