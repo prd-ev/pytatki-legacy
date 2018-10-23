@@ -14,7 +14,12 @@ export default class UsergroupList extends Component {
     const that = this;
     return fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
-      .then(res => res.data.getToken)
+      .then(res => {
+        if (/\d/.test(res.data.getToken)) {
+          return res.data.getToken
+        }
+        alert(res.data.getToken);
+      })
       .then(token => fetch(siteUrl + '/api?query={getUsergroups(access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getUsergroups))

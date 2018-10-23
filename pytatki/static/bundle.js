@@ -31791,7 +31791,11 @@ function (_Component) {
       return fetch(siteUrl + '/api?query={getToken}').then(function (response) {
         return response.json();
       }).then(function (res) {
-        return res.data.getToken;
+        if (/\d/.test(res.data.getToken)) {
+          return res.data.getToken;
+        }
+
+        alert(res.data.getToken);
       }).then(function (token) {
         return fetch(siteUrl + '/api?query={getUsergroups(access_token:"' + token + '")}');
       }).then(function (response) {
