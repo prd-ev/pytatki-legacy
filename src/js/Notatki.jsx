@@ -4,6 +4,14 @@ import AddFolder from "./AddFolder.jsx";
 import EditMode from "./EditMode.jsx";
 import NotegroupList from "./UsergroupList.jsx";
 import Info from "./Info.jsx";
+import {
+  ContextMenu,
+  Item,
+  Separator,
+  Submenu,
+  ContextMenuProvider
+} from "react-contexify";
+
 
 const siteUrl = "http://127.0.0.1:5000";
 
@@ -21,6 +29,8 @@ class Notatki extends React.Component {
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
+
+  onClick = ({ event, ref, data, dataFromProvider }) => console.log(dataFromProvider.key);
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
@@ -145,7 +155,7 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(
+          content.push(<ContextMenuProvider key={value.key} id="menu_id" data={{key: value.key}}>
             <div key={value.key}>
               <h1 onClick={this.infoNote(value.key.slice(4))} id={value.key}>
                 {"Notatka " + value.title}
@@ -154,6 +164,7 @@ class Notatki extends React.Component {
                 {this.state.editModeOn ? " x" : null}
               </span>
             </div>
+          </ContextMenuProvider>
           );
         } else {
           content.push(
@@ -168,6 +179,17 @@ class Notatki extends React.Component {
           );
         }
       }
+      content.push(<ContextMenu key="menu" id='menu_id'>
+        <Item onClick={this.onClick}>Lorem</Item>
+        <Item onClick={this.onClick}>Ipsum</Item>
+        <Separator />
+        <Item disabled>Dolor</Item>
+        <Separator />
+        <Submenu label="Foobar">
+          <Item onClick={this.onClick}>Foo</Item>
+          <Item onClick={this.onClick}>Bar</Item>
+        </Submenu>
+      </ContextMenu>);
       return content;
     }
     return null;
