@@ -126,17 +126,17 @@ class Notatki extends React.Component {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
-            content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
+            content.push(<div className={ComponentStyle.note} key={value.key} onClick={this.openNote} id={value.key}><span>
               {"Notatka " + value.title}
-            </h1>
+            </span>
               <span onClick={this.deleteNote}>
                 {this.state.editModeOn ? " x" : null}
               </span>
             </div>);
           } else {
-            content.push(<div key={value.key}><h1 onClick={this.changeCurrentDirectory} id={value.key} >
+            content.push(<div className={ComponentStyle.folder} key={value.key} onClick={this.changeCurrentDirectory} id={value.key}><span>
               {value.title}
-            </h1>
+            </span>
               <span onClick={this.deleteFolder}>
                 {this.state.editModeOn ? " x " : null}
               </span>
@@ -275,10 +275,10 @@ class Notatki extends React.Component {
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         {this.state.usergroupChosen ? (
           <AddNote uploadNote={this.uploadNote}></AddNote>
-          ) : ("")}
+        ) : ("")}
         {this.state.usergroupChosen ? (
           <AddFolder addFolder={this.addFolder}></AddFolder>
-          ) : ("")}
+        ) : ("")}
         {this.state.usergroupChosen ? (
           <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
         ) : ("")}

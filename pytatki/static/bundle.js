@@ -8540,11 +8540,13 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".no_group_chosen---XNkXG {\n  font-size: 24px; }\n", ""]);
+exports.push([module.i, ".no_group_chosen---XNkXG {\n  font-size: 24px; }\n\n.note---36LoE {\n  background-color: rebeccapurple;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px; }\n  .note---36LoE span {\n    font-size: 18px; }\n\n.folder---2QDV- {\n  background-color: indianred;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px; }\n  .folder---2QDV- span {\n    font-size: 18px; }\n", ""]);
 
 // exports
 exports.locals = {
-	"no_group_chosen": "no_group_chosen---XNkXG"
+	"no_group_chosen": "no_group_chosen---XNkXG",
+	"note": "note---36LoE",
+	"folder": "folder---2QDV-"
 };
 
 /***/ }),
@@ -31456,20 +31458,20 @@ function (_React$Component) {
 
               if (value.is_note) {
                 content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-                  key: value.key
-                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+                  className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.note,
+                  key: value.key,
                   onClick: _this.openNote,
                   id: value.key
-                }, "Notatka " + value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, "Notatka " + value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
                   onClick: _this.deleteNote
                 }, _this.state.editModeOn ? " x" : null)));
               } else {
                 content.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-                  key: value.key
-                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
+                  className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.folder,
+                  key: value.key,
                   onClick: _this.changeCurrentDirectory,
                   id: value.key
-                }, value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+                }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, value.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
                   onClick: _this.deleteFolder
                 }, _this.state.editModeOn ? " x " : null)));
               }

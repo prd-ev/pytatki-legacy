@@ -1,3 +1,25 @@
-.no_group_chosen{
+.no_group_chosen {
     font-size: 24px;
+}
+
+.note {
+    background-color: rebeccapurple;
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+    margin: 10px;
+    span{
+        font-size: 18px;
+    }
+}
+
+.folder {
+    background-color: indianred;
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+    margin: 10px;
+    span{
+        font-size: 18px;
+    }
 }
