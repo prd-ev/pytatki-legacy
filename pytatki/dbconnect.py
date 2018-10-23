@@ -1,6 +1,7 @@
 import pymysql
 from pytatki.config import parse_config
 from passlib.hash import sha256_crypt
+import json
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
@@ -53,7 +54,7 @@ def get_note(id_note, id_user):
         note = con.fetchone()
         con.close()
         conn.close()
-        return note
+        json.dumps(note)
     return False
 
 
