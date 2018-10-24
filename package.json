@@ -34,7 +34,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "react": "^16.5.2",
-    "react-contexify": "^3.0.3",
+    "react-contexify": "^4.0.0-rc1",
     "react-dom": "^16.5.2"
   },
   "directories": {

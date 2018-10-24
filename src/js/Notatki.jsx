@@ -5,11 +5,11 @@ import EditMode from "./EditMode.jsx";
 import NotegroupList from "./UsergroupList.jsx";
 import Info from "./Info.jsx";
 import {
-  ContextMenu,
+  Menu,
   Item,
   Separator,
   Submenu,
-  ContextMenuProvider
+  MenuProvider
 } from "react-contexify";
 
 
@@ -155,7 +155,7 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(<ContextMenuProvider key={value.key} id="menu_id" data={{key: value.key}}>
+          content.push(<MenuProvider key={value.key} id="menu_id" data={{key: value.key}}>
             <div key={value.key}>
               <h1 onClick={this.infoNote(value.key.slice(4))} id={value.key}>
                 {"Notatka " + value.title}
@@ -164,7 +164,7 @@ class Notatki extends React.Component {
                 {this.state.editModeOn ? " x" : null}
               </span>
             </div>
-          </ContextMenuProvider>
+          </MenuProvider>
           );
         } else {
           content.push(
@@ -179,7 +179,7 @@ class Notatki extends React.Component {
           );
         }
       }
-      content.push(<ContextMenu key="menu" id='menu_id'>
+      content.push(<Menu key="menu" id='menu_id'>
         <Item onClick={this.onClick}>Lorem</Item>
         <Item onClick={this.onClick}>Ipsum</Item>
         <Separator />
@@ -189,7 +189,7 @@ class Notatki extends React.Component {
           <Item onClick={this.onClick}>Foo</Item>
           <Item onClick={this.onClick}>Bar</Item>
         </Submenu>
-      </ContextMenu>);
+      </Menu>);
       return content;
     }
     return null;
