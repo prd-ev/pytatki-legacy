@@ -6,8 +6,27 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask import Flask
+from celery import Celery
+
 
 __author__ = 'Patryk Niedzwiedzinski'
+
+
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery.conf.update(app.config)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
 
 
 def create_app(test_config=None):
@@ -22,7 +41,6 @@ def create_app(test_config=None):
         app.config.update(test_config)
     return app
 
-
 CONFIG = parse_config('config.ini')
 if not CONFIG:
     print("An error occurred while parsing config file")
@@ -36,6 +54,8 @@ APP.config.update(
     MAIL_USERNAME=CONFIG['EMAIL']['EMAIL'],
     MAIL_PASSWORD=CONFIG['EMAIL']['EMAIL_PASSWORD']
 )
+APP.config['CELERY_RESULT_BACKEND'] = 'rpc://'
+APP.config['CELERY_BROKER_URL'] = 'amqp://localhost'
 LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login_get'
@@ -43,3 +63,4 @@ BCRYPT = Bcrypt()
 MAIL = Mail(APP)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+CELERY = make_celery(APP)
