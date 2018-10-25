@@ -415,8 +415,7 @@ def admin_add_get():
         con.close()
         conn.close()
         return render_template('admin_add.html', subjects=subjects, classes=classes)
-    else:
-        flash("Nie masz uprawnien", 'warning')
+    flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
