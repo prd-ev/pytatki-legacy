@@ -53,7 +53,7 @@ def save_to_config(config_dict):
         config.write(configfile)
 
 def db_init(host=None, user=None, password=None):
-    """""Create database from sql/create-database"""
+    """Create database from sql/create-database"""
     host = input("DB host: [127.0.0.1]") if not host else host
     host = '127.0.0.1' if host == '' else host
     user = input("DB user: [root] ") if not user else user

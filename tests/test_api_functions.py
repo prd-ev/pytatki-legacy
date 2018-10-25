@@ -12,7 +12,7 @@ from pytatki.views import type_id, has_access_to_notegroup, has_access_to_usergr
 
 
 def test_user_has_access_to_note(insert_note):
-    if has_access_to_note(1, 1) != True:
+    if has_access_to_note(1, 1) is not True:
         raise AssertionError()
 
 def test_get_note(insert_note):
@@ -24,13 +24,13 @@ def test_type_id(insert_text_note_type):
         raise AssertionError()
 
 def test_has_access_to_usergroup(insert_usergroup):
-    if has_access_to_usergroup(1, 1) != True:
+    if has_access_to_usergroup(1, 1) is not True:
         raise AssertionError()
 
 def test_notegroup_empty(insert_notegroup, insert_usergroup):
     _, conn = connection()
     notegroup_id = insert_notegroup(conn, 'test_empty', insert_usergroup)
-    if notegroup_empty(conn, notegroup_id) != True:
+    if notegroup_empty(conn, notegroup_id) is not True:
         raise AssertionError()
     _.close()
     conn.close()
@@ -51,7 +51,7 @@ def test_remove_notegroup(insert_notegroup, insert_usergroup):
 
 def test_note_exists(insert_note):
     _, conn = connection()
-    if note_exists(conn, 1) != True:
+    if note_exists(conn, 1) is not True:
         raise AssertionError()
     _.close()
     conn.close()
@@ -66,7 +66,7 @@ def test_create_action(insert_user):
 def test_remove_note(insert_note):
     _, conn = connection()
     remove_note(conn, 1, 1)
-    if note_exists(conn, 1) != False:
+    if note_exists(conn, 1) is not False:
         raise AssertionError()
     _.close()
     conn.close()

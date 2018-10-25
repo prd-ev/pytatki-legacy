@@ -375,23 +375,22 @@ def admin_add_post():
                     )
         if con.fetchone():
             return jsonify({'data': "Dany przedmiot juz istnieje"})
-        else:
-            group = None
-            if 'parent_id' in request.form:
-                con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                            (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
-                group = con.fetchone()
-            if group or 'parent_id' not in request.form:
-                conn.begin()
-                con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
-                    escape_string(request.form['title']),
-                    escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
-                group_id = con.lastrowid
-                con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
-                            (escape_string(str(group_id)), escape_string(str(request.form['class']))))
-                conn.commit()
-                return jsonify({'data': 'Dodano przedmiot!'})
-            return jsonify({'data': "Wystąpił błąd w zapytaniu"})
+        group = None
+        if 'parent_id' in request.form:
+            con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                        (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
+            group = con.fetchone()
+        if group or 'parent_id' not in request.form:
+            conn.begin()
+            con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
+                escape_string(request.form['title']),
+                escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
+            group_id = con.lastrowid
+            con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
+                        (escape_string(str(group_id)), escape_string(str(request.form['class']))))
+            conn.commit()
+            return jsonify({'data': 'Dodano przedmiot!'})
+        return jsonify({'data': "Wystąpił błąd w zapytaniu"})
         con.close()
         conn.close()
     else:
