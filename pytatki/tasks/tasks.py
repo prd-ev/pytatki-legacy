@@ -1,6 +1,7 @@
-from pytatki.main import CELERY
+from pytatki.main import CELERY, APP
 import schedule
 import time
+import os
 from datetime import datetime, timedelta
 from pytatki.dbconnect import connection
 from pytatki.views import has_access_to_notegroup
@@ -23,6 +24,8 @@ def remove_bin(iduser, notegroup=None):
     con.execute(sql, args)
     notes_to_delete = con.fetchall()
     for note in notes_to_delete:
+        con.execute("SELECT * FROM note WHERE idnote = %s", escape_string(str(note['note_id'])))
+        note = con.fetchone()
         conn.begin()
         con.execute("DELETE FROM action WHERE note_id = %s",
                     escape_string(str(note['note_id'])))
@@ -31,8 +34,19 @@ def remove_bin(iduser, notegroup=None):
         con.execute("DELETE FROM note WHERE idnote = %s",
                     escape_string(str(note['note_id'])))
         conn.commit()
+        if note['note_type_id'] == 1:
+            #TODO: file id
+            path = os.path.join(APP.config['UPLOAD_FOLDER'], note['notegroup_id'], note['content'])
+            if os.path.exists(path):
+                os.remove(path)
     con.close()
     conn.close()
+
+@CELERY.task(name='tasks.email_notification')
+def email_not_verified(usergroup_id):
+    """TASK - Send email to users in usergroup when someone adds new note"""
+    con, conn = connection()
+    pass
 
 schedule.every().day.at("10:30").do(remove_bin)
 
