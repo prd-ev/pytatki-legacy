@@ -161,7 +161,7 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
         )
     )
     idnote = c.lastrowid
-    create_action(conn, "create note {}".format(title), user_id, id)
+    create_action(conn, "create note {}".format(title), user_id, idnote)
     return idnote
 
 def remove_user(conn, iduser):
