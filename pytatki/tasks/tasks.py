@@ -3,19 +3,23 @@ import schedule
 import time
 from datetime import datetime, timedelta
 from pytatki.dbconnect import connection
+from pytatki.views import has_access_to_notegroup
 from pymysql import escape_string
 
 
 @CELERY.task(name='tasks.remove_bin')
-def remove_bin(notegroup=None):
+def remove_bin(iduser, notegroup=None):
     """TASK - Removes permanently deleted notes that are for 30 days in trash"""
     con, conn = connection()
     date = datetime.today() - timedelta(days=30)
     sql = "SELECT note_id FROM action WHERE content LIKE 'removes a note %%' AND date <= %s"
     args = escape_string(date.strftime("%Y-%m-%d"))
     if notegroup:
-        sql += " AND note_id IN (SELECT idnote FROM note WHERE status_id = 2 AND notegroup_id = %s)"
-        args = (args, escape_string(str(notegroup)))
+        if has_access_to_notegroup(notegroup, iduser):
+            sql += " AND note_id IN (SELECT idnote FROM note WHERE status_id = 2 AND notegroup_id = %s)"
+            args = (args, escape_string(str(notegroup)))
+        else:
+            raise ConnectionRefusedError("Invalid notegroup or user")
     con.execute(sql, args)
     notes_to_delete = con.fetchall()
     for note in notes_to_delete:

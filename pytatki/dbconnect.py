@@ -167,3 +167,12 @@ def remove_user(conn, iduser):
     """Removes user from database"""
     conn.cursor().execute("DELETE FROM user WHERE iduser = %s", pymysql.escape_string(str(iduser)))
     #TODO: other tables
+
+def get_trash(notegroup):
+    """Get notes from trash"""
+    con, conn = connection()
+    con.execute("SELECT * FROM note WHERE notegroup_id = %s AND status_id = 2", pymysql.escape_string(str(notegroup)))
+    notes = con.fetchall()
+    con.close()
+    conn.close()
+    return notes
