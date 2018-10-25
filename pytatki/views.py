@@ -374,6 +374,8 @@ def admin_add_post():
                     escape_string(request.form['parent_id']))
                     )
         if con.fetchone():
+            con.close()
+            conn.close()
             return jsonify({'data': "Dany przedmiot juz istnieje"})
         group = None
         if 'parent_id' in request.form:
@@ -389,10 +391,12 @@ def admin_add_post():
             con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
                         (escape_string(str(group_id)), escape_string(str(request.form['class']))))
             conn.commit()
+            con.close()
+            conn.close()
             return jsonify({'data': 'Dodano przedmiot!'})
-        return jsonify({'data': "Wystąpił błąd w zapytaniu"})
         con.close()
         conn.close()
+        return jsonify({'data': "Wystąpił błąd w zapytaniu"})
     else:
         return jsonify({'data': 'Nie mozesz tego zrobic'})
     return redirect(request.args.get('next') if 'next' in request.args else '/')

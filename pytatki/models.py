@@ -22,7 +22,9 @@ def user_load(user_id):
         conn.close()
         gc.collect()
         return user
-    except:
+    except Exception as error:
+        #TODO: exception type
+        print(error)
         return None
 
 

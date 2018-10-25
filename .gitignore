@@ -19,3 +19,5 @@ pytatki/static/bundle.js
 pytatki/static/styles.css.map
 config.ini
 npm-debug.log
+package-lock.json
+pytatki/static/styles.css
