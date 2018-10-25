@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
-import ComponentStyle from '../scss/AddContent.scss'
+import React, { Component } from 'react';
+import ComponentStyle from '../scss/AddContent.scss';
 
 export default class AddFolder extends Component {
     constructor(props) {
-      super(props)
+      super(props);
     }
-    
+
   render() {
     return (
       <form id="addFolderForm" className={ComponentStyle.form} onSubmit={this.props.addFolder}>
@@ -13,6 +13,6 @@ export default class AddFolder extends Component {
           <input required name="title" type="text"/>
           <input type="submit" value="Dodaj"/>
       </form>
-    )
+    );
   }
 }

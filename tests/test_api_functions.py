@@ -1,14 +1,12 @@
 import pymysql
-import pytest
-from passlib.hash import sha256_crypt
 import json
-from init_db import db_init, parse_sql
-from pytatki.dbconnect import (add_user_to_usergroup, connection, create_note,
+from init_db import parse_sql
+from pytatki.dbconnect import (connection, create_note,
                                create_note_type, create_notegroup,
                                create_status, create_user, create_usergroup,
                                has_access_to_note, note_exists,
                                notegroup_empty, remove_note, remove_notegroup, create_action, get_note)
-from pytatki.views import type_id, has_access_to_notegroup, has_access_to_usergroup
+from pytatki.views import type_id, has_access_to_usergroup
 
 
 def test_user_has_access_to_note(insert_note):
@@ -61,6 +59,7 @@ def test_create_action(insert_user):
     _, conn = connection()
     _.execute("SELECT * FROM action WHERE content=\"create note Test\"")
     exists = _.fetchone()
+    conn.close()
     if not exists:
         raise AssertionError()
 

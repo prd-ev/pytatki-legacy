@@ -5,8 +5,8 @@ import os
 from datetime import datetime
 
 from flask import (flash, g, redirect, render_template, request, send_file,
-                   session, jsonify)
-from flask_login import current_user, logout_user
+                   jsonify)
+from flask_login import current_user
 from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
@@ -339,7 +339,7 @@ def add():
             return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
         con, conn = connection()
         conn.begin()
-        note_id = create_note(
+        create_note(
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],

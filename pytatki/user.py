@@ -215,8 +215,8 @@ def login_get():
 def logout():
     """Logout"""
     next_url = request.args.get('next') if 'next' in request.args else None
-    status = request.args.get('status') if 'status' in request.args else None
-    client_id = request.args.get('client_id') if 'client_id' in request.args else None
+    #status = request.args.get('status') if 'status' in request.args else None
+    #client_id = request.args.get('client_id') if 'client_id' in request.args else None
     logout_user()
     return redirect(next_url if next_url else '/')
 
