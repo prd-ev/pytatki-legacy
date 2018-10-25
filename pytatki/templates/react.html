@@ -1,5 +1,6 @@
-<head>
-</head>
+{% extends "_base_react.html" %}
+
+{% block content %}
 
 <body>
   <div id="reactEntry"></div>
@@ -7,3 +8,4 @@
   <!-- Attach React components -->
   <script type="text/javascript" src="{{ url_for('static', filename='bundle.js') }}"></script>
 </body>
+{% endblock %}

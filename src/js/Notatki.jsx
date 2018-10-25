@@ -273,20 +273,22 @@ class Notatki extends React.Component {
     return (
       <div>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
-        {this.state.usergroupChosen ? (
-          <AddNote uploadNote={this.uploadNote}></AddNote>
-        ) : ("")}
-        {this.state.usergroupChosen ? (
-          <AddFolder addFolder={this.addFolder}></AddFolder>
-        ) : ("")}
-        {this.state.usergroupChosen ? (
-          <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-        ) : ("")}
-        {this.state.usergroupChosen ? (
-          <h1 onClick={this.prevFolder}>Cofnij</h1>
-        ) : ("")}
-        {this.showCurrentPath()}
-        {this.packContent()}
+        <div className={ComponentStyle.mainContent}>
+          {this.state.usergroupChosen ? (
+            <AddNote uploadNote={this.uploadNote}></AddNote>
+          ) : ("")}
+          {this.state.usergroupChosen ? (
+            <AddFolder addFolder={this.addFolder}></AddFolder>
+          ) : ("")}
+          {this.state.usergroupChosen ? (
+            <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
+          ) : ("")}
+          {this.state.usergroupChosen ? (
+            <h1 onClick={this.prevFolder}>Cofnij</h1>
+          ) : ("")}
+          {this.showCurrentPath()}
+          {this.packContent()}
+        </div>
       </div>
     );
   };

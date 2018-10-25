@@ -93,7 +93,7 @@
 /*! exports provided: default, uwsgi, email, database */
 /***/ (function(module) {
 
-module.exports = {"default":{"secret_key":"change_it","debug":"True","host":"127.0.0.1","port":"5000"},"uwsgi":{"http":"0.0.0.0:8001","wsgi-file":"run.py","callable":"APP","processes":"5"},"email":{"mail_server":"smtp.gmail.com","mail_port":"465","mail_use_ssl":"True","email":"your_mail@gmail.com","email_password":"your_password"},"database":{"db_host":"127.0.0.1","db_user":"","db_password":"","db_name":""}};
+module.exports = {"default":{"secret_key":"change_it","debug":"True","host":"localhost","port":"5000"},"uwsgi":{"http":"0.0.0.0:8001","wsgi-file":"run.py","callable":"APP","processes":"5"},"email":{"mail_server":"smtp.gmail.com","mail_port":"465","mail_use_ssl":"True","email":"your_mail@gmail.com","email_password":"your_password"},"database":{"db_host":"127.0.0.1","db_user":"","db_password":"","db_name":""}};
 
 /***/ }),
 
@@ -8540,7 +8540,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, "* {\n  box-sizing: border-box; }\n\n.no_group_chosen---XNkXG {\n  font-size: 24px; }\n\n.note---36LoE {\n  background-color: rebeccapurple;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px;\n  border-radius: 10px;\n  vertical-align: top; }\n  .note---36LoE p {\n    font-size: 18px;\n    margin-left: 10px;\n    margin-right: 10px; }\n\n.folder---2QDV- {\n  background-color: indianred;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px;\n  border-radius: 10px;\n  vertical-align: top; }\n  .folder---2QDV- p {\n    font-size: 18px;\n    margin-left: 10px;\n    margin-right: 10px; }\n\n.delete---YQ14y {\n  position: absolute;\n  top: -5px;\n  right: 0px;\n  border-radius: 50%;\n  background-color: green; }\n\n.noteWrapper---10iWt,\n.folderWrapper---2GEKe {\n  position: relative;\n  display: inline-block; }\n", ""]);
+exports.push([module.i, "* {\n  box-sizing: border-box; }\n\n.no_group_chosen---XNkXG {\n  font-size: 24px; }\n\n.note---36LoE {\n  background-color: rebeccapurple;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px;\n  border-radius: 10px;\n  vertical-align: top; }\n  .note---36LoE p {\n    font-size: 18px;\n    margin-left: 10px;\n    margin-right: 10px; }\n\n.folder---2QDV- {\n  background-color: indianred;\n  display: inline-block;\n  height: 150px;\n  width: 150px;\n  margin: 10px;\n  border-radius: 10px;\n  vertical-align: top; }\n  .folder---2QDV- p {\n    font-size: 18px;\n    margin-left: 10px;\n    margin-right: 10px; }\n\n.delete---YQ14y {\n  position: absolute;\n  top: -5px;\n  right: 0px;\n  border-radius: 50%;\n  background-color: green; }\n\n.noteWrapper---10iWt,\n.folderWrapper---2GEKe {\n  position: relative;\n  display: inline-block; }\n\n.mainContent---3JRhJ {\n  margin-left: 150px; }\n", ""]);
 
 // exports
 exports.locals = {
@@ -8549,7 +8549,29 @@ exports.locals = {
 	"folder": "folder---2QDV-",
 	"delete": "delete---YQ14y",
 	"noteWrapper": "noteWrapper---10iWt",
-	"folderWrapper": "folderWrapper---2GEKe"
+	"folderWrapper": "folderWrapper---2GEKe",
+	"mainContent": "mainContent---3JRhJ"
+};
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/UsergroupList.scss":
+/*!*******************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src!./src/scss/UsergroupList.scss ***!
+  \*******************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".sidebar---UaxL_ {\n  position: fixed;\n  height: 100vh;\n  width: 150px;\n  vertical-align: top; }\n", ""]);
+
+// exports
+exports.locals = {
+	"sidebar": "sidebar---UaxL_"
 };
 
 /***/ }),
@@ -31726,7 +31748,9 @@ function (_React$Component) {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UsergroupList_jsx__WEBPACK_IMPORTED_MODULE_4__["default"], {
         updateUsergroup: this.updateCurrentUsergroup,
         siteUrl: siteUrl
-      }), this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: _scss_Notatki_scss__WEBPACK_IMPORTED_MODULE_6___default.a.mainContent
+      }, this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddNote_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {
         uploadNote: this.uploadNote
       }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AddFolder_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
         addFolder: this.addFolder
@@ -31735,7 +31759,7 @@ function (_React$Component) {
         isOn: this.state.editModeOn
       }) : "", this.state.usergroupChosen ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
         onClick: this.prevFolder
-      }, "Cofnij") : "", this.showCurrentPath(), this.packContent());
+      }, "Cofnij") : "", this.showCurrentPath(), this.packContent()));
     }
   }]);
 
@@ -31758,6 +31782,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UsergroupList; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _scss_UsergroupList_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../scss/UsergroupList.scss */ "./src/scss/UsergroupList.scss");
+/* harmony import */ var _scss_UsergroupList_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_scss_UsergroupList_scss__WEBPACK_IMPORTED_MODULE_1__);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -31777,6 +31803,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -31894,7 +31921,9 @@ function (_Component) {
   _createClass(UsergroupList, [{
     key: "render",
     value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "UsergroupList", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, this.state.usergroups));
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: _scss_UsergroupList_scss__WEBPACK_IMPORTED_MODULE_1___default.a.sidebar
+      }, "UsergroupList", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, this.state.usergroups));
     }
   }]);
 
@@ -31995,6 +32024,36 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./Notatki.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/Notatki.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./src/scss/UsergroupList.scss":
+/*!*************************************!*\
+  !*** ./src/scss/UsergroupList.scss ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader?modules&localIdentName=[local]---[hash:base64:5]!../../node_modules/sass-loader/lib/loader.js!../../node_modules/postcss-loader/src!./UsergroupList.scss */ "./node_modules/css-loader/index.js?modules&localIdentName=[local]---[hash:base64:5]!./node_modules/sass-loader/lib/loader.js!./node_modules/postcss-loader/src/index.js!./src/scss/UsergroupList.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 

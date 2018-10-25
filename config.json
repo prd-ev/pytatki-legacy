@@ -2,7 +2,7 @@
     "default": {
         "secret_key": "change_it",
         "debug": "True",
-        "host": "127.0.0.1",
+        "host": "localhost",
         "port": "5000"
     },
     "uwsgi": {
