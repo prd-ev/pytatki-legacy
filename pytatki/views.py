@@ -202,7 +202,6 @@ def delete_user(identifier):
     """Delete user"""
     #TODO: delete user
     return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
-    return redirect('/')
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
