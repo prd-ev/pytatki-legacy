@@ -54,7 +54,7 @@ def get_note(id_note, id_user):
         note = con.fetchone()
         con.close()
         conn.close()
-        json.dumps(note)
+        return json.dumps(note)
     return False
 
 

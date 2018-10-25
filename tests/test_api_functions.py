@@ -1,7 +1,7 @@
 import pymysql
 import pytest
 from passlib.hash import sha256_crypt
-
+import json
 from init_db import db_init, parse_sql
 from pytatki.dbconnect import (add_user_to_usergroup, connection, create_note,
                                create_note_type, create_notegroup,
@@ -16,7 +16,8 @@ def test_user_has_access_to_note(insert_note):
         raise AssertionError()
 
 def test_get_note(insert_note):
-    if get_note(1, 1) != {'idnote': 1, 'value': 'test', 'title': 'Test', 'status_id': 1, 'note_type': 'text', 'creator_id': 1, 'creator_login': 'test', 'notegroup_id': 1, 'notegroup_name': 'test'}:
+    if get_note(1, 1) != json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'status_id': 1, 'note_type': 'text', 'creator_id': 1, 'creator_login': 'test', 'notegroup_id': 1, 'notegroup_name': 'test'}):
+        print(get_note(1, 1))
         raise AssertionError()
 
 def test_type_id(insert_text_note_type):
