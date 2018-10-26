@@ -1,5 +1,5 @@
-import React from 'react'
-import ComponentStyle from '../scss/EditMode.scss'
+import React from 'react';
+import ComponentStyle from '../scss/EditMode.scss';
 
 const EditMode = (props) => {
     if (props.isOn) {
@@ -14,6 +14,6 @@ const EditMode = (props) => {
         <div>
             <button className={ComponentStyle.btn} onClick={props.changeMode}>Włącz tryb edycji</button>
         </div>
-    )
-}
+    );
+};
 export default EditMode;

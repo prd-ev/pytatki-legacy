@@ -1,5 +1,5 @@
 import React from "react";
-import ComponentStyle from '../scss/AddContent.scss'
+import ComponentStyle from '../scss/AddContent.scss';
 
 const AddNote = (props) => {
   return (
@@ -9,7 +9,7 @@ const AddNote = (props) => {
       <input required id="file" type="file" name="file"></input>
       <input type="submit"></input>
     </form>
-  )
+  );
 };
 
 

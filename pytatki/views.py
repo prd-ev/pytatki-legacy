@@ -5,8 +5,8 @@ import os
 from datetime import datetime
 
 from flask import (flash, g, redirect, render_template, request, send_file,
-                   session, jsonify)
-from flask_login import current_user, logout_user
+                   jsonify)
+from flask_login import current_user
 from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
@@ -202,7 +202,6 @@ def delete_user(identifier):
     """Delete user"""
     #TODO: delete user
     return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
-    return redirect('/')
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
@@ -340,7 +339,7 @@ def add():
             return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
         con, conn = connection()
         conn.begin()
-        note_id = create_note(
+        create_note(
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
@@ -375,26 +374,29 @@ def admin_add_post():
                     escape_string(request.form['parent_id']))
                     )
         if con.fetchone():
+            con.close()
+            conn.close()
             return jsonify({'data': "Dany przedmiot juz istnieje"})
-        else:
-            group = None
-            if 'parent_id' in request.form:
-                con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                            (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
-                group = con.fetchone()
-            if group or 'parent_id' not in request.form:
-                conn.begin()
-                con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
-                    escape_string(request.form['title']),
-                    escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
-                group_id = con.lastrowid
-                con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
-                            (escape_string(str(group_id)), escape_string(str(request.form['class']))))
-                conn.commit()
-                return jsonify({'data': 'Dodano przedmiot!'})
-            return jsonify({'data': "Wystąpił błąd w zapytaniu"})
+        group = None
+        if 'parent_id' in request.form:
+            con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                        (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
+            group = con.fetchone()
+        if group or 'parent_id' not in request.form:
+            conn.begin()
+            con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
+                escape_string(request.form['title']),
+                escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
+            group_id = con.lastrowid
+            con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
+                        (escape_string(str(group_id)), escape_string(str(request.form['class']))))
+            conn.commit()
+            con.close()
+            conn.close()
+            return jsonify({'data': 'Dodano przedmiot!'})
         con.close()
         conn.close()
+        return jsonify({'data': "Wystąpił błąd w zapytaniu"})
     else:
         return jsonify({'data': 'Nie mozesz tego zrobic'})
     return redirect(request.args.get('next') if 'next' in request.args else '/')
@@ -415,8 +417,7 @@ def admin_add_get():
         con.close()
         conn.close()
         return render_template('admin_add.html', subjects=subjects, classes=classes)
-    else:
-        flash("Nie masz uprawnien", 'warning')
+    flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 

@@ -160,9 +160,9 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
             pymysql.escape_string(str(status_id))
         )
     )
-    id = c.lastrowid
-    create_action(conn, "create note {}".format(title), user_id, id)
-    return id
+    idnote = c.lastrowid
+    create_action(conn, "create note {}".format(title), user_id, idnote)
+    return idnote
 
 def get_last_note_actions(idnote, iduser):
     """Get 5 last actions of note"""
