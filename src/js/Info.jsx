@@ -92,28 +92,44 @@ class Info extends React.Component {
     window.open(siteUrl + `/download/${e}`);
   };
 
+  renderHeader() {
+    if (this.state.noteInfo != null) {
+      return (
+        <React.Fragment>
+          <h2>
+            <b>{this.state.noteInfo.title}</b> by{" "}
+            {this.state.noteInfo.creator_login}
+          </h2>
+          <p onClick={this.openNote(this.state.noteInfo.idnote)}>
+            EDIT <i className="fas fa-edit" />
+          </p>
+        </React.Fragment>
+      );
+    }
+    return <h2>Loading...</h2>;
+  }
+
+  renderActions() {
+    if (this.state.noteActions != null) {
+      return this.state.noteActions.map(action => (
+        <div key={action.idaction}>
+          {action.content} {action.date}
+        </div>
+      ));
+    }
+    return <span>Loading...</span>;
+  }
+
   packNote = () => {
-    if (this.state.noteInfo !== null) {
-      if (this.state.noteInfo.idnote != null && this.props.visible) {
-        return (
-          <div className={ComponentStyle.info}>
-            <i onClick={() => this.closeInfo()} className="fas fa-times" />
-            <h2>
-              <b>{this.state.noteInfo.title}</b> by{" "}
-              {this.state.noteInfo.creator_login}
-            </h2>
-            <p onClick={this.openNote(this.state.noteInfo.idnote)}>
-              EDIT <i className="fas fa-edit" />
-            </p>
-            <h3>Latest actions</h3>
-            {this.state.noteActions.map(action => (
-              <div key={action.idaction}>
-                {action.content} {action.date}
-              </div>
-            ))}
-          </div>
-        );
-      }
+    if (this.props.visible) {
+      return (
+        <div className={ComponentStyle.info}>
+          <i onClick={() => this.closeInfo()} className="fas fa-times" />
+          {this.renderHeader()}
+          <h3>Latest actions</h3>
+          {this.renderActions()}
+        </div>
+      );
     }
     return <div />;
   };
