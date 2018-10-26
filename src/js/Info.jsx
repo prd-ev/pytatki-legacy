@@ -12,103 +12,80 @@ class Info extends React.Component {
     };
   }
 
-  closeInfo(){
-    this.props.closeInfo()
+  closeInfo() {
+    this.props.closeInfo();
     this.setState({
       noteInfo: null,
       noteActions: null
-    })
+    });
   }
 
-  getNote(id) {
-    let note = null;
-    if (this.state.noteInfo == null && this.props.note != null){
-    fetch(siteUrl + "/api?query={getToken}")
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          siteUrl +
-            "/api?query={getNoteById(id_note:" +
-            id +
-            ',access_token:"' +
-            token +
-            '")}'
-        )
-          .then(response => {
-            return response.json();
-          })
-          .then(response => {
-            return JSON.parse(response.data.getNoteById);
-          })
-          .then(noteId => {
-            this.setState({
-              noteInfo: noteId
-            });
-            note = noteId
-          })
-      );}
-  return note
+  getNote(token) {
+    if (this.state.noteInfo == null && this.props.note != null) {
+      return fetch(
+        siteUrl +
+          "/api/?query={getNoteById(id_note:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
+      )
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          return JSON.parse(response.data.getNoteById);
+        });
+    }
   }
 
-  getNoteLastActions(id) {
-    let actions = null
-    if (this.state.noteActions == null && this.props.note != null){
-    fetch(siteUrl + "/api?query={getToken}")
+  getNoteLastActions(token) {
+    if (this.state.noteActions == null && this.props.note != null) {
+      return fetch(
+        siteUrl +
+          "/api/?query={getNoteLastActions(id_note:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
+      )
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          return JSON.parse(response.data.getNoteLastActions);
+        });
+    }
+  }
+
+  fetchData() {
+    fetch(siteUrl + "/api/?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          siteUrl +
-            "/api?query={getNoteLastActions(id_note:" +
-            id +
-            ',access_token:"' +
-            token +
-            '")}'
-        )
-          .then(response => {
-            return response.json();
-          })
-          //.then(response => response.data.json())
-          .then(response => {
-            return response.data.getNoteLastActions;
-          })
-          .then(noteActions => {
+      .then(token => {
+        this.getNote(token).then(info => {
+          this.getNoteLastActions(token).then(actions => {
             this.setState({
-              noteActions: noteActions
+              noteInfo: info,
+              noteActions: actions
             });
-          })
-      );}
-  return actions
+          });
+        });
+      });
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     if (this.props.visible !== nextProps.visible) {
       return true;
-    } else {
-      if (nextState.noteActions == {} && nextState.noteInfo == {}) {
-        return false;
-      } else {
-        if (this.state.noteInfo !== null) {
-          if (
-            this.state.noteInfo.idnote !== nextState.noteInfo.idnote ||
-            this.state.noteActions != nextState.noteActions
-          )
-            return true;
-        }
-    if (this.props.note !== nextProps.note) {
-          return true;
-        }
-      }
+    }
+    if (this.state.noteInfo !== nextState.noteInfo) {
+      return true;
     }
     return false;
   }
 
   componentDidUpdate() {
-    let note = this.getNote(this.props.note);
-    console.log(note);
-    let actions = this.getNoteLastActions(this.props.note);
-    console.log(actions)
+    this.fetchData();
   }
 
   openNote = e => () => {
@@ -116,23 +93,28 @@ class Info extends React.Component {
   };
 
   packNote = () => {
-    if (this.state.noteInfo !== null){
-    if (this.state.noteInfo.idnote != null && this.props.visible) {
-      return (
-        <div className={ComponentStyle.info}>
-          <i onClick={() => this.closeInfo()} className="fas fa-times"></i>
-          <h2>
-            <b>{this.state.noteInfo.title}</b> by{" "}
-            {this.state.noteInfo.creator_login}
-          </h2>
-          <p onClick={this.openNote(this.state.noteInfo.idnote)}>
-            EDIT <i className="fas fa-edit" />
-          </p>
-          <h3>Latest actions</h3>
-          {this.state.noteActions}
-        </div>
-      );
-    }}
+    if (this.state.noteInfo !== null) {
+      if (this.state.noteInfo.idnote != null && this.props.visible) {
+        return (
+          <div className={ComponentStyle.info}>
+            <i onClick={() => this.closeInfo()} className="fas fa-times" />
+            <h2>
+              <b>{this.state.noteInfo.title}</b> by{" "}
+              {this.state.noteInfo.creator_login}
+            </h2>
+            <p onClick={this.openNote(this.state.noteInfo.idnote)}>
+              EDIT <i className="fas fa-edit" />
+            </p>
+            <h3>Latest actions</h3>
+            {this.state.noteActions.map(action => (
+              <div key={action.idaction}>
+                {action.content} {action.date}
+              </div>
+            ))}
+          </div>
+        );
+      }
+    }
     return <div />;
   };
 
