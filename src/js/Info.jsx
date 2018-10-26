@@ -106,7 +106,12 @@ class Info extends React.Component {
         </React.Fragment>
       );
     }
-    return <h2>Loading...</h2>;
+    return (
+      <div>
+        <br />
+        <i className="ld ld-ring ld-cycle" />
+      </div>
+    );
   }
 
   renderActions() {
@@ -117,7 +122,12 @@ class Info extends React.Component {
         </div>
       ));
     }
-    return <span>Loading...</span>;
+    return (
+      <div>
+        <br />
+        <i className="ld ld-ring ld-cycle" />
+      </div>
+    );
   }
 
   packNote = () => {
