@@ -127,7 +127,7 @@ class Notatki extends React.Component {
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
             content.push(<div className={ComponentStyle.noteWrapper}><div className={ComponentStyle.note} key={value.key} onClick={this.openNote} id={value.key}><p>
-              {"Notatka " + value.title}
+              {value.title}
             </p></div>
               <div className={ComponentStyle.delete} onClick={this.deleteNote}>
                 {this.state.editModeOn ? "X" : null}
