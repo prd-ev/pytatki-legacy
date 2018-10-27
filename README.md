@@ -1,3 +1,4 @@
+# Looking for maintainers!!!
 # pytatki
 
 [![CodeFactor](https://www.codefactor.io/repository/github/PRD-ev/pytatki/badge)](https://www.codefactor.io/repository/github/PRD-ev/pytatki)
@@ -6,9 +7,7 @@
 [![Issues](https://img.shields.io/github/issues/PRD-ev/pytatki.svg)](https://github.com/PRD-ev/pytatki/issues)
 ![Snakes](https://img.shields.io/badge/w%C4%99%C5%BCe%20s%C4%85-jadowite-blue.svg)
 
-<p style="font-size: 50px">Looking for maintainers!!!</p>
-
-Notatki we flasku
+Notes hosting
 
 ## Getting Started
 
