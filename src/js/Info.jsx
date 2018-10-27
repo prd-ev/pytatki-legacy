@@ -13,45 +13,44 @@ class Info extends React.Component {
   }
 
   closeInfo() {
+    this.setState({ noteInfo: null, noteActions: null });
     this.props.closeInfo();
-    this.setState({
-      noteInfo: null,
-      noteActions: null
-    });
   }
 
   getNote(token) {
-    return fetch(
-      siteUrl +
-        "/api/?query={getNoteById(id_note:" +
-        this.props.note +
-        ',access_token:"' +
-        token +
-        '")}'
-    )
-      .then(response => {
-        return response.json();
-      })
-      .then(response => {
-        return JSON.parse(response.data.getNoteById);
-      });
+    if (this.props.note != null)
+      return fetch(
+        siteUrl +
+          "/api/?query={getNoteById(id_note:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
+      )
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          return JSON.parse(response.data.getNoteById);
+        });
   }
 
   getNoteLastActions(token) {
-    return fetch(
-      siteUrl +
-        "/api/?query={getNoteLastActions(id_note:" +
-        this.props.note +
-        ',access_token:"' +
-        token +
-        '")}'
-    )
-      .then(response => {
-        return response.json();
-      })
-      .then(response => {
-        return JSON.parse(response.data.getNoteLastActions);
-      });
+    if (this.props.note != null)
+      return fetch(
+        siteUrl +
+          "/api/?query={getNoteLastActions(id_note:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
+      )
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          return JSON.parse(response.data.getNoteLastActions);
+        });
   }
 
   fetchData() {
@@ -64,14 +63,13 @@ class Info extends React.Component {
         .then(response => response.json())
         .then(res => res.data.getToken)
         .then(token => {
-          this.getNote(token).then(info => {
-            this.getNoteLastActions(token).then(actions => {
-              this.setState({
-                noteInfo: info,
-                noteActions: actions
-              });
+          if (this.getNote(token))
+            this.getNote(token).then(info => {
+              if (this.getNoteLastActions(token))
+                this.getNoteLastActions(token).then(actions => {
+                  this.setState({ noteInfo: info, noteActions: actions });
+                });
             });
-          });
         });
     }
   }
@@ -80,6 +78,9 @@ class Info extends React.Component {
     if (this.props.visible !== nextProps.visible) {
       return true;
     }
+    /*if (this.props.note !== nextProps.note) {
+      return true;
+    }*/
     if (this.state.noteInfo !== nextState.noteInfo) {
       return true;
     }

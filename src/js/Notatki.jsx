@@ -185,7 +185,7 @@ class Notatki extends React.Component {
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
             content.push(
-              <div className={ComponentStyle.noteWrapper}>
+              <div className={ComponentStyle.noteWrapper} key={value.key}>
                 <ContextMenuTrigger
                   id={MENU_TYPE}
                   holdToDisplay={1000}
@@ -199,7 +199,7 @@ class Notatki extends React.Component {
                     className={ComponentStyle.note}
                     onDoubleClick={this.openNoteClick(value.key.slice(4))}
                   >
-                    <p>{"Notatka " + value.title}</p>
+                    <p>{value.title}</p>
                   </div>
                   <span
                     className={ComponentStyle.delete}
@@ -232,8 +232,8 @@ class Notatki extends React.Component {
               </div>
             );
           }
-          return content;
         }
+        return content;
       } else {
         return (
           <p className={ComponentStyle.no_group_chosen}>
