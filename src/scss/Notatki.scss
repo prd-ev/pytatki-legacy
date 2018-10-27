@@ -3,6 +3,8 @@
 }
 .no_group_chosen {
     font-size: 24px;
+    padding-top: 100px;
+    text-align: center;
 }
 
 .note {
@@ -13,6 +15,7 @@
     margin: 10px;
     border-radius: 10px;
     vertical-align: top;
+    cursor: pointer;
     p{
         font-size: 18px;
         margin-left: 10px;
@@ -28,6 +31,7 @@
     margin: 10px;
     border-radius: 10px;
     vertical-align: top;
+    cursor: pointer;
     p{
         font-size: 18px;
         margin-left: 10px;
@@ -50,4 +54,8 @@
 
 .mainContent{
     margin-left: 150px;
+}
+
+.actionBar > div{
+    display: inline-block;
 }

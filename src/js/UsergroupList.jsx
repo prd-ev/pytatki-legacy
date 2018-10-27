@@ -51,7 +51,7 @@ export default class UsergroupList extends Component {
   render() {
     return (
       <div className={ComponentStyle.sidebar}>
-        UsergroupList
+        <p>Grupy</p>
         <ul>
           {this.state.usergroups}
         </ul>

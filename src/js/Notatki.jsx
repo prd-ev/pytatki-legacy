@@ -274,6 +274,7 @@ class Notatki extends React.Component {
       <div>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         <div className={ComponentStyle.mainContent}>
+          <div className={ComponentStyle.actionBar}>
           {this.state.usergroupChosen ? (
             <AddNote uploadNote={this.uploadNote}></AddNote>
           ) : ("")}
@@ -283,6 +284,7 @@ class Notatki extends React.Component {
           {this.state.usergroupChosen ? (
             <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
           ) : ("")}
+          </div>
           {this.state.usergroupChosen ? (
             <h1 onClick={this.prevFolder}>Cofnij</h1>
           ) : ("")}
