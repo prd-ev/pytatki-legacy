@@ -5,15 +5,39 @@ import EditMode from "./EditMode.jsx";
 import NotegroupList from "./UsergroupList.jsx";
 import Info from "./Info.jsx";
 import {
-  Menu,
-  Item,
-  Separator,
-  Submenu,
-  MenuProvider
-} from "react-contexify";
-
+  ContextMenuTrigger,
+  ContextMenu,
+  MenuItem,
+  connectMenu
+} from "react-contextmenu";
 
 const siteUrl = "http://127.0.0.1:5000";
+const MENU_TYPE = "DYNAMIC";
+function collect(props) {
+  return props;
+}
+
+const DynamicMenu = props => {
+  const { id, trigger } = props;
+  const handleItemClick = trigger ? trigger.onItemClick : null;
+
+  return (
+    <ContextMenu id={id}>
+      {trigger && (
+        <MenuItem onClick={handleItemClick} data={{ action: "Open" }}>
+          Otwórz
+        </MenuItem>
+      )}
+      {trigger && (
+        <MenuItem onClick={handleItemClick} data={{ action: "Properties" }}>
+          Właściwości
+        </MenuItem>
+      )}
+    </ContextMenu>
+  );
+};
+
+const ConnectedMenu = connectMenu(MENU_TYPE)(DynamicMenu);
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -30,7 +54,14 @@ class Notatki extends React.Component {
     //Download root folders and set state of data[0] to array of folder objects
   }
 
-  onClick = ({ event, ref, data, dataFromProvider }) => console.log(dataFromProvider.key);
+  handleClick = (e, data, target) => {
+    if (data.action === "Open") {
+      this.openNote(data.name.slice(4));
+    }
+    if (data.action === "Properties") {
+      this.infoNote(data.name.slice(4));
+    }
+  };
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
@@ -115,15 +146,23 @@ class Notatki extends React.Component {
       .catch(error => console.log(error));
   }
 
-  infoNote = id => () => {
-    this.setState({ note: id, infoVisible: true });
+  openNote(e) {
+    window.open(siteUrl + `/download/${e}`);
+  }
+
+  openNoteClick = e => () => {
+    window.open(siteUrl + `/download/${e}`);
   };
+
+  infoNote(id) {
+    this.setState({ note: id, infoVisible: true });
+  }
 
   closeInfo() {
     this.setState({
       note: null,
       infoVisible: false
-    })
+    });
   }
 
   prevFolder = () => {
@@ -155,16 +194,25 @@ class Notatki extends React.Component {
       var content = [];
       for (const value of this.state.data[this.state.currentDepth]) {
         if (value.is_note) {
-          content.push(<MenuProvider key={value.key} id="menu_id" data={{key: value.key}}>
-            <div key={value.key}>
-              <h1 onClick={this.infoNote(value.key.slice(4))} id={value.key}>
+          content.push(
+            <ContextMenuTrigger
+              id={MENU_TYPE}
+              holdToDisplay={1000}
+              name={value.key}
+              onItemClick={this.handleClick}
+              collect={collect}
+              key={value.key}
+            >
+              <h1
+                id={value.key}
+                onDoubleClick={this.openNoteClick(value.key.slice(4))}
+              >
                 {"Notatka " + value.title}
               </h1>
               <span onClick={this.deleteNote}>
                 {this.state.editModeOn ? " x" : null}
               </span>
-            </div>
-          </MenuProvider>
+            </ContextMenuTrigger>
           );
         } else {
           content.push(
@@ -179,17 +227,6 @@ class Notatki extends React.Component {
           );
         }
       }
-      content.push(<Menu key="menu" id='menu_id'>
-        <Item onClick={this.onClick}>Lorem</Item>
-        <Item onClick={this.onClick}>Ipsum</Item>
-        <Separator />
-        <Item disabled>Dolor</Item>
-        <Separator />
-        <Submenu label="Foobar">
-          <Item onClick={this.onClick}>Foo</Item>
-          <Item onClick={this.onClick}>Bar</Item>
-        </Submenu>
-      </Menu>);
       return content;
     }
     return null;
@@ -331,10 +368,15 @@ class Notatki extends React.Component {
         <AddNote uploadNote={this.uploadNote} />
         <AddFolder addFolder={this.addFolder} />
         <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn} />
-        <Info note={this.state.note} visible={this.state.infoVisible} closeInfo={this.closeInfo.bind(this)} />
+        <Info
+          note={this.state.note}
+          visible={this.state.infoVisible}
+          closeInfo={this.closeInfo.bind(this)}
+        />
         <h1 onClick={this.prevFolder}>Cofnij</h1>
         {this.showCurrentPath()}
         {this.packContent()}
+        <ConnectedMenu />
       </div>
     );
   }
