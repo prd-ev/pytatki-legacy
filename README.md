@@ -1,9 +1,12 @@
 # pytatki
+
 [![CodeFactor](https://www.codefactor.io/repository/github/PRD-ev/pytatki/badge)](https://www.codefactor.io/repository/github/PRD-ev/pytatki)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=butterfly-pn/pytatki&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&utm_medium=referral&utm_content=butterfly-pn/pytatki&utm_campaign=Badge_Grade)
 [![CircleCI](https://circleci.com/gh/PRD-ev/pytatki/tree/master.svg?style=svg)](https://circleci.com/gh/PRD-ev/pytatki/tree/master)
 [![Issues](https://img.shields.io/github/issues/PRD-ev/pytatki.svg)](https://github.com/PRD-ev/pytatki/issues)
 ![Snakes](https://img.shields.io/badge/w%C4%99%C5%BCe%20s%C4%85-jadowite-blue.svg)
+
+<p style="font-size: 50px">Looking for maintainers!!!</p>
 
 Notatki we flasku
 
@@ -14,24 +17,32 @@ These instructions will get you a copy of the project up and running on your loc
 ### Instalation
 
 Clone this repo
+
 ```
 git clone https://github.com/PRD-ev/pytatki.git
 ```
+
 Install Flask dependencies
+
 ```
 pip install -r requirements/common.txt
 ```
+
 Install React dependencies
+
 ```
 yarn add
 ```
+
 Build bundles
+
 ```
 yarn run build
 ```
-### Configuration
-Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
 
+### Configuration
+
+Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
 
 ```
 [DEFAULT]
@@ -50,35 +61,33 @@ DB_NAME = 'pytatki'
 To configure database run `init_db.py` script.
 
 ## Testing
-### 
+
+###
+
 ```
 pytest
 ```
 
 ## Built With
 
-* [Bootstrap](https://www.getbootstrap.com/) 
-* [Flask](http://flask.pocoo.org/) 
+- [Bootstrap](https://www.getbootstrap.com/)
+- [Flask](http://flask.pocoo.org/)
 
-## Współpraca
+## Contributing 🎉
 
-Jesteśmy na każdą formę współpracy :). Dane kontaktowe można znaleźć w pliku [CONTRIBUTING.md](https://github.com/butterfly-pn/pytatki/blob/master/docs/CONTRIBUTING.md)
+Feel free to contribute 😜. If you want to contact owners: [CONTRIBUTING.md](https://github.com/butterfly-pn/pytatki/blob/master/docs/CONTRIBUTING.md)
 
+## Authors
 
-## Autorzy
+- **Patryk Niedźwiedziński** - _Initial work_ - [butterfly-pn](https://github.com/butterfly-pn)
+- **Filip Wachowiak** - _React developer_ - [filipw01](https://github.com/filipw01)
 
-* **Patryk Niedźwiedziński** - *Initial work* - [butterfly-pn](https://github.com/butterfly-pn)
-* **Filip Wachowiak** - *React developer* - [filipw01](https://github.com/filipw01)
-
-Zobacz również listę [współautorów](https://github.com/butterfly-pn/pytatki/graphs/contributors), którzy przyczynili się w rozwoju aplikacji.
-
-
-
+Check out [contributors](https://github.com/butterfly-pn/pytatki/graphs/contributors)
 
 ## TODO
 
-- [ ] Dodawanie plików/notatek (dodanie tagów, przedmiotu itd.)
-- [x] Logowanie i rejestracja + admin
-- [ ] Wyszukiwanie notatek
-- [ ] Zarządzanie notatkami (usuń, ukryj itp.)
-- [x] Podział użytkowników na grupy
+- [ ] Add new note (tags, notegroup etc.)
+- [x] Login, register + admin
+- [ ] Search
+- [ ] Manage note (delete, hide, properties etc.)
+- [x] Usergroups
