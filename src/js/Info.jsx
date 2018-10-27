@@ -21,57 +21,59 @@ class Info extends React.Component {
   }
 
   getNote(token) {
-    if (this.state.noteInfo == null && this.props.note != null) {
-      return fetch(
-        siteUrl +
-          "/api/?query={getNoteById(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
-      )
-        .then(response => {
-          return response.json();
-        })
-        .then(response => {
-          return JSON.parse(response.data.getNoteById);
-        });
-    }
+    return fetch(
+      siteUrl +
+        "/api/?query={getNoteById(id_note:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
+    )
+      .then(response => {
+        return response.json();
+      })
+      .then(response => {
+        return JSON.parse(response.data.getNoteById);
+      });
   }
 
   getNoteLastActions(token) {
-    if (this.state.noteActions == null && this.props.note != null) {
-      return fetch(
-        siteUrl +
-          "/api/?query={getNoteLastActions(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
-      )
-        .then(response => {
-          return response.json();
-        })
-        .then(response => {
-          return JSON.parse(response.data.getNoteLastActions);
-        });
-    }
+    return fetch(
+      siteUrl +
+        "/api/?query={getNoteLastActions(id_note:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
+    )
+      .then(response => {
+        return response.json();
+      })
+      .then(response => {
+        return JSON.parse(response.data.getNoteLastActions);
+      });
   }
 
   fetchData() {
-    fetch(siteUrl + "/api/?query={getToken}")
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => {
-        this.getNote(token).then(info => {
-          this.getNoteLastActions(token).then(actions => {
-            this.setState({
-              noteInfo: info,
-              noteActions: actions
+    if (
+      this.state.noteInfo == null &&
+      this.state.noteActions == null &&
+      this.props.note != null
+    ) {
+      fetch(siteUrl + "/api/?query={getToken}")
+        .then(response => response.json())
+        .then(res => res.data.getToken)
+        .then(token => {
+          this.getNote(token).then(info => {
+            this.getNoteLastActions(token).then(actions => {
+              this.setState({
+                noteInfo: info,
+                noteActions: actions
+              });
             });
           });
         });
-      });
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {

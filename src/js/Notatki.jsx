@@ -6,8 +6,8 @@ import NotegroupList from "./UsergroupList.jsx";
 import Info from "./Info.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import ConnectedMenu from "./ContextMenu.jsx";
-import config from '../../config.json'
-import ComponentStyle from '../scss/Notatki.scss'
+import config from "../../config.json";
+import ComponentStyle from "../scss/Notatki.scss";
 
 const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
@@ -27,7 +27,7 @@ class Notatki extends React.Component {
       editModeOn: false,
       note: null,
       infoVisible: false,
-      usergroupChosen: false,
+      usergroupChosen: false
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -180,49 +180,69 @@ class Notatki extends React.Component {
   packContent = () => {
     //Show content of current depth form state (this.state.data)
     if (this.state.usergroupChosen) {
-if (this.state.data[this.state.currentDepth]) {
-      var content = [];
-      for (const value of this.state.data[this.state.currentDepth]) {
-        if (value.is_note) {
-          content.push(
-            <ContextMenuTrigger
-              id={MENU_TYPE}
-              holdToDisplay={1000}
-              name={value.key}
-              onItemClick={this.handleClick}
-              collect={collect}
-              key={value.key}
-            ><div className={ComponentStyle.noteWrapper}>
-              <div
-                id={value.key}
-                  className={ComponentStyle.note}
-                onDoubleClick={this.openNoteClick(value.key.slice(4))}
-              ><p>
-                {"Notatka " + value.title}</p>
+      if (this.state.data[this.state.currentDepth]) {
+        var content = [];
+        for (const value of this.state.data[this.state.currentDepth]) {
+          if (value.is_note) {
+            content.push(
+              <div className={ComponentStyle.noteWrapper}>
+                <ContextMenuTrigger
+                  id={MENU_TYPE}
+                  holdToDisplay={1000}
+                  name={value.key}
+                  onItemClick={this.handleClick}
+                  collect={collect}
+                  key={value.key}
+                >
+                  <div
+                    id={value.key}
+                    className={ComponentStyle.note}
+                    onDoubleClick={this.openNoteClick(value.key.slice(4))}
+                  >
+                    <p>{"Notatka " + value.title}</p>
+                  </div>
+                  <span
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteNote}
+                  >
+                    {this.state.editModeOn ? " x" : null}
+                  </span>
+                </ContextMenuTrigger>
               </div>
-                <span className={ComponentStyle.delete} onClick={this.deleteNote}>
-                {this.state.editModeOn ? " x" : null}
-              </span></div>
-            </ContextMenuTrigger>
-          );
-        } else {
-          content.push(<div className={ComponentStyle.folderWrapper}>
-            <div key={value.key} className={ComponentStyle.folder} onClick={this.changeCurrentDirectory} id={value.key}>
-              <h1 onClick={this.changeCurrentDirectory} id={value.key}>
-                {value.title}
-              </h1>
-              <span className={ComponentStyle.delete} onClick={this.deleteFolder}>
-                {this.state.editModeOn ? " x " : null}
-              </span>
-            </div></div>
-          );
+            );
+          } else {
+            content.push(
+              <div className={ComponentStyle.folderWrapper}>
+                <div
+                  key={value.key}
+                  className={ComponentStyle.folder}
+                  onClick={this.changeCurrentDirectory}
+                  id={value.key}
+                >
+                  <h1 onClick={this.changeCurrentDirectory} id={value.key}>
+                    {value.title}
+                  </h1>
+                  <span
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteFolder}
+                  >
+                    {this.state.editModeOn ? " x " : null}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+          return content;
         }
-        return content;
+      } else {
+        return (
+          <p className={ComponentStyle.no_group_chosen}>
+            Wybierz grupę aby kontynuować
+          </p>
+        );
       }
-    } else {
-      return <p className={ComponentStyle.no_group_chosen}>Wybierz grupę aby kontynuować</p>
+      return null;
     }
-    return null;
   };
 
   uploadNote = e => {
@@ -231,19 +251,25 @@ if (this.state.data[this.state.currentDepth]) {
     const file = form[1].files[0];
     const title = form[0].value;
     var formData = new FormData();
-    formData.append('file', file);
-    formData.append('title', title);
-    formData.append('notegroup_id', this.state.currentDirId[this.state.currentDepth]);
-    fetch(siteUrl + '/add/', {
-      method: 'POST',
-      body: formData
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append(
+      "notegroup_id",
+      this.state.currentDirId[this.state.currentDepth]
     );
+    fetch(siteUrl + "/add/", {
+      method: "POST",
+      body: formData
+    })
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     fetch(siteUrl + "/add/", {
       method: "POST",
       body: formData
@@ -260,24 +286,30 @@ if (this.state.data[this.state.currentDepth]) {
     this.updateContent();
     e.target.querySelector("input").value = null;
     e.target.querySelector("#file").value = null;
-  }
+  };
 
   addFolder = e => {
     e.preventDefault();
     var formData = new FormData();
-    formData.append('title', document.getElementById('addFolderForm')[0].value);
-    formData.append('parent_id', this.state.currentDirId[this.state.currentDirId.length - 1]);
-    formData.append('class', '1');//dodać dynamicznie
-    fetch(siteUrl + '/admin/add/', {
-      method: 'POST',
-      body: formData
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
+    formData.append("title", document.getElementById("addFolderForm")[0].value);
+    formData.append(
+      "parent_id",
+      this.state.currentDirId[this.state.currentDirId.length - 1]
     );
+    formData.append("class", "1"); //dodać dynamicznie
+    fetch(siteUrl + "/admin/add/", {
+      method: "POST",
+      body: formData
+    })
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     formData.append("class", "1"); //dodać dynamicznie
     fetch(siteUrl + "/admin/add/", {
       method: "POST",
@@ -294,7 +326,7 @@ if (this.state.data[this.state.currentDepth]) {
       );
     this.updateContent();
     e.target.querySelector("input").value = null;
-  }
+  };
 
   changeMode = e => {
     e.preventDefault();
@@ -305,27 +337,31 @@ if (this.state.data[this.state.currentDepth]) {
 
   deleteNote = e => {
     let noteId = e.target.previousSibling.id.slice(4);
-    fetch(siteUrl + '/admin/delete/note/' + noteId, {
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
+    fetch(siteUrl + "/admin/delete/note/" + noteId, {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     this.updateContent();
   };
 
   deleteFolder = e => {
     let folderId = e.target.previousSibling.id;
-    fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
+    fetch(siteUrl + "/notegroup/" + folderId + "/delete/", {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     this.updateContent();
   };
 
@@ -366,28 +402,47 @@ if (this.state.data[this.state.currentDepth]) {
       currentDirId: [],
       currentPath: [],
       usergroupChosen: true
-    })
-  }
+    });
+  };
 
   render() {
     return (
       <div>
-        <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
+        <NotegroupList
+          updateUsergroup={this.updateCurrentUsergroup}
+          siteUrl={siteUrl}
+        />
         <div className={ComponentStyle.mainContent}>
           {this.state.usergroupChosen ? (
-            <AddNote uploadNote={this.uploadNote}></AddNote>
-          ) : ("")}
+            <AddNote uploadNote={this.uploadNote} />
+          ) : (
+            ""
+          )}
           {this.state.usergroupChosen ? (
-            <AddFolder addFolder={this.addFolder}></AddFolder>
-          ) : ("")}
+            <AddFolder addFolder={this.addFolder} />
+          ) : (
+            ""
+          )}
           {this.state.usergroupChosen ? (
-            <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-          ) : ("")}
+            <EditMode
+              changeMode={this.changeMode}
+              isOn={this.state.editModeOn}
+            />
+          ) : (
+            ""
+          )}
           {this.state.usergroupChosen ? (
             <h1 onClick={this.prevFolder}>Cofnij</h1>
-          ) : ("")}
+          ) : (
+            ""
+          )}
           {this.showCurrentPath()}
           {this.packContent()}
+          <Info
+            note={this.state.note}
+            visible={this.state.infoVisible}
+            closeInfo={this.closeInfo.bind(this)}
+          />
           <ConnectedMenu />
         </div>
       </div>
