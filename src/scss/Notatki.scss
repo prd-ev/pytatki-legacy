@@ -1,0 +1,53 @@
+*{
+    box-sizing: border-box;
+}
+.no_group_chosen {
+    font-size: 24px;
+}
+
+.note {
+    background-color: rebeccapurple;
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+    margin: 10px;
+    border-radius: 10px;
+    vertical-align: top;
+    p{
+        font-size: 18px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+
+.folder {
+    background-color: indianred;
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+    margin: 10px;
+    border-radius: 10px;
+    vertical-align: top;
+    p{
+        font-size: 18px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+}
+.delete{
+    position: absolute;
+    top: -5px;
+    right: 0px;
+    border-radius: 50%;
+    background-color: green;
+}
+
+.noteWrapper,
+.folderWrapper{
+    position: relative;
+    display: inline-block;
+}
+
+.mainContent{
+    margin-left: 150px;
+}
