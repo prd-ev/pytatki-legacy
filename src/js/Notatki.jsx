@@ -4,40 +4,14 @@ import AddFolder from "./AddFolder.jsx";
 import EditMode from "./EditMode.jsx";
 import NotegroupList from "./UsergroupList.jsx";
 import Info from "./Info.jsx";
-import {
-  ContextMenuTrigger,
-  ContextMenu,
-  MenuItem,
-  connectMenu
-} from "react-contextmenu";
+import { ContextMenuTrigger } from "react-contextmenu";
+import ConnectedMenu from "./ContextMenu.jsx";
 
 const siteUrl = "http://127.0.0.1:5000";
 const MENU_TYPE = "DYNAMIC";
 function collect(props) {
   return props;
 }
-
-const DynamicMenu = props => {
-  const { id, trigger } = props;
-  const handleItemClick = trigger ? trigger.onItemClick : null;
-
-  return (
-    <ContextMenu id={id}>
-      {trigger && (
-        <MenuItem onClick={handleItemClick} data={{ action: "Open" }}>
-          Otwórz
-        </MenuItem>
-      )}
-      {trigger && (
-        <MenuItem onClick={handleItemClick} data={{ action: "Properties" }}>
-          Właściwości
-        </MenuItem>
-      )}
-    </ContextMenu>
-  );
-};
-
-const ConnectedMenu = connectMenu(MENU_TYPE)(DynamicMenu);
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -61,7 +35,18 @@ class Notatki extends React.Component {
     if (data.action === "Properties") {
       this.infoNote(data.name.slice(4));
     }
+    if (data.action === "Delete") {
+      this.deleteNote_ContextMenu(data.name.slice(4));
+    }
   };
+
+  deleteNote_ContextMenu(id) {
+    fetch(siteUrl + "/admin/delete/note/" + id, {})
+      .then(response => response.text()) // if the response is a JSON object
+      .then(success => console.log(success)) // Handle the success response object
+      .catch(error => console.log(error)); // Handle the error response object
+    this.updateContent();
+  }
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
