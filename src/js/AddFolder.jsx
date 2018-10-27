@@ -9,27 +9,27 @@ export default class AddFolder extends Component {
   render() {
     return (
       <div>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addFolder">Dodaj folder</button>
-        <div class="modal" tabindex="-1" role="dialog" id="addFolder">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Dodaj folder w aktualnej lokalizacji</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#addFolder">Dodaj folder</button>
+        <div className="modal" tabIndex="-1" role="dialog" id="addFolder">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Dodaj folder w aktualnej lokalizacji</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body">
+              <div className="modal-body">
                 <form id="addFolderForm" className={ComponentStyle.form} onSubmit={this.props.addFolder}>
-                  <label for="folderTitle">Tytuł folderu</label>
+                  <label htmlFor="folderTitle">Tytuł folderu</label>
                   <br />
                   <input required name="title" type="text" id="folderTitle"/>
                   <br />
                   <input type="submit" value="Dodaj" />
                 </form>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
               </div>
             </div>
           </div>

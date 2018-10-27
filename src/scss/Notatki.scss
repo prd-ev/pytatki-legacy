@@ -8,34 +8,34 @@
 }
 
 .note {
-    background-color: rebeccapurple;
+    background-image: url('/static/images/note.svg');
+    background-size: cover;
     display: inline-block;
     height: 150px;
     width: 150px;
-    margin: 10px;
     border-radius: 10px;
     vertical-align: top;
     cursor: pointer;
     p{
+        margin: 32px 20px 20px 27px;
+        pointer-events: none;
         font-size: 18px;
-        margin-left: 10px;
-        margin-right: 10px;
     }
 }
 
 .folder {
-    background-color: indianred;
+    background-image: url('/static/images/folder.png');
+    background-size: cover;
     display: inline-block;
-    height: 150px;
     width: 150px;
+    height: 130px;
     margin: 10px;
-    border-radius: 10px;
     vertical-align: top;
     cursor: pointer;
     p{
+        pointer-events: none;
         font-size: 18px;
-        margin-left: 10px;
-        margin-right: 10px;
+        margin: 55px 15px 15px 15px;
     }
 }
 .delete{
@@ -58,4 +58,7 @@
 
 .actionBar > div{
     display: inline-block;
+    button{
+        margin-right: 15px
+    }
 }
