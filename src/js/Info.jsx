@@ -1,7 +1,8 @@
 import React from "react";
+import config from "../../config.json";
 import ComponentStyle from "../scss/Info.scss";
 
-const siteUrl = "http://127.0.0.1:5000";
+const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
 class Info extends React.Component {
   constructor(props) {

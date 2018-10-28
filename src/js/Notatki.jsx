@@ -5,7 +5,7 @@ import EditMode from "./EditMode.jsx";
 import NotegroupList from "./UsergroupList.jsx";
 import Info from "./Info.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
-import ConnectedMenu from "./ContextMenu.jsx";
+import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import config from "../../config.json";
 import ComponentStyle from "../scss/Notatki.scss";
 
@@ -41,6 +41,17 @@ class Notatki extends React.Component {
     }
     if (data.action === "Delete") {
       this.deleteNote_ContextMenu(data.name.slice(4));
+    }
+  };
+
+  handleClick = (e, data, target) => {
+    if (data.action === "Properties") {
+      //TODO: Folder properties
+      console.log("folder properties");
+    }
+    if (data.action === "Delete") {
+      //TODO: Delete folder
+      console.log("folder delete");
     }
   };
 
@@ -213,22 +224,31 @@ class Notatki extends React.Component {
           } else {
             content.push(
               <div className={ComponentStyle.folderWrapper}>
-                <div
+                <ContextMenuTrigger
+                  id="NOTEGROUP"
+                  holdToDisplay={1000}
+                  name={value.key}
+                  onItemClick={this.handleGroupClick}
+                  collect={collect}
                   key={value.key}
-                  className={ComponentStyle.folder}
-                  onClick={this.changeCurrentDirectory}
-                  id={value.key}
                 >
-                  <h1 onClick={this.changeCurrentDirectory} id={value.key}>
-                    {value.title}
-                  </h1>
-                  <span
-                    className={ComponentStyle.delete}
-                    onClick={this.deleteFolder}
+                  <div
+                    key={value.key}
+                    className={ComponentStyle.folder}
+                    onClick={this.changeCurrentDirectory}
+                    id={value.key}
                   >
-                    {this.state.editModeOn ? " x " : null}
-                  </span>
-                </div>
+                    <h1 onClick={this.changeCurrentDirectory} id={value.key}>
+                      {value.title}
+                    </h1>
+                    <span
+                      className={ComponentStyle.delete}
+                      onClick={this.deleteFolder}
+                    >
+                      {this.state.editModeOn ? " x " : null}
+                    </span>
+                  </div>
+                </ContextMenuTrigger>
               </div>
             );
           }
@@ -444,6 +464,7 @@ class Notatki extends React.Component {
             closeInfo={this.closeInfo.bind(this)}
           />
           <ConnectedMenu />
+          <ConnectedGroupMenu />
         </div>
       </div>
     );
