@@ -169,16 +169,6 @@ def homepage():
     return render_template('landing_page.html')
 
 
-@APP.route('/app/')
-def app_view():
-    if current_user.is_authenticated:
-        content = find_notegroup_children(1, current_user['iduser'])
-        # return jsonify(content)
-        print(content)
-        return render_template("homepage.html", subject=None, topics=None, notes=None, content=content)
-    return redirect('/')
-
-
 @APP.route('/about/')
 def about():
     """About"""
