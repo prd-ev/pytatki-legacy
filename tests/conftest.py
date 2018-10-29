@@ -19,10 +19,12 @@ def create_db():
         raise Warning("Database exists")
     for query in parse_sql('sql/create-database.sql'):
         cursor.execute(query)
-    cursor.execute("SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
+    cursor.execute(
+        "SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
     user_exists = cursor.fetchone()
     if not user_exists:
-        cursor.execute("CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
+        cursor.execute(
+            "CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
     cursor.execute("GRANT ALL ON pytatki.* TO \'pytatki\'@\'127.0.0.1\'")
     conn.close()
 
@@ -49,6 +51,7 @@ def insert_removed_status(insert_active_status):
 
 @pytest.fixture(scope='session', autouse=True)
 def insert_user(insert_active_status):
+    """test_create_user"""
     _, conn = connection()
     conn.begin()
     user_id = create_user(conn, 'test', 'test', 'test@test', 1)
@@ -56,6 +59,19 @@ def insert_user(insert_active_status):
     _.close()
     conn.close()
     return user_id
+
+
+@pytest.fixture(scope='function', autouse=True)
+def insert_user_new(insert_active_status):
+    def _insert(*args, **kwargs):
+        _, conn = connection()
+        conn.begin()
+        user_id = create_user(*args, **kwargs)
+        conn.commit()
+        _.close()
+        conn.close()
+        return user_id
+    return _insert
 
 
 @pytest.fixture(scope='session', autouse=True)
