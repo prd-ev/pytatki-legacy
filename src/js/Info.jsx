@@ -14,10 +14,13 @@ class Info extends React.Component {
   }
 
   closeInfo() {
+    //Remove data from states
     this.setState({ noteInfo: null, noteActions: null });
+    //Run function to remove states of parent
     this.props.closeInfo();
   }
 
+  //Fetch from /api/?query={getNoteById} of note id in props an token passed as argument
   getNote(token) {
     if (this.props.note != null)
       return fetch(
@@ -29,13 +32,16 @@ class Info extends React.Component {
           '")}'
       )
         .then(response => {
+          //Convert response to json
           return response.json();
         })
         .then(response => {
+          //Filter data
           return JSON.parse(response.data.getNoteById);
         });
   }
 
+  //Fetch from /api/?query={getNoteLastActions} of note id in props and token passed as argument
   getNoteLastActions(token) {
     if (this.props.note != null)
       return fetch(
@@ -47,13 +53,16 @@ class Info extends React.Component {
           '")}'
       )
         .then(response => {
+          //Convert data to json
           return response.json();
         })
         .then(response => {
+          //Filter data
           return JSON.parse(response.data.getNoteLastActions);
         });
   }
 
+  //Fetch data of note from api and set to state
   fetchData() {
     if (
       this.state.noteInfo == null &&
@@ -75,27 +84,28 @@ class Info extends React.Component {
     }
   }
 
+  //Check if component should update: if visible changes or if noteInfo changes
   shouldComponentUpdate(nextProps, nextState) {
     if (this.props.visible !== nextProps.visible) {
       return true;
     }
-    /*if (this.props.note !== nextProps.note) {
-      return true;
-    }*/
     if (this.state.noteInfo !== nextState.noteInfo) {
       return true;
     }
     return false;
   }
 
+  //If component updated fetch new data
   componentDidUpdate() {
     this.fetchData();
   }
 
+  //Opens note in new window
   openNote = e => () => {
     window.open(siteUrl + `/download/${e}`);
   };
 
+  //Renders header of info component
   renderHeader() {
     if (this.state.noteInfo != null) {
       return (
@@ -118,6 +128,7 @@ class Info extends React.Component {
     );
   }
 
+  //Render actions
   renderActions() {
     if (this.state.noteActions != null) {
       return this.state.noteActions.map(action => (
@@ -134,22 +145,17 @@ class Info extends React.Component {
     );
   }
 
-  packNote = () => {
-    if (this.props.visible) {
-      return (
+  render() {
+    return (
+      <React.Fragment>
         <div className={ComponentStyle.info}>
           <i onClick={() => this.closeInfo()} className="fas fa-times" />
           {this.renderHeader()}
           <h3>Latest actions</h3>
           {this.renderActions()}
         </div>
-      );
-    }
-    return <div />;
-  };
-
-  render() {
-    return <div id="info">{this.packNote()}</div>;
+      </React.Fragment>
+    );
   }
 }
 
