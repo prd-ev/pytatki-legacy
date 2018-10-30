@@ -6,7 +6,7 @@ module.exports = (env, argv) => {
   return {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "styles.css"
+        filename: "style.css"
       })
     ],
     entry: ["@babel/polyfill","./src/js/index.js"],
@@ -23,10 +23,19 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.s?css$/,
-          exclude: /node_modules/,
+          exclude: [/node_modules/,/global.scss/],
           use: [
             devMode ? "style-loader" : MiniCssExtractPlugin.loader,
             "css-loader?modules&localIdentName=[local]---[hash:base64:5]",
+            "sass-loader",
+            "postcss-loader"
+          ]
+        },
+        {
+          test: /global.scss/,
+          use: [
+            devMode ? "style-loader" : MiniCssExtractPlugin.loader,
+            "css-loader",
             "sass-loader",
             "postcss-loader"
           ]

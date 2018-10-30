@@ -1,21 +1,29 @@
-.sidebar{
+@import "_variables";
+
+.sidebar {
     position: fixed;
     height: 100vh;
     width: 150px;
     vertical-align: top;
-    p{
+
+    p {
         margin-left: 10px;
     }
-    ul{
+
+    ul {
         list-style: none;
         margin-right: 20px;
-        li{
+
+        li {
             text-transform: uppercase;
             margin: 5px 0;
             padding: 5px;
-            border: 1px solid blue;
+            background-color: $primary;
+            border-radius: 5px;
             text-align: center;
-            &:hover{
+            color: $white;
+
+            &:hover {
                 cursor: pointer;
             }
         }

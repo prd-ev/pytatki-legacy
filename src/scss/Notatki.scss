@@ -1,6 +1,5 @@
-*{
-    box-sizing: border-box;
-}
+@import "_variables";
+
 .no_group_chosen {
     font-size: 24px;
     padding-top: 100px;
@@ -16,7 +15,8 @@
     border-radius: 10px;
     vertical-align: top;
     cursor: pointer;
-    p{
+
+    p {
         margin: 32px 20px 20px 27px;
         pointer-events: none;
         font-size: 18px;
@@ -32,13 +32,15 @@
     margin: 10px;
     vertical-align: top;
     cursor: pointer;
-    p{
+
+    p {
         pointer-events: none;
         font-size: 18px;
         margin: 55px 15px 15px 15px;
     }
 }
-.delete{
+
+.delete {
     position: absolute;
     top: -5px;
     right: 0px;
@@ -47,18 +49,19 @@
 }
 
 .noteWrapper,
-.folderWrapper{
+.folderWrapper {
     position: relative;
     display: inline-block;
 }
 
-.mainContent{
+.mainContent {
     margin-left: 150px;
 }
 
-.actionBar > div{
+.actionBar>div {
     display: inline-block;
-    button{
+
+    button {
         margin-right: 15px
     }
 }

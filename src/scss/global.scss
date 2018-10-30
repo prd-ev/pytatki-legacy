@@ -1,0 +1,33 @@
+@import '_variables';
+
+* {
+    box-sizing: border-box;
+}
+
+.nav-link {
+    color: $black !important;
+}
+
+.btn-primary {
+    background-color: $secondary;
+    border-color: $secondary;
+
+    &:hover {
+        background-color: $primary;
+        border-color: $primary;
+    }
+
+    &:active:hover {
+        background-color: $primary;
+        border-color: $primary;
+    }
+}
+
+.navbar-brand {
+    color: $black;
+
+    .badge {
+        border: solid 1px $black;
+    }
+
+}

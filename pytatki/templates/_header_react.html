@@ -4,8 +4,7 @@
 <head>
 
     <meta charset=utf-8>
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=300, height=device-height, target-densitydpi=medium-dpi, user-scalable=no"
-    />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=300, height=device-height, target-densitydpi=medium-dpi, user-scalable=no" />
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
@@ -16,101 +15,102 @@
         crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-    <script>
-        $('.modal').on('shown.bs.modal', function () {
-            $(this).find('input:first').focus();
-        });
-    </script>
 </head>
 
 <body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}" {%if current_user.is_authenticated and page_id=='homepage'
-    %}onhashchange="check_hash()" onload="check_hash()" {%endif%}>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark secondary-light mb-2">
+    %}" onload="check_hash()" {%endif%}>
+    <nav class="navbar navbar-expand-md mb-2">
         <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
             <span class="align-middle">Pytatki</span>
-            <span class="align-middle badge" style="border-color:#ffc107; color:#ffc107; border: 1px solid">alpha</span>
+            <span class="align-middle badge">alpha</span>
         </a>
         {% if page_id == 'register' or page_id == 'login' %} {% else %}
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse" aria-controls="navbarsExampleDefault"
-            aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbar-collapse">
-             {% block menu %}{% endblock %}
+            {% block menu %}{% endblock %}
         </div>
         {% endif %}
-        </nav>
-        
-        
-                    <div id="messages">
-                        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
-                        <div data-alert class="alert alert-{{category}} alert-dismissible show">
-                            {{ message|safe }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        {% endfor %} {% endif %} {% endwith %}
-                    </div>
-            {% block content %}{% endblock %}
-        {% if page_id != 'register' %}
-        <div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-            style="text-align: left;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zarejestruj się</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container">
-                            <form id="form" method=post action="/register/">
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="" placeholder="Nazwa użytkownika">
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="email" name="email" type="email" value="" placeholder="Adres email">
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="reg_password" name="password" type="password" value="" placeholder="Hasło">
-                                    <ul id="pass" class="bg-white m-2 p-2 rounded" style="width: 80%; padding: .375rem .75rem; display: none; position: absolute; z-index: 999; -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);">
-                                        <li id="letter" class="text-danger ml-4">
-                                            <small class="form-text">
-                                                <b>Duże</b> i
-                                                <b>małe</b> litery</small>
-                                        </li>
-                                        <li id="number" class="text-danger ml-4">
-                                            <small class="form-text">
-                                                <b>Cyfry</b>
-                                            </small>
-                                        </li>
-                                        <li id="length" class="text-danger ml-4">
-                                            <small class="form-text">
-                                                <b>8</b> znaków</small>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password" value="" placeholder="Powtórz hasło">
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked">
-                                    <label class="form-check-label" for="accept_tos">
-                                        Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia 2018r.)
-                                    </label>
-                                </div>
-                                <br>
-                                <input id="submit" class="btn btn-primary" disabled="disabled" type=submit value="Zarejestruj się">
-                            </form>
-                        </div>
+    </nav>
+
+
+    <div id="messages">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in
+        messages %}
+        <div data-alert class="alert alert-{{category}} alert-dismissible show">
+            {{ message|safe }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
+    </div>
+    {% block content %}{% endblock %}
+    {% if page_id != 'register' %}
+    <div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+        style="text-align: left;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zarejestruj się</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <form id="form" method=post action="/register/">
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="username" name="username" type="text"
+                                    value="" placeholder="Nazwa użytkownika">
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="email" name="email" type="email"
+                                    value="" placeholder="Adres email">
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="reg_password" name="password"
+                                    type="password" value="" placeholder="Hasło">
+                                <ul id="pass" class="bg-white m-2 p-2 rounded" style="width: 80%; padding: .375rem .75rem; display: none; position: absolute; z-index: 999; -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);">
+                                    <li id="letter" class="text-danger ml-4">
+                                        <small class="form-text">
+                                            <b>Duże</b> i
+                                            <b>małe</b> litery</small>
+                                    </li>
+                                    <li id="number" class="text-danger ml-4">
+                                        <small class="form-text">
+                                            <b>Cyfry</b>
+                                        </small>
+                                    </li>
+                                    <li id="length" class="text-danger ml-4">
+                                        <small class="form-text">
+                                            <b>8</b> znaków</small>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password"
+                                    value="" placeholder="Powtórz hasło">
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked">
+                                <label class="form-check-label" for="accept_tos">
+                                    Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia
+                                    2018r.)
+                                </label>
+                            </div>
+                            <br>
+                            <input id="submit" class="btn btn-primary" disabled="disabled" type=submit value="Zarejestruj się">
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            var form = document.getElementById("form");
+    </div>
+    <script>
+        var form = document.getElementById("form");
 
             var username = document.getElementById("username");
             var email = document.getElementById("email");
@@ -271,38 +271,42 @@
                     document.getElementById("submit").disabled = "disabled";
                 }
             }
-        </script> {%endif%} {% if page_id != 'login' %}
-        <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="text-align: left;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zaloguj się</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container">
-                            <form method=post action="/login/">
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="" placeholder="Login lub email">
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło">
-                                </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                    <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
-                                </div>
-                                <input class="btn btn-primary" type=submit value="Zaloguj się">
-                            </form>
-                        </div>
+        </script>
+    {%endif%} {% if page_id != 'login' %}
+    <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+        style="text-align: left;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zaloguj się</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <form method=post action="/login/">
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="username" name="username" type="text"
+                                    value="" placeholder="Login lub email">
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="password" name="password" type="password"
+                                    value="" placeholder="Hasło">
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
+                            </div>
+                            <input class="btn btn-primary" type=submit value="Zaloguj się">
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-        {%endif%}
-        
-        </body>
-        
-        </html>
+    </div>
+    {%endif%}
+
+</body>
+
+</html>
