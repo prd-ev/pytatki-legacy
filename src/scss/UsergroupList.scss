@@ -1,13 +1,11 @@
 @import "_variables";
 
 .sidebar {
-    position: fixed;
-    height: 100vh;
-    width: 150px;
-    vertical-align: top;
+    grid-column: 1;
+    grid-row: 2;
 
     p {
-        margin-left: 10px;
+        margin-left: 20px;
     }
 
     ul {

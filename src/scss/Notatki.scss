@@ -55,22 +55,27 @@
 }
 
 .mainContent {
-    margin-left: 150px;
+    grid-column: 2;
+    grid-row: 1 / span 2;
 }
 
-.actionBar>div {
-    display: inline-block;
+.actionBar {
+    margin-top: 20px;
+    &>div {
+        display: inline-block;
 
-    button {
-        margin-right: 15px
+        button {
+            margin-right: 15px
+        }
     }
 }
 
-.back{
+.back {
+    margin-top: 10px;
     font-size: 30px;
     position: absolute;
 }
 
-.fetchedData{
-    padding-top: 45px; 
+.fetchedData {
+    padding-top: 45px;
 }

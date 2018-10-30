@@ -271,7 +271,7 @@ class Notatki extends React.Component {
 
   render() {
     return (
-      <div>
+      <React.Fragment>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         <div className={ComponentStyle.mainContent}>
           <div className={ComponentStyle.actionBar} key="actionBar">
@@ -295,8 +295,8 @@ class Notatki extends React.Component {
             {this.packContent()}
           </div>
         </div>
-      </div>
-    );
+      </React.Fragment>
+      );
   };
 }
 
