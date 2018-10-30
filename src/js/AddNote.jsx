@@ -18,13 +18,13 @@ const AddNote = (props) => {
               <form id="form" className={ComponentStyle.form} onSubmit={props.uploadNote}>
                 <label htmlFor="noteTitle">Tytuł notatki</label>
                 <br />
-                <input required type="text" name="title" id="noteTitle"></input>
+                <input required type="text" name="title" id="noteTitle" />
                 <br />
                 <label htmlFor="noteFile">Plik notatki</label>
                 <br />
-                <input required id="file" type="file" name="file" id="noteFile"></input>
+                <input required type="file" name="file" id="noteFile" />
                 <br />
-                <input type="submit" value="Dodaj"></input>
+                <input type="submit" value="Dodaj" />
               </form>
             </div>
             <div className="modal-footer">
@@ -34,7 +34,7 @@ const AddNote = (props) => {
         </div>
       </div>
     </div>
-  )
+  );
 };
 
 

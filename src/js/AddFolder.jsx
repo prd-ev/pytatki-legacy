@@ -3,7 +3,7 @@ import ComponentStyle from '../scss/AddContent.scss';
 
 export default class AddFolder extends Component {
   constructor(props) {
-    super(props)
+    super(props);
   }
 
   render() {
@@ -23,7 +23,7 @@ export default class AddFolder extends Component {
                 <form id="addFolderForm" className={ComponentStyle.form} onSubmit={this.props.addFolder}>
                   <label htmlFor="folderTitle">Tytuł folderu</label>
                   <br />
-                  <input required name="title" type="text" id="folderTitle"/>
+                  <input required name="title" type="text" id="folderTitle" />
                   <br />
                   <input type="submit" value="Dodaj" />
                 </form>
@@ -35,6 +35,6 @@ export default class AddFolder extends Component {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }

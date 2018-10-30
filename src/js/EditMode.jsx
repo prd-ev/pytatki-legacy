@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types'
 import ComponentStyle from '../scss/EditMode.scss';
 
 const EditMode = (props) => {
@@ -16,4 +17,9 @@ const EditMode = (props) => {
         </div>
     );
 };
+
+EditMode.propTypes = {
+    changeMode: PropTypes.func
+}
+
 export default EditMode;
