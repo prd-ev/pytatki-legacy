@@ -14,14 +14,12 @@
         list-style: none;
         margin-right: 20px;
 
-        li {
+        button {
             text-transform: uppercase;
             margin: 5px 0;
             padding: 5px;
-            background-color: $primary;
-            border-radius: 5px;
             text-align: center;
-            color: $white;
+            width: 100%;
 
             &:hover {
                 cursor: pointer;

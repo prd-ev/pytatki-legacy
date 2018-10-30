@@ -12,20 +12,18 @@
     background-color: $secondary;
     border-color: $secondary;
     color: $white;
+    box-shadow: 1px 1px 4px 0px $black;
 
 
     &:active,
-    &:visited,
-    &:hover {
+    &:hover,
+    &:focus {
         background-color: $primary;
         border-color: $primary;
         color: $white;
+        box-shadow: 1px 1px 4px 0px $black;
     }
 
-    &:active,
-    &:focus{
-        box-shadow: none !important;
-    }
 }
 
 .navbar-brand {

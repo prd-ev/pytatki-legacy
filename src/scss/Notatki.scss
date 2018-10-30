@@ -17,7 +17,7 @@
     cursor: pointer;
 
     p {
-        margin: 32px 20px 20px 27px;
+        margin: 150px 20px 20px 27px;
         pointer-events: none;
         font-size: 18px;
     }
@@ -36,7 +36,7 @@
     p {
         pointer-events: none;
         font-size: 18px;
-        margin: 55px 15px 15px 15px;
+        margin: 140px 15px 15px 15px;
     }
 }
 
@@ -44,10 +44,12 @@
     position: absolute;
     top: -5px;
     right: 0px;
+    cursor: pointer;
 }
 
 .noteWrapper,
 .folderWrapper {
+    margin-bottom: 50px;
     position: relative;
     display: inline-block;
 }
@@ -62,4 +64,13 @@
     button {
         margin-right: 15px
     }
+}
+
+.back{
+    font-size: 30px;
+    position: absolute;
+}
+
+.fetchedData{
+    padding-top: 45px; 
 }

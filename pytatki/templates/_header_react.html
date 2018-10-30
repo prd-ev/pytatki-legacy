@@ -4,8 +4,7 @@
 <head>
 
     <meta charset=utf-8>
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=300, height=device-height, target-densitydpi=medium-dpi, user-scalable=no" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -18,12 +17,11 @@
         crossorigin="anonymous"></script>
 </head>
 
-<body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}" {%if current_user.is_authenticated and page_id=='homepage'
-    %}" onload="check_hash()" {%endif%}>
+<body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}">
     <nav class="navbar navbar-expand-md mb-2">
         <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
             <span class="align-middle">Pytatki</span>
-            <span class="align-middle badge">alpha</span>
+            <span class="align-middle badge">beta</span>
         </a>
         {% if page_id == 'register' or page_id == 'login' %} {% else %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapse"

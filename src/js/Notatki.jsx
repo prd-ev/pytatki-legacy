@@ -116,7 +116,7 @@ class Notatki extends React.Component {
     for (const folder of this.state.currentPath) {
       path = path + " / " + folder;
     }
-    return <h5>{path}</h5>
+    return <span>{path}</span>
   }
 
   packContent = () => {
@@ -126,19 +126,19 @@ class Notatki extends React.Component {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
-            content.push(<div className={ComponentStyle.noteWrapper}><div className={ComponentStyle.note} key={value.key} onClick={this.openNote} id={value.key}><p>
+            content.push(<div className={ComponentStyle.noteWrapper} key={value.key}><div className={ComponentStyle.note} onClick={this.openNote} id={value.key}><p>
               {value.title}
             </p></div>
               <div className={ComponentStyle.delete} onClick={this.deleteNote}>
-                {this.state.editModeOn ? <i class="fas fa-times"></i> : null}
+                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
               </div>
             </div>);
           } else {
-            content.push(<div className={ComponentStyle.folderWrapper}><div className={ComponentStyle.folder} key={value.key} onClick={this.changeCurrentDirectory} id={value.key}><p>
+            content.push(<div className={ComponentStyle.folderWrapper} key={value.key}><div className={ComponentStyle.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
               {value.title}
             </p></div>
               <div className={ComponentStyle.delete} onClick={this.deleteFolder}>
-                {this.state.editModeOn ? <i class="fas fa-times"></i> : null}
+                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
               </div>
             </div>);
           }
@@ -274,22 +274,26 @@ class Notatki extends React.Component {
       <div>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         <div className={ComponentStyle.mainContent}>
-          <div className={ComponentStyle.actionBar}>
-          {this.state.usergroupChosen ? (
-            <AddNote uploadNote={this.uploadNote}></AddNote>
-          ) : ("")}
-          {this.state.usergroupChosen ? (
-            <AddFolder addFolder={this.addFolder}></AddFolder>
-          ) : ("")}
-          {this.state.usergroupChosen ? (
-            <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-          ) : ("")}
+          <div className={ComponentStyle.actionBar} key="actionBar">
+            {this.state.usergroupChosen ? (
+              <AddNote uploadNote={this.uploadNote}></AddNote>
+            ) : ("")}
+            {this.state.usergroupChosen ? (
+              <AddFolder addFolder={this.addFolder}></AddFolder>
+            ) : ("")}
+            {this.state.usergroupChosen ? (
+              <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
+            ) : ("")}
           </div>
-          {this.state.usergroupChosen ? (
-            <h1 onClick={this.prevFolder}>Cofnij</h1>
+          {this.state.usergroupChosen && this.state.currentDepth ? (
+            <div className={ComponentStyle.back}>
+              <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
+              {this.showCurrentPath()}
+            </div>
           ) : ("")}
-          {this.showCurrentPath()}
-          {this.packContent()}
+          <div className={ComponentStyle.fetchedData} key="fetchedData">
+            {this.packContent()}
+          </div>
         </div>
       </div>
     );
