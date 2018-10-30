@@ -81,3 +81,48 @@ nav {
         }
     }
 }
+
+.landing-content {
+    margin: 33vh auto 0 auto;
+    color: $black;
+    text-transform: uppercase;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    position: relative;
+    
+    .brand {
+        font-size: 60px;
+        letter-spacing: 4px;
+    }
+
+    .badge {
+        position: absolute;
+        border: solid 1px $primary;
+        letter-spacing: 1px;
+        color: $primary;
+        vertical-align: top;
+        font-size: 15px;
+    }
+
+    .motivation {
+        font-size: 16px;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+    }
+
+    .empty-button {
+        border: solid 3px $primary;
+        border-radius: 4px;
+        letter-spacing: 1px;
+        font-size: 24px;
+        color: $primary;
+        padding: 3px 55px;
+
+        &:hover {
+            text-decoration: none;
+            background-color: $primary;
+            border-color: $primary;
+            color: $white;
+        }
+    }
+}
