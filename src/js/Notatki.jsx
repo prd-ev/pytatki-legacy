@@ -112,9 +112,9 @@ class Notatki extends React.Component {
 
   showCurrentPath = () => {
     //Show current path from state
-    let path = "";
+    let path = " ";
     for (const folder of this.state.currentPath) {
-      path = path + " / " + folder;
+      path = path + "/" + folder;
     }
     return <span>{path}</span>
   }

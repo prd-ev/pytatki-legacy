@@ -20,12 +20,12 @@ nav {
     grid-column: 2;
 }
 
-.navbar-nav{
+.navbar-nav {
     margin-left: 20px;
-}
 
-.nav-link {
-    color: $black !important;
+    .nav-link {
+        color: $black !important;
+    }
 }
 
 .btn {
@@ -38,8 +38,8 @@ nav {
     &:active,
     &:hover,
     &:focus {
-        background-color: $secondary;
-        border-color: $secondary;
+        background-color: $primary_hover;
+        border-color: $primary_hover;
         color: $white;
         box-shadow: 1px 1px 4px 0 $black;
     }
@@ -62,5 +62,22 @@ nav {
         vertical-align: top;
         font-size: 8px;
     }
+}
 
+.nav-pills {
+    .nav-link {
+        color: $secondary;
+
+        &:hover {
+            color: $secondary_hover
+        }
+    }
+
+    .nav-link.active {
+        background-color: $secondary !important;
+
+        &:hover {
+            color: $white;
+        }
+    }
 }
