@@ -28,9 +28,11 @@
 
 .navbar-brand {
     color: $black;
-
+    &:hover{
+        color: $black;
+    }
     .badge {
-        border: solid 1px $black;
+        border: solid 1px red;
     }
 
 }
