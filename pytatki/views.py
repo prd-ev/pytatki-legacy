@@ -1,8 +1,6 @@
 """Widoki aplikacji"""
-import gc
 import json
 import os
-from datetime import datetime
 
 from flask import (flash, g, redirect, render_template, request, send_file,
                    jsonify)
@@ -174,6 +172,7 @@ def homepage():
 @APP.route('/app/')
 def app_view():
     return render_template('react.html')
+
 
 @APP.route('/about/')
 def about():
