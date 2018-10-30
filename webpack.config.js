@@ -42,5 +42,5 @@ module.exports = (env, argv) => {
         }
       ]
     },
-  }
+  };
 };

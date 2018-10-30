@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import ComponentStyle from '../scss/AddContent.scss'
+import React, { Component } from 'react';
+import ComponentStyle from '../scss/AddContent.scss';
 
 export default class AddFolder extends Component {
   constructor(props) {

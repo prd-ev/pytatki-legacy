@@ -1,5 +1,5 @@
 import React from "react";
-import ComponentStyle from '../scss/AddContent.scss'
+import ComponentStyle from '../scss/AddContent.scss';
 
 const AddNote = (props) => {
   return (
