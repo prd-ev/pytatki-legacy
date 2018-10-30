@@ -3,8 +3,10 @@ import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx'
 import NotegroupList from './UsergroupList.jsx'
+import config from '../../config.json'
+import ComponentStyle from '../scss/Notatki.scss'
 
-const siteUrl = "http://127.0.0.1:5000";
+const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -15,6 +17,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
+      usergroupChosen: false,
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -113,33 +116,37 @@ class Notatki extends React.Component {
     for (const folder of this.state.currentPath) {
       path = path + " / " + folder;
     }
-    return <h5>{path}</h5>
+    return <span>{path}</span>
   }
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
-    if (this.state.data[this.state.currentDepth]) {
-      var content = [];
-      for (const value of this.state.data[this.state.currentDepth]) {
-        if (value.is_note) {
-          content.push(<div key={value.key}><h1 onClick={this.openNote} id={value.key} >
-            {"Notatka " + value.title}
-          </h1>
-            <span onClick={this.deleteNote}>
-              {this.state.editModeOn ? " x" : null}
-            </span>
-          </div>);
-        } else {
-          content.push(<div key={value.key}><h1 onClick={this.changeCurrentDirectory} id={value.key} >
-            {value.title}
-          </h1>
-            <span onClick={this.deleteFolder}>
-              {this.state.editModeOn ? " x " : null}
-            </span>
-          </div>);
+    if (this.state.usergroupChosen) {
+      if (this.state.data[this.state.currentDepth]) {
+        var content = [];
+        for (const value of this.state.data[this.state.currentDepth]) {
+          if (value.is_note) {
+            content.push(<div className={ComponentStyle.noteWrapper} key={value.key}><div className={ComponentStyle.note} onClick={this.openNote} id={value.key}><p>
+              {value.title}
+            </p></div>
+              <div className={ComponentStyle.delete} onClick={this.deleteNote}>
+                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
+              </div>
+            </div>);
+          } else {
+            content.push(<div className={ComponentStyle.folderWrapper} key={value.key}><div className={ComponentStyle.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
+              {value.title}
+            </p></div>
+              <div className={ComponentStyle.delete} onClick={this.deleteFolder}>
+                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
+              </div>
+            </div>);
+          }
         }
+        return content;
       }
-      return content;
+    } else {
+      return <p className={ComponentStyle.no_group_chosen}>Wybierz grupę aby kontynuować</p>
     }
     return null;
   };
@@ -157,13 +164,15 @@ class Notatki extends React.Component {
       method: 'POST',
       body: formData
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
     this.updateContent();
+    e.target.querySelector("input").value = null;
+    e.target.querySelector("#file").value = null;
   }
 
   addFolder = (e) => {
@@ -176,13 +185,14 @@ class Notatki extends React.Component {
       method: 'POST',
       body: formData
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
     this.updateContent();
+    e.target.querySelector("input").value = null;
   }
 
   changeMode = (e) => {
@@ -196,9 +206,9 @@ class Notatki extends React.Component {
     let noteId = e.target.previousSibling.id.slice(4);
     fetch(siteUrl + '/admin/delete/note/' + noteId, {
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
@@ -209,9 +219,9 @@ class Notatki extends React.Component {
     let folderId = e.target.previousSibling.id;
     fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
     }).then(
-      response => response.text() // if the response is a JSON object
+      response => response.json() // if the response is a JSON object
     ).then(
-      success => console.log(success) // Handle the success response object
+      success => alert(success.data) // Handle the success response object
     ).catch(
       error => console.log(error) // Handle the error response object
     );
@@ -254,22 +264,39 @@ class Notatki extends React.Component {
     this.setState({
       currentDepth: 0,
       currentDirId: [],
-      currentPath: []
+      currentPath: [],
+      usergroupChosen: true
     })
   }
 
   render() {
     return (
-      <div>
-        <NotegroupList updateUsergroup={this.updateCurrentUsergroup}></NotegroupList>
-        <AddNote uploadNote={this.uploadNote}></AddNote>
-        <AddFolder addFolder={this.addFolder}></AddFolder>
-        <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-        <h1 onClick={this.prevFolder}>Cofnij</h1>
-        {this.showCurrentPath()}
-        {this.packContent()}
-      </div>
-    );
+      <React.Fragment>
+        <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
+        <div className={ComponentStyle.mainContent}>
+          <div className={ComponentStyle.actionBar} key="actionBar">
+            {this.state.usergroupChosen ? (
+              <AddNote uploadNote={this.uploadNote}></AddNote>
+            ) : ("")}
+            {this.state.usergroupChosen ? (
+              <AddFolder addFolder={this.addFolder}></AddFolder>
+            ) : ("")}
+            {this.state.usergroupChosen ? (
+              <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
+            ) : ("")}
+          </div>
+          {this.state.usergroupChosen && this.state.currentDepth ? (
+            <div className={ComponentStyle.back}>
+              <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
+              {this.showCurrentPath()}
+            </div>
+          ) : ("")}
+          <div className={ComponentStyle.fetchedData} key="fetchedData">
+            {this.packContent()}
+          </div>
+        </div>
+      </React.Fragment>
+      );
   };
 }
 

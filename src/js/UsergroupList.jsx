@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import ComponentStyle from '../scss/UsergroupList.scss'
 
 export default class UsergroupList extends Component {
   constructor(props) {
@@ -8,13 +9,18 @@ export default class UsergroupList extends Component {
     }
     this.getUsergroups();
   }
-  
+
   getUsergroups = () => {
-    const siteUrl = "http://127.0.0.1:5000"
+    const siteUrl = this.props.siteUrl;
     const that = this;
     return fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
-      .then(res => res.data.getToken)
+      .then(res => {
+        if (/\d/.test(res.data.getToken)) {
+          return res.data.getToken
+        }
+        alert(res.data.getToken);
+      })
       .then(token => fetch(siteUrl + '/api?query={getUsergroups(access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getUsergroups))
@@ -33,7 +39,7 @@ export default class UsergroupList extends Component {
       .then(plainGroups => {
         let groups = []
         for (const group of plainGroups) {
-          groups.push(<h1 onClick={this.props.updateUsergroup} key={group.key} id={group.key}>{group.name}</h1>);
+          groups.push(<li key={group.key}><button className="btn" onClick={this.props.updateUsergroup} id={group.key}>{group.name}</button></li>);
         }
         that.setState({
           usergroups: groups
@@ -44,9 +50,11 @@ export default class UsergroupList extends Component {
 
   render() {
     return (
-      <div>
-        UsergroupList
-      {this.state.usergroups}
+      <div className={ComponentStyle.sidebar}>
+        <p>Grupy</p>
+        <ul>
+          {this.state.usergroups}
+        </ul>
       </div>
     )
   }

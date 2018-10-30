@@ -1,0 +1,81 @@
+@import "_variables";
+
+.no_group_chosen {
+    font-size: 24px;
+    padding-top: 100px;
+    text-align: center;
+}
+
+.note {
+    background-image: url('/static/images/note.svg');
+    background-size: cover;
+    display: inline-block;
+    height: 150px;
+    width: 150px;
+    border-radius: 10px;
+    vertical-align: top;
+    cursor: pointer;
+
+    p {
+        margin: 150px 20px 20px 27px;
+        pointer-events: none;
+        font-size: 18px;
+    }
+}
+
+.folder {
+    background-image: url('/static/images/folder.png');
+    background-size: cover;
+    display: inline-block;
+    width: 150px;
+    height: 130px;
+    margin: 10px;
+    vertical-align: top;
+    cursor: pointer;
+
+    p {
+        pointer-events: none;
+        font-size: 18px;
+        margin: 140px 15px 15px 15px;
+    }
+}
+
+.delete {
+    position: absolute;
+    top: -5px;
+    right: 0px;
+    cursor: pointer;
+}
+
+.noteWrapper,
+.folderWrapper {
+    margin-bottom: 50px;
+    position: relative;
+    display: inline-block;
+}
+
+.mainContent {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+.actionBar {
+    margin-top: 20px;
+    &>div {
+        display: inline-block;
+
+        button {
+            margin-right: 15px
+        }
+    }
+}
+
+.back {
+    margin-top: 10px;
+    font-size: 30px;
+    position: absolute;
+}
+
+.fetchedData {
+    padding-top: 45px;
+}

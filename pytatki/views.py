@@ -152,10 +152,12 @@ def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user
     note = con.fetchone()
     return note
 
+
 def get_usergroups_of_user(iduser):
     """Get list of usergroups"""
     con, conn = connection()
-    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s", escape_string(str(iduser)))
+    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s",
+                escape_string(str(iduser)))
     usergroups = con.fetchall()
     con.close()
     conn.close()
@@ -168,6 +170,10 @@ def homepage():
         return redirect('/app/')
     return render_template('landing_page.html')
 
+
+@APP.route('/app/')
+def app_view():
+    return render_template('react.html')
 
 @APP.route('/about/')
 def about():
@@ -190,8 +196,9 @@ def admin():
 @login_manager
 def delete_user(identifier):
     """Delete user"""
-    #TODO: delete user
+    # TODO: delete user
     return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
+
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
@@ -206,6 +213,7 @@ def delete_notegroup(identifier):
     con.close()
     conn.close()
     return jsonify({'data': 'notegroup not empty'})
+
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
@@ -360,8 +368,8 @@ def admin_add_post():
         con, conn = connection()
         con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
                     (escape_string(request.form['title']),
-                    escape_string(request.form['class']),
-                    escape_string(request.form['parent_id']))
+                     escape_string(request.form['class']),
+                     escape_string(request.form['parent_id']))
                     )
         if con.fetchone():
             con.close()
@@ -429,11 +437,6 @@ def download(identifier):
             return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
-
-
-@APP.route('/notatki/')
-def react():
-    return render_template('index.html')
 
 
 @APP.route('/graphql/')
