@@ -130,7 +130,7 @@ class Notatki extends React.Component {
               {value.title}
             </p></div>
               <div className={ComponentStyle.delete} onClick={this.deleteNote}>
-                {this.state.editModeOn ? "X" : null}
+                {this.state.editModeOn ? <i class="fas fa-times"></i> : null}
               </div>
             </div>);
           } else {
@@ -138,7 +138,7 @@ class Notatki extends React.Component {
               {value.title}
             </p></div>
               <div className={ComponentStyle.delete} onClick={this.deleteFolder}>
-                {this.state.editModeOn ? "X" : null}
+                {this.state.editModeOn ? <i class="fas fa-times"></i> : null}
               </div>
             </div>);
           }

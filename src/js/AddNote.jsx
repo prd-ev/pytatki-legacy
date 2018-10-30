@@ -4,7 +4,7 @@ import ComponentStyle from '../scss/AddContent.scss'
 const AddNote = (props) => {
   return (
     <div>
-      <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#addNote">Dodaj notatkę</button>
+      <button type="button" className="btn" data-toggle="modal" data-target="#addNote">Dodaj notatkę</button>
       <div className="modal" tabIndex="-1" role="dialog" id="addNote">
         <div className="modal-dialog" role="document">
           <div className="modal-content">

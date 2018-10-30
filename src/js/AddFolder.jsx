@@ -9,7 +9,7 @@ export default class AddFolder extends Component {
   render() {
     return (
       <div>
-        <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#addFolder">Dodaj folder</button>
+        <button type="button" className="btn" data-toggle="modal" data-target="#addFolder">Dodaj folder</button>
         <div className="modal" tabIndex="-1" role="dialog" id="addFolder">
           <div className="modal-dialog" role="document">
             <div className="modal-content">

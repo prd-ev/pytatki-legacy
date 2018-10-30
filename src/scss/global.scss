@@ -8,18 +8,23 @@
     color: $black !important;
 }
 
-.btn-primary {
+.btn {
     background-color: $secondary;
     border-color: $secondary;
+    color: $white;
 
+
+    &:active,
+    &:visited,
     &:hover {
         background-color: $primary;
         border-color: $primary;
+        color: $white;
     }
 
-    &:active:hover {
-        background-color: $primary;
-        border-color: $primary;
+    &:active,
+    &:focus{
+        box-shadow: none !important;
     }
 }
 
