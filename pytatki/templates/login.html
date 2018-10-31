@@ -1,37 +1,84 @@
-{% extends "_base.html" %}
+<!doctype html>
+<html lang='pl'>
 
-{% set page_id = 'login' %}
+<head>
 
-{% block content %}
-  <div class="row login-row">
-    <div class="col-lg-4">
+    <meta charset=utf-8>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+        crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="mb-2">
+        <a class="navbar-brand" href="/" style="height: 45px">
+            <span class="align-middle">Pytatki</span>
+            <span class="badge">beta</span>
+        </a>
+    </nav>
+    <div>
+        <div id="messages">
+            {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category,
+            message in
+            messages %}
+            <div data-alert class="alert alert-{{category}} alert-dismissible show">
+                {{ message|safe }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %} {% endif %} {% endwith %}
+        </div>
     </div>
-    <div class="col-lg-4 bg-white rounded m-2" style="padding:15px;">
-      <h3>Logowanie</h3>
-		<form method=post action="{% if request.args.get('next') %}{{request.path + "?next=" + request.args.get('next')}}{%else%}/login/{%endif%}">
-            <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{%elif request.args.get('username')%}{{request.args.get('username')}}{%else%}{%endif%}" {%if not request.args.get('username')%}autofocus{%endif%} placeholder="Login">
+    <div class="row login-row">
+        <div class="col-lg-4">
+        </div>
+        <div class="col-lg-4 bg-white rounded m-2" style="padding:15px;">
+            <h3>Logowanie</h3>
+            <form method=post action="{% if request.args.get('next') %}{{request.path + " ?next=" + request.args.get('next')}}{%else%}/login/{%endif%}">
+                <div class="form-group">
+                    <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{%elif request.args.get('username')%}{{request.args.get('username')}}{%else%}{%endif%}"
+                        {%if not request.args.get( 'username' )%}autofocus{%endif%} placeholder="Login">
+                </div>
+                <div class="form-group">
+                    <input autocapitalize="none" class="form-control" id="password" name="password" type="password"
+                        value="" placeholder="Hasło" {%if request.args.get( 'username' )%}autofocus{%endif%}> {% if
+                    wrong %}
+                    <small class="form-text text-danger">
+                        Niepoprawny login lub hasło!
+                    </small>
+                    {% endif %}
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                    <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
+                </div>
+                <input class="btn btn-primary" type=submit value="Zaloguj się">
+            </form>
+            {% if error %}
+            <p class="error">
+                <strong>Error:</strong>{{error}}</p>
+            {% endif %}
+            <div>
+                <p>Nie masz konta?
+                    <a href="{{url_for('register_get', next=request.args.get('next'))}}" style="text-decoration: none">Zarejestruj
+                        się</a>
+                </p>
             </div>
-            <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło" {%if request.args.get('username')%}autofocus{%endif%}>
-                {% if wrong %}
-                <small class="form-text text-danger">
-                    Niepoprawny login lub hasło!
-                </small>
-                {% endif %}
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
-            </div>
-            <input class="btn btn-primary" type=submit value="Zaloguj się">
-		</form>
-		{% if error %}
-			<p class="error"><strong>Error:</strong>{{error}}</p>
-		{% endif %}
-	</div>
-    <div class="col-lg-4">
+        </div>
+        <div class="col-lg-4">
+        </div>
     </div>
-  </div>
-<center><p>Nie masz konta? <a href="{{url_for('register_get', next=request.args.get('next'))}}" style="text-decoration: none">Zarejestruj się</a></p></center>
-{% endblock %}
+
+</body>
+
+</html>

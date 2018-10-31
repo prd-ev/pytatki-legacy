@@ -1,11 +1,14 @@
-{% extends "_base_react.html" %}
+{% extends "_header_react.html" %}
 
 {% block content %}
 
-<body>
-  <div id="reactEntry"></div>
-
-  <!-- Attach React components -->
-  <script type="text/javascript" src="{{ url_for('static', filename='bundle.js') }}"></script>
-</body>
+<div id="reactEntry"></div>
+</div>
+<footer>
+  <a class="btn btn-danger btn-block" href="https://gitreports.com/issue/butterfly-pn/pytatki">
+    Zgłoś błąd!
+  </a>
+</footer>
+<!-- Attach React components -->
+<script type="text/javascript" src="{{ url_for('static', filename='bundle.js') }}"></script>
 {% endblock %}

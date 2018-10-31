@@ -39,7 +39,7 @@ export default class UsergroupList extends Component {
       .then(plainGroups => {
         let groups = []
         for (const group of plainGroups) {
-          groups.push(<li onClick={this.props.updateUsergroup} key={group.key} id={group.key}>{group.name}</li>);
+          groups.push(<li key={group.key}><button className="btn" onClick={this.props.updateUsergroup} id={group.key}>{group.name}</button></li>);
         }
         that.setState({
           usergroups: groups
@@ -51,7 +51,7 @@ export default class UsergroupList extends Component {
   render() {
     return (
       <div className={ComponentStyle.sidebar}>
-        UsergroupList
+        <p>Klasy</p>
         <ul>
           {this.state.usergroups}
         </ul>

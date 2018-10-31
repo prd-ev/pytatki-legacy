@@ -61,7 +61,7 @@ class Notatki extends React.Component {
       .then(success => console.log(success)) // Handle the success response object
       .catch(error => console.log(error)); // Handle the error response object
     this.updateContent();
-  }
+  };
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
@@ -109,11 +109,11 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           siteUrl +
-          "/api?query={getRootId(id_usergroup:" +
-          usergroup +
-          ',access_token:"' +
-          token +
-          '")}'
+            "/api?query={getRootId(id_usergroup:" +
+            usergroup +
+            ',access_token:"' +
+            token +
+            '")}'
         )
           .then(response => response.json())
           .then(myJson => Number(myJson.data.getRootId))
@@ -124,7 +124,7 @@ class Notatki extends React.Component {
             that.updateContent(rootId);
           })
       );
-  }
+  };
 
   getContent = dir_id => {
     return fetch(siteUrl + "/api?query={getToken}")
@@ -133,22 +133,22 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           siteUrl +
-          "/api?query={getContent(id_notegroup:" +
-          dir_id +
-          ',access_token:"' +
-          token +
-          '")}'
+            "/api?query={getContent(id_notegroup:" +
+            dir_id +
+            ',access_token:"' +
+            token +
+            '")}'
         )
       )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
 
       .catch(error => console.log(error));
-  }
+  };
 
   openNote = e => {
     window.open(siteUrl + `/download/${e}`);
-  }
+  };
 
   openNoteClick = e => () => {
     window.open(siteUrl + `/download/${e}`);
@@ -159,14 +159,14 @@ class Notatki extends React.Component {
       note: id,
       infoVisible: true
     });
-  }
+  };
 
   closeInfo = () => {
     this.setState({
       note: null,
       infoVisible: false
     });
-  }
+  };
 
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
@@ -184,11 +184,11 @@ class Notatki extends React.Component {
 
   showCurrentPath = () => {
     //Show current path from state
-    let path = "";
+    let path = " ";
     for (const folder of this.state.currentPath) {
-      path = path + " / " + folder;
+      path = path + "/" + folder;
     }
-    return <h5>{path}</h5>;
+    return <span>{path}</span>;
   };
 
   packContent = () => {
@@ -215,12 +215,14 @@ class Notatki extends React.Component {
                   >
                     <p>{value.title}</p>
                   </div>
-                  <span
+                  <div
                     className={ComponentStyle.delete}
                     onClick={this.deleteNote}
                   >
-                    {this.state.editModeOn ? " x" : null}
-                  </span>
+                    {this.state.editModeOn ? (
+                      <i className="fas fa-times" />
+                    ) : null}
+                  </div>
                 </ContextMenuTrigger>
               </div>
             );
@@ -241,15 +243,17 @@ class Notatki extends React.Component {
                     onClick={this.changeCurrentDirectory}
                     id={value.key}
                   >
-                    <h1 onClick={this.changeCurrentDirectory} id={value.key}>
+                    <p onClick={this.changeCurrentDirectory} id={value.key}>
                       {value.title}
-                    </h1>
-                    <span
-                      className={ComponentStyle.delete}
-                      onClick={this.deleteFolder}
-                    >
-                      {this.state.editModeOn ? " x " : null}
-                    </span>
+                    </p>
+                  </div>
+                  <div
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteFolder}
+                  >
+                    {this.state.editModeOn ? (
+                      <i className="fas fa-times" />
+                    ) : null}
                   </div>
                 </ContextMenuTrigger>
               </div>
@@ -416,7 +420,7 @@ class Notatki extends React.Component {
         data: updated_data
       });
     });
-  }
+  };
 
   updateCurrentUsergroup = e => {
     this.getUsergroupRoot(e.target.id);
@@ -430,37 +434,43 @@ class Notatki extends React.Component {
 
   render() {
     return (
-      <div>
+      <React.Fragment>
         <NotegroupList
           updateUsergroup={this.updateCurrentUsergroup}
           siteUrl={siteUrl}
         />
         <div className={ComponentStyle.mainContent}>
-          {this.state.usergroupChosen ? (
-            <AddNote uploadNote={this.uploadNote} />
-          ) : (
+          <div className={ComponentStyle.actionBar} key="actionBar">
+            {this.state.usergroupChosen ? (
+              <AddNote uploadNote={this.uploadNote} />
+            ) : (
               ""
             )}
-          {this.state.usergroupChosen ? (
-            <AddFolder addFolder={this.addFolder} />
-          ) : (
+            {this.state.usergroupChosen ? (
+              <AddFolder addFolder={this.addFolder} />
+            ) : (
               ""
             )}
-          {this.state.usergroupChosen ? (
-            <EditMode
-              changeMode={this.changeMode}
-              isOn={this.state.editModeOn}
-            />
-          ) : (
+            {this.state.usergroupChosen ? (
+              <EditMode
+                changeMode={this.changeMode}
+                isOn={this.state.editModeOn}
+              />
+            ) : (
               ""
             )}
-          {this.state.usergroupChosen ? (
-            <h1 onClick={this.prevFolder}>Cofnij</h1>
+          </div>
+          {this.state.usergroupChosen && this.state.currentDepth ? (
+            <div className={ComponentStyle.back}>
+              <i onClick={this.prevFolder} className="fas fa-arrow-left" />
+              {this.showCurrentPath()}
+            </div>
           ) : (
-              ""
-            )}
-          {this.showCurrentPath()}
-          {this.packContent()}
+            ""
+          )}
+          <div className={ComponentStyle.fetchedData} key="fetchedData">
+            {this.packContent()}
+          </div>
           <Info
             note={this.state.note}
             visible={this.state.infoVisible}
@@ -469,7 +479,7 @@ class Notatki extends React.Component {
           <ConnectedMenu />
           <ConnectedGroupMenu />
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }
