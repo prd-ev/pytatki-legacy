@@ -44,7 +44,7 @@ class Notatki extends React.Component {
     }
   };
 
-  handleClick = (e, data, target) => {
+  handleClickGroup = (e, data, target) => {
     if (data.action === "Properties") {
       //TODO: Folder properties
       console.log("folder properties");
@@ -228,7 +228,7 @@ class Notatki extends React.Component {
                   id="NOTEGROUP"
                   holdToDisplay={1000}
                   name={value.key}
-                  onItemClick={this.handleGroupClick}
+                  onItemClick={this.handleClickGroup}
                   collect={collect}
                   key={value.key}
                 >

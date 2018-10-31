@@ -146,16 +146,20 @@ class Info extends React.Component {
   }
 
   render() {
-    return (
-      <React.Fragment>
-        <div className={ComponentStyle.info}>
-          <i onClick={() => this.closeInfo()} className="fas fa-times" />
-          {this.renderHeader()}
-          <h3>Latest actions</h3>
-          {this.renderActions()}
-        </div>
-      </React.Fragment>
-    );
+    if (this.props.visible) {
+      return (
+        <React.Fragment>
+          <div className={ComponentStyle.info}>
+            <i onClick={() => this.closeInfo()} className="fas fa-times" />
+            {this.renderHeader()}
+            <h3>Latest actions</h3>
+            {this.renderActions()}
+          </div>
+        </React.Fragment>
+      );
+    } else {
+      return <React.Fragment />;
+    }
   }
 }
 
