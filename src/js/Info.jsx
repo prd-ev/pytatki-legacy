@@ -13,23 +13,26 @@ class Info extends React.Component {
     };
   }
 
-  closeInfo() {
+  closeInfo = () => {
     //Remove data from states
-    this.setState({ noteInfo: null, noteActions: null });
+    this.setState({
+      noteInfo: null,
+      noteActions: null
+    });
     //Run function to remove states of parent
-    this.props.closeInfo();
+    this.props.closeInfoNotatki();
   }
 
   //Fetch from /api/?query={getNoteById} of note id in props an token passed as argument
-  getNote(token) {
+  getNote = token => {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-          "/api/?query={getNoteById(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        "/api/?query={getNoteById(id_note:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
       )
         .then(response => {
           //Convert response to json
@@ -42,15 +45,15 @@ class Info extends React.Component {
   }
 
   //Fetch from /api/?query={getNoteLastActions} of note id in props and token passed as argument
-  getNoteLastActions(token) {
+  getNoteLastActions = token => {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-          "/api/?query={getNoteLastActions(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        "/api/?query={getNoteLastActions(id_note:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
       )
         .then(response => {
           //Convert data to json
@@ -63,7 +66,7 @@ class Info extends React.Component {
   }
 
   //Fetch data of note from api and set to state
-  fetchData() {
+  fetchData = () => {
     if (
       this.state.noteInfo == null &&
       this.state.noteActions == null &&
@@ -106,7 +109,7 @@ class Info extends React.Component {
   };
 
   //Renders header of info component
-  renderHeader() {
+  renderHeader = () => {
     if (this.state.noteInfo != null) {
       return (
         <React.Fragment>
@@ -129,7 +132,7 @@ class Info extends React.Component {
   }
 
   //Render actions
-  renderActions() {
+  renderActions = () => {
     if (this.state.noteActions != null) {
       return this.state.noteActions.map(action => (
         <div key={action.idaction}>

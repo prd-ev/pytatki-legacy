@@ -55,7 +55,7 @@ class Notatki extends React.Component {
     }
   };
 
-  deleteNote_ContextMenu(id) {
+  deleteNote_ContextMenu = id => {
     fetch(siteUrl + "/admin/delete/note/" + id, {})
       .then(response => response.text()) // if the response is a JSON object
       .then(success => console.log(success)) // Handle the success response object
@@ -101,7 +101,7 @@ class Notatki extends React.Component {
     });
   };
 
-  getUsergroupRoot(usergroup) {
+  getUsergroupRoot = usergroup => {
     const that = this;
     fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
@@ -109,11 +109,11 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           siteUrl +
-            "/api?query={getRootId(id_usergroup:" +
-            usergroup +
-            ',access_token:"' +
-            token +
-            '")}'
+          "/api?query={getRootId(id_usergroup:" +
+          usergroup +
+          ',access_token:"' +
+          token +
+          '")}'
         )
           .then(response => response.json())
           .then(myJson => Number(myJson.data.getRootId))
@@ -126,18 +126,18 @@ class Notatki extends React.Component {
       );
   }
 
-  getContent(dir_id) {
+  getContent = dir_id => {
     return fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
           siteUrl +
-            "/api?query={getContent(id_notegroup:" +
-            dir_id +
-            ',access_token:"' +
-            token +
-            '")}'
+          "/api?query={getContent(id_notegroup:" +
+          dir_id +
+          ',access_token:"' +
+          token +
+          '")}'
         )
       )
       .then(response => response.json())
@@ -146,7 +146,7 @@ class Notatki extends React.Component {
       .catch(error => console.log(error));
   }
 
-  openNote(e) {
+  openNote = e => {
     window.open(siteUrl + `/download/${e}`);
   }
 
@@ -154,11 +154,14 @@ class Notatki extends React.Component {
     window.open(siteUrl + `/download/${e}`);
   };
 
-  infoNote(id) {
-    this.setState({ note: id, infoVisible: true });
+  infoNote = id => {
+    this.setState({
+      note: id,
+      infoVisible: true
+    });
   }
 
-  closeInfo() {
+  closeInfo = () => {
     this.setState({
       note: null,
       infoVisible: false
@@ -385,7 +388,7 @@ class Notatki extends React.Component {
     this.updateContent();
   };
 
-  updateContent() {
+  updateContent = () => {
     const that = this;
     this.getContent(
       this.state.currentDirId[this.state.currentDirId.length - 1]
@@ -436,32 +439,32 @@ class Notatki extends React.Component {
           {this.state.usergroupChosen ? (
             <AddNote uploadNote={this.uploadNote} />
           ) : (
-            ""
-          )}
+              ""
+            )}
           {this.state.usergroupChosen ? (
             <AddFolder addFolder={this.addFolder} />
           ) : (
-            ""
-          )}
+              ""
+            )}
           {this.state.usergroupChosen ? (
             <EditMode
               changeMode={this.changeMode}
               isOn={this.state.editModeOn}
             />
           ) : (
-            ""
-          )}
+              ""
+            )}
           {this.state.usergroupChosen ? (
             <h1 onClick={this.prevFolder}>Cofnij</h1>
           ) : (
-            ""
-          )}
+              ""
+            )}
           {this.showCurrentPath()}
           {this.packContent()}
           <Info
             note={this.state.note}
             visible={this.state.infoVisible}
-            closeInfo={this.closeInfo.bind(this)}
+            closeInfoNotatki={this.closeInfo}
           />
           <ConnectedMenu />
           <ConnectedGroupMenu />
