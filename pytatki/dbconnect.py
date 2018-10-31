@@ -1,6 +1,7 @@
 import pymysql
 from pytatki.config import parse_config
 from passlib.hash import sha256_crypt
+import json
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
@@ -53,7 +54,7 @@ def get_note(id_note, id_user):
         note = con.fetchone()
         con.close()
         conn.close()
-        return note
+        return json.dumps(note)
     return False
 
 
@@ -159,9 +160,9 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
             pymysql.escape_string(str(status_id))
         )
     )
-    id = c.lastrowid
-    create_action(conn, "create note {}".format(title), user_id, id)
-    return id
+    idnote = c.lastrowid
+    create_action(conn, "create note {}".format(title), user_id, idnote)
+    return idnote
 
 def remove_user(conn, iduser):
     """Removes user from database"""

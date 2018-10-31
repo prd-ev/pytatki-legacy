@@ -1,12 +1,10 @@
 """Widoki aplikacji"""
-import gc
 import json
 import os
-from datetime import datetime
 
 from flask import (flash, g, redirect, render_template, request, send_file,
-                   session, jsonify)
-from flask_login import current_user, logout_user
+                   jsonify)
+from flask_login import current_user
 from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
@@ -68,7 +66,7 @@ def find_notegroup_children(id_notegroup, id_user):
         usergroups = con.fetchall()
         con.execute(
             "SELECT idnote, value, note_type, creator_login, notegroup_id, notegroup_name, title AS 'name' FROM "
-            "note_view WHERE notegroup_id = %s",
+            "note_view WHERE notegroup_id = %s AND status_id = 1",
             escape_string(str(id_notegroup)))
         notes = con.fetchall()
         con.close()
@@ -152,14 +150,16 @@ def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user
     note = con.fetchone()
     return note
 
+
 def get_usergroups_of_user(iduser):
     """Get list of usergroups"""
     con, conn = connection()
-    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s", escape_string(str(iduser)))
+    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s",
+                escape_string(str(iduser)))
     usergroups = con.fetchall()
     con.close()
     conn.close()
-    return usergroups
+    return json.dumps(usergroups, ensure_ascii=False)
 
 
 @APP.route('/')
@@ -171,12 +171,7 @@ def homepage():
 
 @APP.route('/app/')
 def app_view():
-    if current_user.is_authenticated:
-        content = find_notegroup_children(1, current_user['iduser'])
-        # return jsonify(content)
-        print(content)
-        return render_template("homepage.html", subject=None, topics=None, notes=None, content=content)
-    return redirect('/')
+    return render_template('react.html')
 
 
 @APP.route('/about/')
@@ -200,9 +195,9 @@ def admin():
 @login_manager
 def delete_user(identifier):
     """Delete user"""
-    #TODO: delete user
-    flash("This function is not avaliable in this version: \'{}\'".format(str(__version__)), 'warning')
-    return redirect('/')
+    # TODO: delete user
+    return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
+
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
@@ -218,6 +213,7 @@ def delete_notegroup(identifier):
     conn.close()
     return jsonify({'data': 'notegroup not empty'})
 
+
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_note(identifier):
@@ -228,14 +224,15 @@ def delete_note(identifier):
             conn.begin()
             remove_note(conn, identifier, current_user['iduser'])
             conn.commit()
-            flash('Notatka zostala usunieta!', 'success')
-        else:
-            flash('Nie ma takiej notatki', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
+            con.close()
+            conn.close()
+            return jsonify({'data': 'Notatka zostala usunieta!'})
+        con.close()
+        conn.close()
+        return jsonify({'data': 'Nie ma takiej notatki'})
     con.close()
     conn.close()
-    return redirect(request.args.get('next') if 'next' in request.args else '/')
+    return jsonify({'data': 'Nie mozesz tego zrobic!'})
 
 
 @APP.route("/admin/user-list/")
@@ -319,18 +316,15 @@ def add():
     if request.method == 'POST':
         form = request.form
         if 'file' not in request.files:
-            flash('Error: No file part', 'danger')
-            return redirect(request.url)
+            return jsonify({'data': 'No file part'})
         request_file = request.files['file']
         if request_file.filename == '':
-            flash('Nie wybrano pliku', 'warning')
-            return redirect(request.url)
+            return jsonify({'data': 'Nie wybrano pliku'})
         if request_file:
             if allowed_file(request_file.filename):
                 filename = secure_filename(request_file.filename)
             else:
-                flash("File unsecure")
-                return redirect('/')
+                return jsonify({'data': "File unsecure"})
             print(filename)
             if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
                 if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
@@ -339,11 +333,10 @@ def add():
                 request_file.save(os.path.join(
                     APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
         else:
-            flash('Nieobslugiwane rozszerzenie', 'warning')
-            return redirect(request.url)
+            return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
         con, conn = connection()
         conn.begin()
-        note_id = create_note(
+        create_note(
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
@@ -354,8 +347,7 @@ def add():
         conn.commit()
         con.close()
         conn.close()
-        flash('Notatka zostala dodana!', 'success')
-        return redirect(request.args.get('next') if 'next' in request.args else '/#' + str(form['notegroup_id']))
+        return jsonify({'data': 'Notatka zostala dodana!'})
     else:
         con, conn = connection()
         con.execute(
@@ -375,33 +367,35 @@ def admin_add_post():
         con, conn = connection()
         con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
                     (escape_string(request.form['title']),
-                    escape_string(request.form['class']),
-                    escape_string(request.form['parent_id']))
+                     escape_string(request.form['class']),
+                     escape_string(request.form['parent_id']))
                     )
         if con.fetchone():
-            flash("Dany przedmiot juz istnieje", 'warning')
-        else:
-            group = None
-            if 'parent_id' in request.form:
-                con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                            (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
-                group = con.fetchone()
-            if group or 'parent_id' not in request.form:
-                conn.begin()
-                con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
-                    escape_string(request.form['title']),
-                    escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
-                group_id = con.lastrowid
-                con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
-                            (escape_string(str(group_id)), escape_string(str(request.form['class']))))
-                conn.commit()
-                flash('Dodano przedmiot!', 'success')
-            else:
-                flash("Wystąpił błąd w zapytaniu", 'warning')
+            con.close()
+            conn.close()
+            return jsonify({'data': "Dany przedmiot juz istnieje"})
+        group = None
+        if 'parent_id' in request.form:
+            con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                        (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
+            group = con.fetchone()
+        if group or 'parent_id' not in request.form:
+            conn.begin()
+            con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
+                escape_string(request.form['title']),
+                escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
+            group_id = con.lastrowid
+            con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
+                        (escape_string(str(group_id)), escape_string(str(request.form['class']))))
+            conn.commit()
+            con.close()
+            conn.close()
+            return jsonify({'data': 'Dodano przedmiot!'})
         con.close()
         conn.close()
+        return jsonify({'data': "Wystąpił błąd w zapytaniu"})
     else:
-        flash('Nie mozesz tego zrobic', 'warning')
+        return jsonify({'data': 'Nie mozesz tego zrobic'})
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
@@ -420,8 +414,7 @@ def admin_add_get():
         con.close()
         conn.close()
         return render_template('admin_add.html', subjects=subjects, classes=classes)
-    else:
-        flash("Nie masz uprawnien", 'warning')
+    flash("Nie masz uprawnien", 'warning')
     return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
@@ -443,11 +436,6 @@ def download(identifier):
             return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
-
-
-@APP.route('/notatki/')
-def react():
-    return render_template('index.html')
 
 
 @APP.route('/graphql/')
