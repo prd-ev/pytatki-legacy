@@ -185,7 +185,7 @@ def about():
 @login_manager
 def admin():
     """Admin"""
-    if current_user.is_admin:
+    if current_user.is_admin():
         return render_template('admin.html')
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
@@ -218,7 +218,7 @@ def delete_notegroup(identifier):
 @login_manager
 def delete_note(identifier):
     """Delete note"""
-    if current_user.is_admin:
+    if current_user.is_admin():
         con, conn = connection()
         if note_exists(conn, identifier):
             conn.begin()
@@ -230,8 +230,6 @@ def delete_note(identifier):
         con.close()
         conn.close()
         return jsonify({'data': 'Nie ma takiej notatki'})
-    con.close()
-    conn.close()
     return jsonify({'data': 'Nie mozesz tego zrobic!'})
 
 
@@ -239,7 +237,7 @@ def delete_note(identifier):
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    if current_user.is_admin:
+    if current_user.is_admin():
         con, conn = connection()
         con.execute("SELECT * FROM user")
         users_raw = con.fetchall()
@@ -263,7 +261,7 @@ def give_admin(identifier):
     con.execute("SELECT * FROM user WHERE iduser = %s",
                 escape_string(identifier))
     user = con.fetchone()
-    if current_user.is_admin and user and user['iduser'] != current_user:
+    if current_user.is_admin() and user and user['iduser'] != current_user:
         try:
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
                         (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))
@@ -284,7 +282,7 @@ def take_admin(identifier):
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
         user = con.fetchone()
-        if current_user.is_admin and query:
+        if current_user.is_admin() and query:
             try:
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
                             (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))))
@@ -363,7 +361,7 @@ def add():
 @login_manager
 def admin_add_post():
     """Admin add"""
-    if current_user.is_admin:
+    if current_user.is_admin():
         con, conn = connection()
         con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
                     (escape_string(request.form['title']),
@@ -403,7 +401,7 @@ def admin_add_post():
 @login_manager
 def admin_add_get():
     """Admin add"""
-    if current_user.is_admin:
+    if current_user.is_admin():
         con, conn = connection()
         con.execute("SELECT idnotegroup, folder_name, parent_id FROM notegroup_view WHERE iduser = %s",
                     escape_string(str(current_user['iduser'])))
