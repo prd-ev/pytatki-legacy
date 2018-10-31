@@ -23,7 +23,7 @@ def user_load(user_id):
         gc.collect()
         return user
     except Exception as error:
-        #TODO: exception type
+        # TODO: exception type
         print(error)
         return None
 
@@ -96,11 +96,12 @@ class User(dict):
 
     def is_admin(self):
         con, conn = connection()
-        query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                            (escape_string(self['userid']), escape_string(Config.json()['admin_group_id'])))
+        con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                    (escape_string(str(self['iduser'])), escape_string(Config['IDENTIFIERS']['admingroup_id'])))
+        admin = con.fetchone()
         con.close()
         conn.close()
-        if query:
+        if admin:
             return True
         return False
 
