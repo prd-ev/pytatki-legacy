@@ -1,5 +1,6 @@
 .idea
 __pycache__
+*/__pycache__
 test.db
 records
 files
@@ -10,3 +11,13 @@ venv
 .DS_Store
 src/.DS_Store
 .vscode
+docs/database-schema.mwb.bak
+config/__init__.py
+node_modules
+pytatki/static/bundle.js
+pytatki/static/bundle.js.map
+pytatki/static/style.css
+pytatki/static/style.css.map
+config.ini
+npm-debug.log
+pytatki/files/*

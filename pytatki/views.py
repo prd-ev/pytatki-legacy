@@ -1,51 +1,177 @@
 """Widoki aplikacji"""
+import json
 import os
-import gc
-from datetime import datetime
-from sqlalchemy import func, and_
-from flask import render_template, redirect, request, session, flash, send_file, g
+
+from flask import (flash, g, redirect, render_template, request, send_file,
+                   jsonify)
+from flask_login import current_user
+from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
-from flask_login import logout_user, current_user
-from main import APP, DB
-from config import CONFIG
-from pytatki.models import User, Subject, Topic, Note
-from pytatki.view_manager import ban, login_manager, nocache
 from pytatki import __version__
-
+from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
+                               remove_note, remove_notegroup, create_note,
+                               has_access_to_note)
+from pytatki.main import APP, CONFIG
+from pytatki.models import User
+from pytatki.view_manager import login_manager, nocache
 
 __author__ = 'Patryk Niedzwiedzinski'
 
-ALLOWED_EXTENSIONS = set([
-    'txt',
-    'pdf',
-    'png',
-    'jpg',
-    'jpeg',
-    'gif',
-    'doc',
-    'docx',
-    'ppt',
-    'pptx',
-    'xslx',
-    'xsl',
-    'odt',
-    'rtf',
-    'cpp',
-    ])
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt',
+                      'rtf', 'cpp'}
+
+
+def type_id(type_name):
+    con, conn = connection()
+    con.execute("SELECT idnote_type FROM note_type WHERE name = %s",
+                escape_string(type_name))
+    file_type = con.fetchone()
+    con.close()
+    conn.close()
+    return file_type['idnote_type']
+
+
+def has_access_to_notegroup(id_notegroup, id_user):
+    """Returns true if user has access to notegroup, else false"""
+    con, conn = connection()
+    con.execute("SELECT iduser FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (escape_string(str(id_user)), escape_string(str(id_notegroup))))
+    return_value = con.fetchone()
+    con.close()
+    conn.close()
+    return True if return_value else False
+
+
+def has_access_to_usergroup(id_usergroup, id_user):
+    """Returns true if user has access to usergroup, else false"""
+    con, conn = connection()
+    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+    return_value = con.fetchone()
+    con.close()
+    conn.close()
+    return True if return_value else False
+
+
+def find_notegroup_children(id_notegroup, id_user):
+    """Generate dict with recurent children of usergroup"""
+    if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
+        return "ID must be a valid positive integer"
+    children = []
+    if has_access_to_notegroup(id_notegroup, id_user):
+        con, conn = connection()
+        con.execute("SELECT idnotegroup, folder_name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (
+            escape_string(str(id_user)), escape_string(str(id_notegroup))))
+        usergroups = con.fetchall()
+        con.execute(
+            "SELECT idnote, value, note_type, creator_login, notegroup_id, notegroup_name, title AS 'name' FROM "
+            "note_view WHERE notegroup_id = %s AND status_id = 1",
+            escape_string(str(id_notegroup)))
+        notes = con.fetchall()
+        con.close()
+        conn.close()
+        if usergroups:
+            for usergroup in usergroups:
+                children.append(usergroup)
+        if notes:
+            for note in notes:
+                children.append(note)
+    return json.dumps(children, ensure_ascii=False)
+
+
+def get_root_id(id_usergroup, id_user):
+    """Get if of root directory in usergroup"""
+    if has_access_to_usergroup(id_usergroup, id_user):
+        con, conn = connection()
+        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s AND parent_id = 0",
+                    (escape_string(str(id_user)), escape_string(str(id_usergroup))))
+        root_id = con.fetchone()
+        if not root_id:
+            return "No root folder" + str(id_user)
+        root_id = root_id['idnotegroup']
+        con.close()
+        conn.close()
+        return root_id
+    return "Access denied"
+
+
+def add_tag_to_note(tag, id_note, id_user):
+    """Add tag to note, if tag doesn't exist create new"""
+    if has_access_to_note(id_note, id_user):
+        con, conn = connection()
+        con.execute("SELECT * FROM tag WHERE name = %s", escape_string(tag))
+        tag = con.fetchone()
+        if not tag:
+            conn.begin()
+            con.execute("INSERT INTO tag (name) VALUES (%s)",
+                        escape_string(tag))
+            tag_id = con.lastrowid
+            conn.commit()
+        else:
+            tag_id = tag['idtag']
+        conn.begin()
+        con.execute("INSERT INTO tagging (note_id, tag_id) VALUES (%s, %s)",
+                    (escape_string(str(id_note)), escape_string(str(tag_id))))
+        conn.commit()
+        con.execute("SELECT * FROM note_tags WHERE idnote = %s",
+                    escape_string(str(id_note)))
+        note = con.fetchone()
+        con.close()
+        conn.close()
+        return note
+
+
+def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user=1):
+    """Post a note to database"""
+    if not has_access_to_notegroup(id_notegroup, id_user):
+        return "Access denied"
+    if type_name == "file":
+        return "File type is not supported via GraphQL"
+    con, conn = connection()
+    con.execute("SELECT idnote FROM note WHERE title = %s AND notegroup_id = %s", (
+        escape_string(title), escape_string(str(id_notegroup))))
+    used_name = con.fetchone()
+    if used_name:
+        con.close()
+        conn.close()
+        return "Cannot add note: used title"
+    conn.begin()
+    con.execute("INSERT INTO note (value, title, note_type_id, user_id, notegroup_id) VALUES (%s, %s, %s, %s, %s)", (
+        escape_string(value), escape_string(title), escape_string(
+            str(type_id(type_name))), escape_string(str(id_user)),
+        escape_string(str(id_notegroup))))
+    note_id = con.lastrowid
+    con.execute("INSERT INTO action (content, user_id, note_id) VALUES (\"Create\", %s, %s)", (
+        escape_string(str(id_user)), escape_string(str(note_id))))
+    conn.commit()
+    con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                escape_string(str(note_id)))
+    note = con.fetchone()
+    return note
+
+
+def get_usergroups_of_user(iduser):
+    """Get list of usergroups"""
+    con, conn = connection()
+    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s",
+                escape_string(str(iduser)))
+    usergroups = con.fetchall()
+    con.close()
+    conn.close()
+    return json.dumps(usergroups, ensure_ascii=False)
 
 
 @APP.route('/')
-@ban
 def homepage():
-    """Homepage"""
     if current_user.is_authenticated:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        notes = Note.query.order_by(Note.id.asc()).all()
-        return render_template('homepage.html', subjects=subjects,
-                               topics=topics, notes=notes)
-    return render_template('homepage.html')
+        return redirect('/app/')
+    return render_template('landing_page.html')
+
+
+@APP.route('/app/')
+def app_view():
+    return render_template('react.html')
 
 
 @APP.route('/about/')
@@ -59,8 +185,8 @@ def about():
 @login_manager
 def admin():
     """Admin"""
-    if current_user.admin or current_user.modderator:
-        return render_template('admin.html', admin=admin)
+    if current_user.is_admin:
+        return render_template('admin.html')
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
 
@@ -69,232 +195,112 @@ def admin():
 @login_manager
 def delete_user(identifier):
     """Delete user"""
-    if not User.query.filter_by(id=identifier).first().superuser:
-        if identifier == current_user.id or current_user.admin:
-            user = User.query.filter_by(id=identifier).first()
-            if user:
-                if identifier == current_user.id:
-                    logout_user()
-                    DB.session.delete(user)
-                    DB.session.commit()
-                    gc.collect()
-                    session.clear()
-                    gc.collect()
-                    flash('Twoje konto zostalo usuniete', 'success')
-                else:
-                    DB.session.delete(user)
-                    DB.session.commit()
-                    flash('Uzytkownik zostal usuniety', 'success')
-            else:
-                flash('Nie ma takiego uzytkownika', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    # TODO: delete user
+    return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
+
+
+@APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
+def delete_notegroup(identifier):
+    con, conn = connection()
+    if notegroup_empty(conn, identifier):
+        conn.begin()
+        remove_notegroup(conn, identifier)
+        conn.commit()
+        con.close()
+        conn.close()
+        return jsonify({'data': 'success'})
+    con.close()
+    conn.close()
+    return jsonify({'data': 'notegroup not empty'})
+
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_note(identifier):
     """Delete note"""
-    if current_user.admin or current_user.modderator:
-        note = Note.query.filter_by(id=identifier).first()
-        if note:
-            try:
-                os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
-                DB.session.delete(note)
-                DB.session.commit()
-                flash('Notatka zostala usunieta!', 'success')
-            except Exception as error:
-                flash('Blad: '+str(error), 'danger')
-        else:
-            flash('Nie ma takiej notatki', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    if current_user.is_admin:
+        con, conn = connection()
+        if note_exists(conn, identifier):
+            conn.begin()
+            remove_note(conn, identifier, current_user['iduser'])
+            conn.commit()
+            con.close()
+            conn.close()
+            return jsonify({'data': 'Notatka zostala usunieta!'})
+        con.close()
+        conn.close()
+        return jsonify({'data': 'Nie ma takiej notatki'})
+    con.close()
+    conn.close()
+    return jsonify({'data': 'Nie mozesz tego zrobic!'})
 
-@APP.route('/admin/delete/subject/<int:identifier>/', methods=["GET"])
-@login_manager
-def delete_subject(identifier):
-    """Delete subject"""
-    if current_user.admin or current_user.modderator:
-        subject = Subject.query.filter_by(id=identifier).first()
-        if subject:
-            try:
-                DB.session.delete(subject)
-                for topic in Topic.query.order_by(Topic.id.asc()).all():
-                    if topic.subject_id == identifier:
-                        DB.session.delete(topic)
-                for note in Note.query.order_by(Note.id.asc()).all():
-                    if note.subject_id == identifier:
-                        DB.session.delete(note)
-                DB.session.commit()
-                flash('Przedmiot zostal usuniety!', 'success')
-            except Exception as error:
-                flash('Blad: '+str(error), 'danger')
-        else:
-            flash('Nie ma takiego przedmiotu', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/delete/topic/<int:identifier>/', methods=["GET"])
-@login_manager
-def delete_topic(identifier):
-    """Delete topic"""
-    if current_user.admin or current_user.modderator:
-        topic = Topic.query.filter_by(id=identifier).first()
-        if topic:
-            try:
-                DB.session.delete(topic)
-                for note in Note.query.order_by(Note.id.asc()).all():
-                    if note.topic_id == identifier:
-                        DB.session.delete(note)
-                DB.session.commit()
-                flash('Dzial zostal usuniety!', 'success')
-            except Exception as error:
-                flash('Blad: '+str(error), 'danger')
-        else:
-            flash('Nie ma takiego dzialu', 'warning')
-    else:
-        flash('Nie mozesz tego zrobic!', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
 
 @APP.route("/admin/user-list/")
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    if current_user.admin or current_user.modderator:
-        users = User.query.order_by(User.id.asc()).all()
-        admini = 0
-        for user in users:
-            if user.admin:
-                admini += 1
-        return render_template('user_list.html', users=users, admini=admini)
+    if current_user.is_admin:
+        con, conn = connection()
+        con.execute("SELECT * FROM user")
+        users_raw = con.fetchall()
+        con.close()
+        conn.close()
+        users = []
+        for user_dict in users_raw:
+            user = User()
+            user.update(user_dict)
+            users.append(user)
+        return render_template('user_list.html', users=users)
     flash('Nie mozesz tego zrobic!', 'warning')
     return redirect('/')
 
-@APP.route('/admin/ban/<username>/', methods=["GET"])
-@login_manager
-def ban_user(username):
-    """Ban user"""
-    user = User.query.filter_by(username=username).first()
-    if user:
-        user.ban = True
-        DB.session.commit()
-        flash('Uzytkownik '+user.username+' zostal zbanowany', 'success')
-    else:
-        flash('Nie ma takiego uzytkownika', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/unban/<username>/', methods=["GET"])
-@login_manager
-def unban(username):
-    """Unban user"""
-    user = User.query.filter_by(username=username).first()
-    if user:
-        user.ban = False
-        DB.session.commit()
-        flash('Uzytkownik '+user.username+' zostal odbanowany', 'success')
-    else:
-        flash('Nie ma takiego uzytkownika', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
 
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def give_admin(identifier):
     """Give admin"""
-    if current_user.admin and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != current_user:
+    con, conn = connection()
+    con.execute("SELECT * FROM user WHERE iduser = %s",
+                escape_string(identifier))
+    user = con.fetchone()
+    if current_user.is_admin and user and user['iduser'] != current_user:
         try:
-            User.query.filter_by(id=identifier).first().admin = True
-            DB.session.commit()
+            con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
+                        (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))
+            conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
+                user['login']), 'success')
         except Exception as error:
-            flash("Blad: "+str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+            flash("Error: " + str(error), 'danger')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
-@APP.route('/admin/take-mod/<int:identifier>/', methods=["GET"])
-@login_manager
-def take_mod(identifier):
-    """Take mod"""
-    if current_user.admin and User.query.filter_by(id=identifier).first():
-        try:
-            User.query.filter_by(id=identifier).first().modderator = False
-            DB.session.commit()
-            flash('Odebrano uprawnienia moderatora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        except Exception as error:
-            flash("Blad: " + str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-    flash("Nie mozna tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/give-mod/<int:identifier>/', methods=["GET"])
-@login_manager
-def give_mod(identifier):
-    """Give mod"""
-    if current_user.admin and User.query.filter_by(id=identifier).first() \
-    and User.query.filter_by(id=identifier).first() != current_user:
-        try:
-            User.query.filter_by(id=identifier).first().modderator = True
-            DB.session.commit()
-            flash('Przekazano uprawnienia moderatora uzytkownikowi ' + str(
-                User.query.filter_by(id=identifier).first().username), 'success')
-        except Exception as error:
-            flash("Blad: "+str(error), 'danger')
-    else:
-        flash("Nie mozesz tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
 
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if not User.query.filter_by(id=identifier).first().superuser:
-        if current_user.admin and User.query.filter_by(id=identifier).first():
+    if int(identifier) != int(CONFIG['IDENTIFIERS']['ADMIN_ID']):
+        con, conn = connection()
+        query = con.execute(
+            "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
+        user = con.fetchone()
+        if current_user.is_admin and query:
             try:
-                User.query.filter_by(id=identifier).first().admin = False
-                DB.session.commit()
-                flash('Odebrano uprawnienia administratora uzytkownikowi ' + str(
-                    User.query.filter_by(id=identifier).first().username), 'success')
+                con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                            (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))))
+                conn.commit()
+                flash('Odebrano uprawnienia administratora uzytkownikowi ' +
+                      user['login'], 'success')
             except Exception as error:
-                flash("Blad: " + str(error), 'danger')
+                flash("Error: " + str(error), 'danger')
         else:
             flash("Nie mozesz tego zrobic", 'warning')
+        con.close()
+        conn.close()
     else:
         flash("Nie mozesz tego zrobic", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
+
 
 def allowed_file(filename):
     """Check if file has valid name and allowed extension"""
@@ -302,186 +308,114 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS \
            and not filename == ''
 
+
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
 def add():
     """Add new note"""
     if request.method == 'POST':
-        try:
-            form = request.form
-            if 'file' not in request.files:
-                flash('Blad: No file part', 'danger')
-                return redirect(request.url)
-            request_file = request.files['file']
-            if request_file.filename == '':
-                flash('Nie wybrano pliku', 'warning')
-                return redirect(request.url)
-            if request_file:
-                if allowed_file(request_file.filename):
-                    filename = secure_filename(request_file.filename)
-                    if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'],
-                                                       form['subject'], form['topic'])):
-                        os.makedirs(os.path.join(APP.config['UPLOAD_FOLDER'], form['subject'],
-                                                 form['topic']))
-                        request_file.save(os.path.join(APP.config['UPLOAD_FOLDER'],
-                                                       form['subject'], form['topic'], filename))
-                else:
-                    flash('Nieobslugiwane rozszerzenie', 'warning')
-                    return redirect(request.url)
-            note = Note()
-            note.name = form['title']
-            note.author_id = current_user.id
-            note.subject_id = form['subject']
-            note.topic_id = form['topic']
-            note.file = os.path.join(form['subject'], form['topic'], filename)
-            note.date = datetime.now()
-            DB.session.add(note)
-            DB.session.commit()
-            flash('Notatka zostala dodana!', 'success')
-            if request.args.get('next'):
-                if request.args.get('next') == '/':
-                    pass
-                else:
-                    return redirect(request.args.get('next'))
-            return redirect('/#'+str(form['subject'])+'#'+str(form['topic']))
-        except Exception as error:
-            flash("Blad: " + str(error), 'danger')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
+        form = request.form
+        if 'file' not in request.files:
+            return jsonify({'data': 'No file part'})
+        request_file = request.files['file']
+        if request_file.filename == '':
+            return jsonify({'data': 'Nie wybrano pliku'})
+        if request_file:
+            if allowed_file(request_file.filename):
+                filename = secure_filename(request_file.filename)
+            else:
+                return jsonify({'data': "File unsecure"})
+            print(filename)
+            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
+                if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
+                    os.makedirs(os.path.join(
+                        APP.config['UPLOAD_FOLDER'], form['notegroup_id']))
+                request_file.save(os.path.join(
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
+        else:
+            return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
+        con, conn = connection()
+        conn.begin()
+        create_note(
+            conn,
+            str(os.path.join(form['notegroup_id'], filename)),
+            form['title'],
+            CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'],
+            current_user['iduser'],
+            form['notegroup_id'],
+            CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID'])
+        conn.commit()
+        con.close()
+        conn.close()
+        return jsonify({'data': 'Notatka zostala dodana!'})
     else:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        return render_template('add.html', subjects=subjects, topics=topics)
+        con, conn = connection()
+        con.execute(
+            "SELECT * FROM notegroup_view WHERE iduser = %s",
+            escape_string(str(current_user['iduser'])))
+        topics = con.fetchall()
+        con.close()
+        conn.close()
+        return render_template('add.html', topics=topics)
+
 
 @APP.route('/admin/add/', methods=["POST"])
 @login_manager
 def admin_add_post():
     """Admin add"""
-    if current_user.admin or current_user.modderator:
-        if request.form['type'] == 'subject':
-            try:
-                if Subject.query.filter(func.lower(Subject.name) == func.lower(
-                        request.form['title'])).first():
-                    flash("Dany przedmiot juz istnieje", 'warning')
-                else:
-                    subject = Subject()
-                    subject.name = request.form['title']
-                    DB.session.add(subject)
-                    DB.session.commit()
-                    flash('Dodano przedmiot!', 'success')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
-        elif request.form['type'] == 'topic':
-            try:
-                if Topic.query.filter(and_(func.lower(Topic.name) == func.lower(
-                        request.form['title']), Topic.subject_id == request.form['subject'])
-                                     ).first():
-                    flash("Dany dzial juz istnieje", 'warning')
-                else:
-                    topic = Topic()
-                    topic.name = request.form['title']
-                    topic.subject_id = request.form['subject']
-                    DB.session.add(topic)
-                    DB.session.commit()
-                    flash('Dodano dzial!', 'success')
-            except Exception as e:
-                flash('Blad: '+str(e), 'danger')
+    if current_user.is_admin:
+        con, conn = connection()
+        con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
+                    (escape_string(request.form['title']),
+                     escape_string(request.form['class']),
+                     escape_string(request.form['parent_id']))
+                    )
+        if con.fetchone():
+            con.close()
+            conn.close()
+            return jsonify({'data': "Dany przedmiot juz istnieje"})
+        group = None
+        if 'parent_id' in request.form:
+            con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                        (escape_string(str(current_user['iduser'])), escape_string(request.form['parent_id'])))
+            group = con.fetchone()
+        if group or 'parent_id' not in request.form:
+            conn.begin()
+            con.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)", (
+                escape_string(request.form['title']),
+                escape_string(request.form['parent_id'] if 'parent_id' in request.form else str(0))))
+            group_id = con.lastrowid
+            con.execute("INSERT INTO usergroup_has_notegroup (notegroup_id, usergroup_id) VALUES (%s, %s)",
+                        (escape_string(str(group_id)), escape_string(str(request.form['class']))))
+            conn.commit()
+            con.close()
+            conn.close()
+            return jsonify({'data': 'Dodano przedmiot!'})
+        con.close()
+        conn.close()
+        return jsonify({'data': "Wystąpił błąd w zapytaniu"})
     else:
-        flash('Nie mozesz tego zrobic', 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
+        return jsonify({'data': 'Nie mozesz tego zrobic'})
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
+
 
 @APP.route('/admin/add/', methods=["GET"])
 @login_manager
 def admin_add_get():
     """Admin add"""
-    if current_user.admin or current_user.modderator:
-        subjects = Subject.query.order_by(Subject.id.asc()).all()
-        topics = Topic.query.order_by(Topic.id.asc()).all()
-        return render_template('admin_add.html', subjects=subjects, topics=topics)
-    else:
-        flash("Nie masz uprawnien", 'warning')
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect('/')
-
-@APP.route('/admin/notes/')
-@login_manager
-def notes():
-    """List of notes"""
-    notes = Note.query.order_by(Note.id.asc()).all()
-    return render_template('notes.html', notes=notes)
-
-@APP.route('/admin/subjects/')
-@login_manager
-def subjects():
-    """List of subjects"""
-    subjects = Subject.query.order_by(Subject.id.asc()).all()
-    topics = Topic.query.order_by(Topic.id.asc()).all()
-    return render_template('subjects.html', subjects=subjects, topics=topics)
-
-
-@APP.route('/admin/subject/<identifier>/edit/', methods=['GET', 'POST'])
-def edit_subject(identifier):
-    """Edit subject"""
-    if request.method == 'POST':
-        form = request.form
-        Subject.query.filter_by(id=identifier).first().name = form['name']
-        DB.session.commit()
-        if request.args.get('next'):
-            return redirect(request.args.get('next'))
-        return redirect(request.path)
-    subject = Subject.query.filter_by(id=identifier).first()
-    return render_template('edit.html', subject=subject)
-
-
-@APP.route('/admin/topic/<identifier>/edit/', methods=['POST'])
-def edit_topic_post(identifier):
-    """Edit topic"""
-    Topic.query.filter_by(id=identifier).first().name = request.form['name']
-    Topic.query.filter_by(id=identifier).first().subject_id = request.form['subject']
-    DB.session.commit()
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect(request.path)
-
-
-@APP.route('/admin/topic/<identifier>/edit/', methods=['GET'])
-def edit_topic_get(identifier):
-    """Edit topic"""
-    topic = Topic.query.filter_by(id=identifier).first()
-    subjects = Subject.query.order_by(Subject.id.asc()).all()
-    return render_template('edit_t.html', topic=topic, subjects=subjects)
-
-@APP.route('/admin/note/<identifier>/edit/', methods=['POST'])
-def edit_note_post(identifier):
-    """Edit note"""
-    Note.query.filter_by(id=identifier).first().name = request.form['name']
-    Note.query.filter_by(id=identifier).first().subject_id = request.form['subject']
-    Note.query.filter_by(id=identifier).first().topic_id = request.form['topic']
-    if 'file' in request.files:
-        if allowed_file(request.files['file'].filename):
-            filename = secure_filename(request.files['file'].filename)
-            os.remove(os.path.join(APP.config['UPLOAD_FOLDER'], Note.query.filter_by(
-                id=identifier).first().file))
-            request.files['file'].save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-            Note.query.filter_by(id=identifier).first().file = str(filename)
-    flash('Zapisano zmiany!', 'success')
-    DB.session.commit()
-    if request.args.get('next'):
-        return redirect(request.args.get('next'))
-    return redirect(request.path)
-
-
-@APP.route('/admin/note/<identifier>/edit/', methods=['GET'])
-def edit_note_get(identifier):
-    """Edit note"""
-    note = Note.query.filter_by(id=identifier).first()
-    topics = Topic.query.order_by(Topic.id.asc()).all()
-    subjects = Subject.query.order_by(Subject.id.asc()).all()
-    return render_template('edit_n.html', note=note, topics=topics, subjects=subjects)
+    if current_user.is_admin:
+        con, conn = connection()
+        con.execute("SELECT idnotegroup, folder_name, parent_id FROM notegroup_view WHERE iduser = %s",
+                    escape_string(str(current_user['iduser'])))
+        subjects = con.fetchall()
+        con.execute("SELECT idusergroup, name FROM usergroup_membership WHERE iduser = %s ",
+                    escape_string(str(current_user['iduser'])))
+        classes = con.fetchall()
+        con.close()
+        conn.close()
+        return render_template('admin_add.html', subjects=subjects, classes=classes)
+    flash("Nie masz uprawnien", 'warning')
+    return redirect(request.args.get('next') if 'next' in request.args else '/')
 
 
 @APP.route('/download/<identifier>/')
@@ -490,9 +424,23 @@ def edit_note_get(identifier):
 def download(identifier):
     """Download file"""
     if current_user.is_authenticated:
-        note = Note.query.filter_by(id=identifier).first()
-        return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note.file))
+        if has_access_to_note(identifier, current_user['iduser']):
+            con, conn = connection()
+            con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                        escape_string(identifier))
+            note = con.fetchone()
+            con.close()
+            conn.close()
+            if note['note_type'] == "file":
+                return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
+            return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
 
-APP.secret_key = CONFIG.secret_key
+
+@APP.route('/graphql/')
+def graphql_explorer():
+    return render_template("graphql.html")
+
+
+APP.secret_key = CONFIG['DEFAULT']['secret_key']

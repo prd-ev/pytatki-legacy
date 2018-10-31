@@ -1,0 +1,44 @@
+{% extends "_base.html" %}
+
+{% set page_id = 'add' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-2">
+    </div>
+    <div class="col-lg-8 bg-white rounded m-2" style="padding:15px;">
+        <h3>Dodaj</h3>
+        <form id="add" method=post enctype=multipart/form-data> <div class="form-group">
+            <input class="form-control" id="title" name="title" type="text" value="" autofocus placeholder="Tytuł / Temat">
+    </div>
+    <div class="form-group">
+        <label for="type">Wybierz kategorię</label>
+        <select class="custom-select" id="type" name="type">
+            <option value="note" selected>Notatka / Materiał powtórzeniowy</option>
+            <option value="test">Sprawdzian</option>
+            <option value="other">Inne</option>
+        </select>
+    </div>
+    <div class="custom-file">
+        <input type="file" name="file" class="custom-file-input" id="file">
+        <label class="custom-file-label" for="file">Wybierz plik</label>
+    </div>
+    <div class="form-group">
+        <label for="subject">Wybierz przedmiot</label>
+        <select class="custom-select" id="topic" name="topic" onchange="select_check()">
+            <option value="" selected>-- Wybierz --</option>
+            {%for topic in topics%}<option value="{{topic['idnotegroup']}}">{{topic['folder_name']}}</option>{%endfor%}
+        </select>
+    </div>
+    <input class="btn btn-primary" type=submit value="Wyślij">
+    </form>
+
+    {% if error %}
+    <p class="error"><strong>Error:</strong>{{error}}</p>
+    {% endif %}
+</div>
+<div class="col-lg-2">
+</div>
+
+</div>
+{% endblock %}

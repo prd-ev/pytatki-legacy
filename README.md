@@ -1,84 +1,92 @@
+# Looking for maintainers!!!
 # pytatki
-[![CodeFactor](https://www.codefactor.io/repository/github/butterfly-pn/pytatki/badge)](https://www.codefactor.io/repository/github/butterfly-pn/pytatki)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=butterfly-pn/pytatki&amp;utm_campaign=Badge_Grade)
-[![CircleCI](https://circleci.com/gh/butterfly-pn/pytatki.svg?style=svg)](https://circleci.com/gh/butterfly-pn/pytatki)
 
-Notatki we flasku
+[![CodeFactor](https://www.codefactor.io/repository/github/PRD-ev/pytatki/badge)](https://www.codefactor.io/repository/github/PRD-ev/pytatki)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&utm_medium=referral&utm_content=butterfly-pn/pytatki&utm_campaign=Badge_Grade)
+[![CircleCI](https://circleci.com/gh/PRD-ev/pytatki/tree/master.svg?style=svg)](https://circleci.com/gh/PRD-ev/pytatki/tree/master)
+[![Issues](https://img.shields.io/github/issues/PRD-ev/pytatki.svg)](https://github.com/PRD-ev/pytatki/issues)
+![Snakes](https://img.shields.io/badge/w%C4%99%C5%BCe%20s%C4%85-jadowite-blue.svg)
+
+Notes hosting
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Wymagania
+### Instalation
 
-Aby uruchomić aplikację potrzebne są odpowiednie moduły python'a. Można je pobrać za pomocą pip'a wpisując następujące komendy:
+Clone this repo
+
+```
+git clone https://github.com/PRD-ev/pytatki.git
+```
+
+Install Flask dependencies
 
 ```
 pip install -r requirements/common.txt
 ```
 
-### Instalacja
-
-Sklonuj to repozytorium na komputer, na którym chcesz uruchomić aplikację
-```
-git clone https://github.com/butterfly-pn/pytatki.git
-```
-Następnie otwórz plik config/\_\_init\_\_.py. Pytatki pozwalają zapisać dwa presety ustawień `Localhost` i `Server`. Dzięki temu możesz testować aplikację lokalnie, a gdy wszystko będzie gotowe wystarczy zmienić tylko jedną linijką, żeby udostępnić światu aplikację :).
-
+Install React dependencies
 
 ```
-class Localhost:
-    '''Do testowania na komputerze lokalnym'''
-    secret_key = str()
-    DEBUG = True #True oznacza, że aplikacja będzie sprawdzać zmiany w plikach
-    HOST = "127.0.0.1" #Tutaj wpisujemy adres, na którym chcemy postawić stronę
-    PORT = 5000 #Tutaj wpisujemy port, na którym ma działać aplikacja
-    EMAIL = "twoj@email" #Z tego maila wysyłane będą powiadomienia do użytkowników
-    EMAIL_PASSWORD = "haslo_do_twojego_maila" #Hasło do maila
-    
-    (...)
-    
-CONFIG = Localhost("sekretny_klucz") #W nawiasie wpisujemy klucz do szyfrowania haseł w bazie danych
-# NIE ZATRZYMUJ WARTOŚCI DOMYŚLNEJ!
+yarn add
 ```
 
-Żeby uruchomić aplikację wpisz:
+Build bundles
 
 ```
-python main.py
+yarn run build
 ```
 
+### Configuration
 
-## Testowanie
-### 
+Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
+
+```
+[DEFAULT]
+secret_key = "your_own_secret_key" # Don't leave default value
+DEBUG = True
+HOST = 127.0.0.1
+PORT = 5000
+
+[DATABASE]
+DB_HOST = '127.0.0.1'
+DB_USER = 'pytatki'
+DB_PASSWORD = 'pytatki'
+DB_NAME = 'pytatki'
+```
+
+To configure database run `init_db.py` script.
+
+## Testing
+
+###
+
 ```
 pytest
 ```
 
 ## Built With
 
-* [Bootstrap](https://www.getbootstrap.com/) 
-* [Flask](http://flask.pocoo.org/) 
+- [Bootstrap](https://www.getbootstrap.com/)
+- [Flask](http://flask.pocoo.org/)
 
-## Współpraca
+## Contributing 🎉
 
-Jesteśmy na każdą formę współpracy :). Dane kontaktowe można znaleźć w pliku [CONTRIBUTING.md](https://github.com/butterfly-pn/pytatki/blob/master/docs/CONTRIBUTING.md)
+Feel free to contribute 😜. If you want to contact owners: [CONTRIBUTING.md](https://github.com/butterfly-pn/pytatki/blob/master/docs/CONTRIBUTING.md)
 
+## Authors
 
-## Autorzy
+- **Patryk Niedźwiedziński** - _Initial work_ - [butterfly-pn](https://github.com/butterfly-pn)
+- **Filip Wachowiak** - _React developer_ - [filipw01](https://github.com/filipw01)
 
-* **Patryk Niedźwiedziński** - *Initial work* - [butterfly-pn](https://github.com/butterfly-pn)
-* **Filip Wachowiak** - [filipw01](https://github.com/filipw01)
-
-Zobacz również listę [współautorów](https://github.com/butterfly-pn/pytatki/graphs/contributors), którzy przyczynili się w rozwoju aplikacji.
-
-
-
+Check out [contributors](https://github.com/butterfly-pn/pytatki/graphs/contributors)
 
 ## TODO
 
-1. Dodawanie plików/notatek (dodanie tagów, przedmiotu itd.)
-2. Logowanie i rejestracja + admin
-3. Wyszukiwanie notatek
-4. Zarządzanie notatkami (usuń, ukryj itp.)
-5. Podział użytkowników na klasy
+- [ ] Add new note (tags, notegroup etc.)
+- [x] Login, register + admin
+- [ ] Search
+- [ ] Manage note (delete, hide, properties etc.)
+- [x] Usergroups

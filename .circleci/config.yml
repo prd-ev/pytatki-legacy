@@ -7,6 +7,11 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.1
+      - image: circleci/mariadb:10.2
+        environment:
+        - MYSQL_USER: root
+        - MYSQL_HOST: 127.0.0.1
+        - MYSQL_ALLOW_EMPTY_PASSWORD: true
       
     steps:
       - checkout
@@ -16,6 +21,10 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements/dev.txt
+      - run:
+          name: Copy config.ini
+          command: |
+            cp examples/config.ini .
       - run:
           command: |
             . venv/bin/activate

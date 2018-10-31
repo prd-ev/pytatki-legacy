@@ -1,41 +1,89 @@
 # -*- coding: utf-8 -*-
-"""Modele rekordów wpisywanych do bazy danych"""
-from passlib.utils import unicode
-from sqlalchemy import Column
-from sqlalchemy.types import Integer, String, Boolean
+"""Database tables models"""
+from flask_login._compat import unicode
 from passlib.hash import sha256_crypt
-from main import DB, LM
+from pytatki.main import LM
+from pytatki.dbconnect import connection
+from pymysql import escape_string
+import gc
+from pytatki.main import CONFIG as Config
 
-__author__ = 'Patryk Niedźwiedziński'
 
 @LM.user_loader
 def user_load(user_id):
-    return User.query.get(int(user_id))
+    try:
+        con, conn = connection()
+        con.execute("SELECT * FROM user WHERE iduser = %s",
+                    escape_string(str(user_id)))
+        user_dict = con.fetchone()
+        user = User()
+        user.update(user_dict)
+        con.close()
+        conn.close()
+        gc.collect()
+        return user
+    except Exception as error:
+        #TODO: exception type
+        print(error)
+        return None
 
-class User(DB.Model):
-    """
-    User model for reviewers.
-    """
-    __tablename__ = 'user'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    active = Column(Boolean, default=True)
-    username = Column(String(20), unique=True)
-    email = Column(String(200), unique=True)
-    confirm_mail = Column(Boolean, default=False)
-    password = Column(String(200), default='')
-    modderator = Column(Boolean, default=False)
-    admin = Column(Boolean, default=False)
-    superuser = Column(Boolean, default=False)
-    ban = Column(Boolean, default=False)
+
+class User(dict):
+
+    def __setitem__(self, key, item):
+        self.__dict__[key] = item
+
+    def __getitem__(self, key):
+        return self.__dict__[key]
+
+    def __repr__(self):
+        return repr(self.__dict__)
+
+    def __len__(self):
+        return len(self.__dict__)
+
+    def __delitem__(self, key):
+        del self.__dict__[key]
+
+    def clear(self):
+        return self.__dict__.clear()
+
+    def copy(self):
+        return self.__dict__.copy()
+
+    def has_key(self, k):
+        return k in self.__dict__
+
+    def update(self, *args, **kwargs):
+        return self.__dict__.update(*args, **kwargs)
+
+    def keys(self):
+        return self.__dict__.keys()
+
+    def values(self):
+        return self.__dict__.values()
+
+    def items(self):
+        return self.__dict__.items()
+
+    def pop(self, *args):
+        return self.__dict__.pop(*args)
+
+    def __cmp__(self, dict_):
+        return self.__cmp__(self.__dict__)
+
+    def __contains__(self, item):
+        return item in self.__dict__
+
+    def __iter__(self):
+        return iter(self.__dict__)
+
+    def __unicode__(self):
+        return unicode(repr(self.__dict__))
 
     def check_password(self, password):
-        if sha256_crypt.verify(password, self.password):
+        if sha256_crypt.verify(password, self['password']):
             return True
-
-    def __init__(self, username, password, email):
-        self.username = username
-        self.password = password
-        self.email = email
 
     def is_authenticated(self):
         return True
@@ -46,30 +94,15 @@ class User(DB.Model):
     def is_anonymous(self):
         return False
 
+    def is_admin(self):
+        con, conn = connection()
+        query = con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                            (escape_string(self['userid']), escape_string(Config.json()['admin_group_id'])))
+        con.close()
+        conn.close()
+        if query:
+            return True
+        return False
+
     def get_id(self):
-        return unicode(self.id)
-
-    def __repr__(self):
-        return '<User %r>' % (self.username)
-
-
-class Note(DB.Model):
-    __tablename__ = 'note'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String(200))
-    file = Column(String(200), default="")
-    author_id = Column(Integer)
-    subject_id = Column(Integer)
-    topic_id = Column(Integer)
-    date = Column(String(20))
-
-
-class Topic(DB.Model):
-    __tablename__ = 'topic'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String(200))
-    subject_id = Column(Integer)
-
-class Subject(DB.Model):
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String(200))
+        return unicode(self['iduser'])
