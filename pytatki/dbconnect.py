@@ -64,6 +64,7 @@ def note_exists(conn, idnote):
         "SELECT * FROM note_view WHERE idnote = %s AND status_id = 1", pymysql.escape_string(str(idnote)))
     return True if note_exists else False
 
+
 def create_action(conn, content, iduser, idnote):
     conn.cursor().execute(
         "INSERT INTO action (content, note_id, user_id) VALUES (%s, %s, %s)",
@@ -74,13 +75,16 @@ def create_action(conn, content, iduser, idnote):
         )
     )
 
+
 def remove_note(conn, idnote, iduser):
     """Removes a note"""
     conn.cursor().execute(
         "UPDATE note SET status_id = %s WHERE idnote = %s",
-        (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote)))
+        (pymysql.escape_string(str(
+            CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote)))
     )
-    create_action(conn, 'removes a note \'{}\''.format(str(idnote)), iduser, idnote)
+    create_action(conn, 'removes a note \'{}\''.format(
+        str(idnote)), iduser, idnote)
 
 
 def add_user_to_usergroup(conn, iduser, idusergroup):
@@ -114,7 +118,8 @@ def remove_notegroup(conn, idnotegroup):
     if notegroup_empty(conn, idnotegroup):
         print("x")
         c = conn.cursor()
-        c.execute("DELETE FROM usergroup_has_notegroup WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))
+        c.execute("DELETE FROM usergroup_has_notegroup WHERE notegroup_id = %s",
+                  pymysql.escape_string(str(idnotegroup)))
         c.execute("DELETE FROM notegroup WHERE idnotegroup = %s",
                   pymysql.escape_string(str(idnotegroup)))
         return True
@@ -164,23 +169,51 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
     create_action(conn, "create note {}".format(title), user_id, idnote)
     return idnote
 
+
 def get_last_note_actions(idnote, iduser):
     """Get 5 last actions of note"""
     con, conn = connection()
-    con.execute("SELECT * FROM action WHERE note_id = %s ORDER BY date DESC", pymysql.escape_string(str(idnote)))
+    con.execute("SELECT * FROM action WHERE note_id = %s ORDER BY date DESC",
+                pymysql.escape_string(str(idnote)))
     last_actions = con.fetchmany(5)
     last_actions = [
         {
             'idaction': row['idaction'], 'content': row['content'], 'user_id': row['user_id'], 'date': row['date'].strftime('%I:%M %d.%m.%Y')
-        } 
+        }
         for row in last_actions
-        ]
+    ]
     con.close()
     conn.close()
     print(last_actions)
     return json.dumps(last_actions)
 
+
 def remove_user(conn, iduser):
     """Removes user from database"""
-    conn.cursor().execute("DELETE FROM user WHERE iduser = %s", pymysql.escape_string(str(iduser)))
-    #TODO: other tables
+    conn.cursor().execute("DELETE FROM user WHERE iduser = %s",
+                          pymysql.escape_string(str(iduser)))
+    # TODO: other tables
+
+
+def has_access_to_notegroup(id_notegroup, id_user):
+    """Returns true if user has access to notegroup, else false"""
+    con, conn = connection()
+    con.execute("SELECT iduser FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                (pymysql.escape_string(str(id_user)), pymysql.escape_string(str(id_notegroup))))
+    return_value = con.fetchone()
+    con.close()
+    conn.close()
+    return True if return_value else False
+
+
+def get_notegroup(idnotegroup, iduser):
+    """Get info about notegroup"""
+    if has_access_to_notegroup(idnotegroup, iduser):
+        con, conn = connection()
+        con.execute("SELECT * FROM notegroup WHERE idnotegroup = %s",
+                    pymysql.escape_string(str(idnotegroup)))
+        notegroup_info = con.fetchone()
+        con.close()
+        conn.close()
+        return notegroup_info
+    return False

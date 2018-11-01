@@ -3,7 +3,7 @@ import AddNote from "./AddNote.jsx";
 import AddFolder from "./AddFolder.jsx";
 import EditMode from "./EditMode.jsx";
 import NotegroupList from "./UsergroupList.jsx";
-import Info from "./Info.jsx";
+import InfoNote from "./InfoNote.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import config from "../../config.json";
@@ -471,7 +471,7 @@ class Notatki extends React.Component {
           <div className={ComponentStyle.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
-          <Info
+          <InfoNote
             note={this.state.note}
             visible={this.state.infoVisible}
             closeInfoNotatki={this.closeInfo}

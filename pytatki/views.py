@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from pytatki import __version__
 from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
                                remove_note, remove_notegroup, create_note,
-                               has_access_to_note)
+                               has_access_to_note, has_access_to_notegroup)
 from pytatki.main import APP, CONFIG
 from pytatki.models import User
 from pytatki.view_manager import login_manager, nocache
@@ -30,17 +30,6 @@ def type_id(type_name):
     con.close()
     conn.close()
     return file_type['idnote_type']
-
-
-def has_access_to_notegroup(id_notegroup, id_user):
-    """Returns true if user has access to notegroup, else false"""
-    con, conn = connection()
-    con.execute("SELECT iduser FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                (escape_string(str(id_user)), escape_string(str(id_notegroup))))
-    return_value = con.fetchone()
-    con.close()
-    conn.close()
-    return True if return_value else False
 
 
 def has_access_to_usergroup(id_usergroup, id_user):

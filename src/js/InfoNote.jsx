@@ -4,7 +4,7 @@ import ComponentStyle from "../scss/Info.scss";
 
 const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
-class Info extends React.Component {
+class InfoNote extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,18 +21,18 @@ class Info extends React.Component {
     });
     //Run function to remove states of parent
     this.props.closeInfoNotatki();
-  }
+  };
 
   //Fetch from /api/?query={getNoteById} of note id in props an token passed as argument
   getNote = token => {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-        "/api/?query={getNoteById(id_note:" +
-        this.props.note +
-        ',access_token:"' +
-        token +
-        '")}'
+          "/api/?query={getNoteById(id_note:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
       )
         .then(response => {
           //Convert response to json
@@ -42,18 +42,18 @@ class Info extends React.Component {
           //Filter data
           return JSON.parse(response.data.getNoteById);
         });
-  }
+  };
 
   //Fetch from /api/?query={getNoteLastActions} of note id in props and token passed as argument
   getNoteLastActions = token => {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-        "/api/?query={getNoteLastActions(id_note:" +
-        this.props.note +
-        ',access_token:"' +
-        token +
-        '")}'
+          "/api/?query={getNoteLastActions(id_note:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
       )
         .then(response => {
           //Convert data to json
@@ -63,7 +63,7 @@ class Info extends React.Component {
           //Filter data
           return JSON.parse(response.data.getNoteLastActions);
         });
-  }
+  };
 
   //Fetch data of note from api and set to state
   fetchData = () => {
@@ -85,7 +85,7 @@ class Info extends React.Component {
             });
         });
     }
-  }
+  };
 
   //Check if component should update: if visible changes or if noteInfo changes
   shouldComponentUpdate(nextProps, nextState) {
@@ -129,7 +129,7 @@ class Info extends React.Component {
         <i className="ld ld-ring ld-cycle" />
       </div>
     );
-  }
+  };
 
   //Render actions
   renderActions = () => {
@@ -146,7 +146,7 @@ class Info extends React.Component {
         <i className="ld ld-ring ld-cycle" />
       </div>
     );
-  }
+  };
 
   render() {
     if (this.props.visible) {
@@ -166,4 +166,4 @@ class Info extends React.Component {
   }
 }
 
-export default Info;
+export default InfoNote;
