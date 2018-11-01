@@ -1,0 +1,1 @@
+mysql -e 'SET @dbname = \"'+$1+'\"; \. create_database.sql; \. create_tables.sql'
