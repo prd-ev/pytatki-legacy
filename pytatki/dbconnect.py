@@ -215,5 +215,5 @@ def get_notegroup(idnotegroup, iduser):
         notegroup_info = con.fetchone()
         con.close()
         conn.close()
-        return notegroup_info
+        return json.dumps(notegroup_info)
     return False
