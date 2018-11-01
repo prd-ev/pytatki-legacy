@@ -20,6 +20,9 @@ module.exports = (env, argv) => {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
           loader: "babel-loader",
+          options: {
+            cwd: './'
+          },
         },
         {
           test: /\.s?css$/,
