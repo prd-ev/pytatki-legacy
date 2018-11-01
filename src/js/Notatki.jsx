@@ -17,7 +17,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
-      usergroupChosen: false,
+      currentUsergroupName: "",
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -63,12 +63,12 @@ class Notatki extends React.Component {
     );
   };
 
-  getUsergroupRoot(usergroup) {
+  getUsergroupRoot(usergroupId) {
     const that = this;
     fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroup + ',access_token:"' + token + '")}')
+      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroupId + ',access_token:"' + token + '")}')
         .then(response => response.json())
         .then(myJson => Number(myJson.data.getRootId))
         .then(rootId => {
@@ -121,7 +121,7 @@ class Notatki extends React.Component {
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
-    if (this.state.usergroupChosen) {
+    if (this.state.currentUsergroupName) {
       if (this.state.data[this.state.currentDepth]) {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
@@ -260,12 +260,13 @@ class Notatki extends React.Component {
   }
 
   updateCurrentUsergroup = e => {
-    this.getUsergroupRoot(e.target.id)
+    this.getUsergroupRoot(e.target.id);
+    let usergroupName = e.target.innerText;
     this.setState({
       currentDepth: 0,
       currentDirId: [],
       currentPath: [],
-      usergroupChosen: true
+      currentUsergroupName: usergroupName
     })
   }
 
@@ -274,18 +275,19 @@ class Notatki extends React.Component {
       <React.Fragment>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         <div className={ComponentStyle.mainContent}>
+          <p>{this.state.currentUsergroupName}</p>
           <div className={ComponentStyle.actionBar} key="actionBar">
-            {this.state.usergroupChosen ? (
+            {this.state.currentUsergroupName ? (
               <AddNote uploadNote={this.uploadNote}></AddNote>
             ) : ("")}
-            {this.state.usergroupChosen ? (
+            {this.state.currentUsergroupName ? (
               <AddFolder addFolder={this.addFolder}></AddFolder>
             ) : ("")}
-            {this.state.usergroupChosen ? (
+            {this.state.currentUsergroupName ? (
               <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
             ) : ("")}
           </div>
-          {this.state.usergroupChosen && this.state.currentDepth ? (
+          {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={ComponentStyle.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
               {this.showCurrentPath()}
