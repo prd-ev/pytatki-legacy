@@ -81,7 +81,7 @@ def db_init(host=None, user=None, password=None):
     username = 'admin' if username == '' else username
     email = input("Insert your admin email: ")
     password = input("Insert your admin password: ")
-    admin_id = create_user(conn, username, email, password, active_id)
+    admin_id = create_user(conn, username, password, email, active_id)
     con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (
         escape_string(str(admin_id)), escape_string(str(admin_group_id))))
     conn.commit()

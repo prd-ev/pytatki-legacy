@@ -1,4 +1,4 @@
 name = "pytatki"
-__version__ = "1.1a1"
+__version__ = "1.1a2"
 
 import pytatki.dbconnect
