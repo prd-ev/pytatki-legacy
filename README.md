@@ -1,4 +1,5 @@
 # Looking for maintainers!!!
+
 # pytatki
 
 [![CodeFactor](https://www.codefactor.io/repository/github/PRD-ev/pytatki/badge)](https://www.codefactor.io/repository/github/PRD-ev/pytatki)
@@ -41,20 +42,30 @@ yarn run build
 
 ### Configuration
 
-Create `config.ini` file in root directory of repository. You can find an example in `examples` folder.
+Create `config.json` file in root directory of repository. You can find an example in `examples` folder.
 
-```
-[DEFAULT]
-secret_key = "your_own_secret_key" # Don't leave default value
-DEBUG = True
-HOST = 127.0.0.1
-PORT = 5000
-
-[DATABASE]
-DB_HOST = '127.0.0.1'
-DB_USER = 'pytatki'
-DB_PASSWORD = 'pytatki'
-DB_NAME = 'pytatki'
+```json
+{
+  "DEFAULT": {
+    "secret_key": "change_it",
+    "DEBUG": true,
+    "HOST": "127.0.0.1",
+    "PORT": 5000
+  },
+  "EMAIL": {
+    "MAIL_SERVER": "smtp.gmail.com",
+    "MAIL_PORT": 465,
+    "MAIL_USE_SSL": true,
+    "EMAIL": "your_mail@gmail.com",
+    "EMAIL_PASSWORD": "your_password"
+  },
+  "DATABASE": {
+    "DB_HOST": "127.0.0.1",
+    "DB_USER": "pytatki",
+    "DB_PASSWORD": "pytatki",
+    "DB_NAME": "pytatki"
+  }
+}
 ```
 
 To configure database run `init_db.py` script.
