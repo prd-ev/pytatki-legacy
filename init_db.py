@@ -1,9 +1,9 @@
 __author__ = "Patryk Niedźwiedziński"
 """Skrypt tworzenia bazy danych"""
 
-import configparser
 from pymysql import escape_string, connect
 from pytatki.dbconnect import connection, create_usergroup, create_status, create_note_type, create_user
+import json
 
 
 def parse_sql(filename):
@@ -40,19 +40,18 @@ def save_to_config(config_dict):
     """
     Save data to config.ini
     """
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    config.sections()
-    config.add_section('IDENTIFIERS')
-    config['IDENTIFIERS']['admingroup_id'] = str(config_dict['admingroup_id'])
-    config['IDENTIFIERS']['admin_id'] = str(config_dict['admin_id'])
-    config['IDENTIFIERS']['status_active_id'] = str(config_dict['active_id'])
-    config['IDENTIFIERS']['status_removed_id'] = str(config_dict['removed_id'])
-    config['IDENTIFIERS']['note_type_file_id'] = str(config_dict['file_id'])
-    config['IDENTIFIERS']['note_type_text_id'] = str(config_dict['text_id'])
-    config['IDENTIFIERS']['note_type_url_id'] = str(config_dict['url_id'])
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
+    with open('config.json', 'r') as fp:
+        config = json.load(fp)
+    config['IDENTIFIERS']['admingroup_id'] = config_dict['admingroup_id']
+    config['IDENTIFIERS']['admin_id'] = config_dict['admin_id']
+    config['IDENTIFIERS']['status_active_id'] = config_dict['active_id']
+    config['IDENTIFIERS']['status_removed_id'] = config_dict['removed_id']
+    config['IDENTIFIERS']['note_type_file_id'] = config_dict['file_id']
+    config['IDENTIFIERS']['note_type_text_id'] = config_dict['text_id']
+    config['IDENTIFIERS']['note_type_url_id'] = config_dict['url_id']
+    with open('config.json', 'w') as configfile:
+        configfile.truncate(0)
+        json.dump(config, configfile)
 
 
 def db_init(host=None, user=None, password=None):
