@@ -50,9 +50,22 @@ class Notatki extends React.Component {
       this.infoNote(data.is_note, data.name);
     }
     if (data.action === "Delete") {
-      //TODO: Delete folder
-      console.log("folder delete");
+      this.deleteFolder_ContextMenu(data.name);
     }
+  };
+
+  deleteFolder_ContextMenu = id => {
+    fetch(siteUrl + "/notegroup/" + id + "/delete/", {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    this.updateContent();
   };
 
   deleteNote_ContextMenu = id => {
@@ -272,7 +285,6 @@ class Notatki extends React.Component {
           </p>
         );
       }
-      return null;
     }
   };
 
