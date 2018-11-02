@@ -10,7 +10,7 @@
       {%else%}
       {{user['login']}}
       {%endif%}
-      {% if user.admin %}
+      {% if user.admin() %}
       <span class="ml-3 badge badge-primary">ADMIN</span>
       {% endif %}
     </h2>
@@ -66,14 +66,13 @@
         {% endif %}
       </div>
       <div class="tab-pane fade" id="v-pills-email" role="tabpanel" aria-labelledby="v-pills-email-tab">
-        <form method=post action="/user/update-email/?next=/user/{{current_user.username}}#v-pills-email">
+        <form method=post action="/user/update-email/?next=/user/{{current_user['login']}}#v-pills-email">
           <div class="input-group">
-            <input autocapitalize="none" class="form-control {% if current_user.confirm_mail %}is-valid{% else %}is-invalid{% endif %}"
-              id="email" name="email" type="text" value="{{ current_user.email }}" placeholder="Email">
-            <div class="input-group-append"><input class="btn {% if current_user.confirm_mail %}btn-success{% else %}btn-danger{% endif %}"
-                type=submit value="Zaktualizuj"></div>
+            <input autocapitalize="none" class="form-control {% if current_user['email_confirm'] %}is-valid{% else %}is-invalid{% endif %}"
+              id="email" name="email" type="text" value="{{ current_user['email'] }}" placeholder="Email">
+            <div class="input-group-append"><input class="btn btn-danger" type=submit value="Zaktualizuj"></div>
           </div>
-          {% if not current_user.confirm_mail %}
+          {% if not current_user['confirm_email'] %}
           <small class="form-text text-danger">
             Niezweryfikowany adres email
           </small>
@@ -90,14 +89,13 @@
             </div>
             <div class="modal-body">
               <div class="container">
-                <form method=post action="/user/update-password/?next=/user/{{current_user.username}}#v-pills-account">
+                <form method=post action="/user/update-password/?next=/user/{{current_user['login']}}#v-pills-account">
                   <div class="form-group">
                     <input autocapitalize="none" class="form-control" id="password" name="password" type="password"
                       placeholder="Current password">
                     <input autocapitalize="none" class="form-control" id="new-password" name="new-password" type="password"
                       placeholder="New password">
-                    <div class="input-group-append"><input class="btn {% if current_user.confirm_mail %}btn-success{% else %}btn-danger{% endif %}"
-                        type=submit value="Zaktualizuj"></div>
+                    <div class="input-group-append"><input class="btn btn-danger" type=submit value="Zaktualizuj"></div>
                   </div>
                 </form>
               </div>
