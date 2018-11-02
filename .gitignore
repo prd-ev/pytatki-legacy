@@ -22,3 +22,4 @@ config.ini
 npm-debug.log
 pytatki/files/*
 ./config.json
+config.json
