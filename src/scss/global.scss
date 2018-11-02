@@ -10,6 +10,9 @@
     grid-template-rows: 290px auto;
     grid-column-gap: 30px;
 }
+.row{
+    margin-right: 0;
+}
 
 nav {
     grid-row: 1;

@@ -49,18 +49,20 @@
         <p>{{group['name']}}</p>
         {% endfor %}
         {% else %}
-        <p>Wygląda na to, że ten użytkownik nie należy do żadnej klasy</p>
+        <p>Wygląda na to, że nie należysz do żadnej klasy</p>
         <a href="#" class="btn btn-primary">Dołącz teraz</a>
         {% endif %}
       </div>
       <div class="tab-pane fade" id="v-pills-note" role="tabpanel" aria-labelledby="v-pills-group-tab">
         {% if notes %}
         {% for note in notes %}
-        <a href="/download/{{note['idnote']}}"><p>{{note['title']}}</p></a>
+        <a href="/download/{{note['idnote']}}">
+          <p>{{note['title']}}</p>
+        </a>
         {% endfor %}
         {% else %}
-        <p>Wygląda na to, że ten użytkownik nie posiada żadnej notatki</p>
-        <a href="#" class="btn btn-primary">Dołącz teraz</a>
+        <p>Wygląda na to, że posiadasz żadnej notatki</p>
+        <a href="#" class="btn btn-primary">Dodaj jakąś teraz</a>
         {% endif %}
       </div>
       <div class="tab-pane fade" id="v-pills-email" role="tabpanel" aria-labelledby="v-pills-email-tab">
@@ -129,6 +131,45 @@
           <a class="btn btn-primary" data-dismiss="modal" href="#">Anuluj</a>
           </form>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+{%else%}
+<hr>
+<h2>O użytkowniku</h2>
+<div class="row">
+  <div class="col-md-3">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+      <a class="nav-link active" id="v-pills-group-tab" data-toggle="pill" href="#v-pills-group" role="tab"
+        aria-controls="v-pills-group" aria-selected="false">Klasy</a>
+      <a class="nav-link" id="v-pills-group-tab" data-toggle="pill" href="#v-pills-note" role="tab" aria-controls="v-pills-group"
+        aria-selected="false">Notatki</a>
+    </div>
+  </div>
+  <div class="col">
+    <div class="tab-content" id="v-pills-tabContent">
+      <div class="tab-pane fade" id="v-pills-group" role="tabpanel" aria-labelledby="v-pills-group-tab">
+        {% if groups %}
+        {% for group in groups %}
+        <p>{{group['name']}}</p>
+        {% endfor %}
+        {% else %}
+        <p>Wygląda na to, że ten użytkownik nie należy do żadnej klasy</p>
+        <a href="#" class="btn btn-primary">Dodaj go teraz</a>
+        {% endif %}
+      </div>
+      <div class="tab-pane fade" id="v-pills-note" role="tabpanel" aria-labelledby="v-pills-group-tab">
+        {% if notes %}
+        <h5>Pamiętaj, możesz nie mieć dostępu do niektórych notatek</h5>
+        {% for note in notes %}
+        <a href="/download/{{note['idnote']}}">
+          <p>{{note['title']}}</p>
+        </a>
+        {% endfor %}
+        {% else %}
+        <p>Wygląda na to, że ten użytkownik nie posiada żadnej notatki</p>
+        {% endif %}
       </div>
     </div>
   </div>
