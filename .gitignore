@@ -21,3 +21,4 @@ pytatki/static/style.css.map
 config.ini
 npm-debug.log
 pytatki/files/*
+./config.json

@@ -5,6 +5,7 @@ import configparser
 from pymysql import escape_string, connect
 from pytatki.dbconnect import connection, create_usergroup, create_status, create_note_type, create_user
 
+
 def parse_sql(filename):
     data = open(filename, 'r').readlines()
     stmts = []
@@ -34,6 +35,7 @@ def parse_sql(filename):
             stmts.append(line.strip())
     return stmts
 
+
 def save_to_config(config_dict):
     """
     Save data to config.ini
@@ -42,15 +44,16 @@ def save_to_config(config_dict):
     config.read('config.ini')
     config.sections()
     config.add_section('IDENTIFIERS')
-    config['IDENTIFIERS']['ADMINGROUP_ID'] = str(config_dict['admingroup_id'])
-    config['IDENTIFIERS']['ADMIN_ID'] = str(config_dict['admin_id'])
-    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = str(config_dict['active_id'])
-    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = str(config_dict['removed_id'])
-    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = str(config_dict['file_id'])
-    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = str(config_dict['text_id'])
-    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = str(config_dict['url_id'])
+    config['IDENTIFIERS']['admingroup_id'] = str(config_dict['admingroup_id'])
+    config['IDENTIFIERS']['admin_id'] = str(config_dict['admin_id'])
+    config['IDENTIFIERS']['status_active_id'] = str(config_dict['active_id'])
+    config['IDENTIFIERS']['status_removed_id'] = str(config_dict['removed_id'])
+    config['IDENTIFIERS']['note_type_file_id'] = str(config_dict['file_id'])
+    config['IDENTIFIERS']['note_type_text_id'] = str(config_dict['text_id'])
+    config['IDENTIFIERS']['note_type_url_id'] = str(config_dict['url_id'])
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
+
 
 def db_init(host=None, user=None, password=None):
     """Create database from sql/create-database"""
@@ -69,12 +72,14 @@ def db_init(host=None, user=None, password=None):
         conn.cursor().execute(query)
     conn.commit()
     conn.close()
-    con, conn = connection(host='127.0.0.1', user='pytatki', password='pytatki', db='pytatki')
+    con, conn = connection(host='127.0.0.1', user='pytatki',
+                           password='pytatki', db='pytatki')
     conn.begin()
     admin_group_id = create_usergroup(conn, 'admins', 'Group of admins')
     active_id = create_status(conn, 'active', 'Record is active')
     removed_id = create_status(conn, 'removed', 'Record is removed')
-    file_id = create_note_type(conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
+    file_id = create_note_type(
+        conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
     text_id = create_note_type(conn, "text", "Just plain non-formated text")
     url_id = create_note_type(conn, "url", "An URL link to another resource")
     username = input("Insert your admin login: [admin]")
@@ -95,7 +100,7 @@ def db_init(host=None, user=None, password=None):
         'file_id': file_id,
         'text_id': text_id,
         'url_id': url_id
-        })
+    })
 
 
 if __name__ == '__main__':

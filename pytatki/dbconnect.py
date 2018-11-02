@@ -5,7 +5,7 @@ import json
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
-CONFIG = parse_config('config.ini', check_db_configuration=False)
+CONFIG = parse_config('config.json', check_db_configuration=False)
 
 
 def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_USER'],
@@ -64,6 +64,7 @@ def note_exists(conn, idnote):
         "SELECT * FROM note_view WHERE idnote = %s AND status_id = 1", pymysql.escape_string(str(idnote)))
     return True if note_exists else False
 
+
 def create_action(conn, content, iduser, idnote):
     conn.cursor().execute(
         "INSERT INTO action (content, note_id, user_id) VALUES (%s, %s, %s)",
@@ -74,13 +75,16 @@ def create_action(conn, content, iduser, idnote):
         )
     )
 
+
 def remove_note(conn, idnote, iduser):
     """Removes a note"""
     conn.cursor().execute(
         "UPDATE note SET status_id = %s WHERE idnote = %s",
-        (pymysql.escape_string(str(CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote)))
+        (pymysql.escape_string(str(
+            CONFIG['IDENTIFIERS']['status_removed_id'])), pymysql.escape_string(str(idnote)))
     )
-    create_action(conn, 'removes a note \'{}\''.format(str(idnote)), iduser, idnote)
+    create_action(conn, 'removes a note \'{}\''.format(
+        str(idnote)), iduser, idnote)
 
 
 def add_user_to_usergroup(conn, iduser, idusergroup):
@@ -114,7 +118,8 @@ def remove_notegroup(conn, idnotegroup):
     if notegroup_empty(conn, idnotegroup):
         print("x")
         c = conn.cursor()
-        c.execute("DELETE FROM usergroup_has_notegroup WHERE notegroup_id = %s", pymysql.escape_string(str(idnotegroup)))
+        c.execute("DELETE FROM usergroup_has_notegroup WHERE notegroup_id = %s",
+                  pymysql.escape_string(str(idnotegroup)))
         c.execute("DELETE FROM notegroup WHERE idnotegroup = %s",
                   pymysql.escape_string(str(idnotegroup)))
         return True
@@ -164,7 +169,9 @@ def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_
     create_action(conn, "create note {}".format(title), user_id, idnote)
     return idnote
 
+
 def remove_user(conn, iduser):
     """Removes user from database"""
-    conn.cursor().execute("DELETE FROM user WHERE iduser = %s", pymysql.escape_string(str(iduser)))
-    #TODO: other tables
+    conn.cursor().execute("DELETE FROM user WHERE iduser = %s",
+                          pymysql.escape_string(str(iduser)))
+    # TODO: other tables
