@@ -25,6 +25,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
+      is_note: null,
       note: null,
       infoVisible: false,
       usergroupChosen: false
@@ -37,7 +38,7 @@ class Notatki extends React.Component {
       this.openNote(data.name.slice(4));
     }
     if (data.action === "Properties") {
-      this.infoNote(data.name.slice(4));
+      this.infoNote(data.is_note, data.name.slice(4));
     }
     if (data.action === "Delete") {
       this.deleteNote_ContextMenu(data.name.slice(4));
@@ -46,8 +47,7 @@ class Notatki extends React.Component {
 
   handleClickGroup = (e, data, target) => {
     if (data.action === "Properties") {
-      //TODO: Folder properties
-      console.log("folder properties");
+      this.infoNote(data.is_note, data.name);
     }
     if (data.action === "Delete") {
       //TODO: Delete folder
@@ -154,8 +154,9 @@ class Notatki extends React.Component {
     window.open(siteUrl + `/download/${e}`);
   };
 
-  infoNote = id => {
+  infoNote = (is_note, id) => {
     this.setState({
+      is_note: is_note,
       note: id,
       infoVisible: true
     });
@@ -163,6 +164,7 @@ class Notatki extends React.Component {
 
   closeInfo = () => {
     this.setState({
+      is_note: null,
       note: null,
       infoVisible: false
     });
@@ -204,6 +206,7 @@ class Notatki extends React.Component {
                   id={MENU_TYPE}
                   holdToDisplay={1000}
                   name={value.key}
+                  is_note={value.is_note}
                   onItemClick={this.handleClick}
                   collect={collect}
                   key={value.key}
@@ -233,6 +236,7 @@ class Notatki extends React.Component {
                   id="NOTEGROUP"
                   holdToDisplay={1000}
                   name={value.key}
+                  is_note={value.is_note}
                   onItemClick={this.handleClickGroup}
                   collect={collect}
                   key={value.key}
@@ -473,6 +477,7 @@ class Notatki extends React.Component {
           </div>
           <InfoNote
             note={this.state.note}
+            is_note={this.state.is_note}
             visible={this.state.infoVisible}
             closeInfoNotatki={this.closeInfo}
           />

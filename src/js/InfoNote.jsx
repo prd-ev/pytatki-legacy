@@ -9,7 +9,9 @@ class InfoNote extends React.Component {
     super(props);
     this.state = {
       noteInfo: null,
-      noteActions: null
+      noteActions: null,
+      groupInfo: null,
+      groupContent: null
     };
   }
 
@@ -17,7 +19,9 @@ class InfoNote extends React.Component {
     //Remove data from states
     this.setState({
       noteInfo: null,
-      noteActions: null
+      noteActions: null,
+      groupInfo: null,
+      groupContent: null
     });
     //Run function to remove states of parent
     this.props.closeInfoNotatki();
@@ -65,25 +69,92 @@ class InfoNote extends React.Component {
         });
   };
 
+  //Fetch from /api/?query={getNotegroupById} of note id in props an token passed as argument
+  getNotegroup = token => {
+    if (this.props.note != null)
+      return fetch(
+        siteUrl +
+          "/api/?query={getNotegroupById(notegroup_id:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
+      )
+        .then(response => {
+          //Convert response to json
+          return response.json();
+        })
+        .then(response => {
+          //Filter data
+          return JSON.parse(response.data.getNotegroupById);
+        });
+  };
+
+  //Fetch from /api/?query={getContent} of note id in props an token passed as argument
+  getContent = token => {
+    if (this.props.note != null)
+      return fetch(
+        siteUrl +
+          "/api/?query={getContent(id_notegroup:" +
+          this.props.note +
+          ',access_token:"' +
+          token +
+          '")}'
+      )
+        .then(response => {
+          //Convert response to json
+          return response.json();
+        })
+        .then(response => {
+          //Filter data
+          return JSON.parse(response.data.getContent);
+        });
+  };
+
   //Fetch data of note from api and set to state
   fetchData = () => {
-    if (
-      this.state.noteInfo == null &&
-      this.state.noteActions == null &&
-      this.props.note != null
-    ) {
-      fetch(siteUrl + "/api/?query={getToken}")
-        .then(response => response.json())
-        .then(res => res.data.getToken)
-        .then(token => {
-          if (this.getNote(token))
-            this.getNote(token).then(info => {
-              if (this.getNoteLastActions(token))
-                this.getNoteLastActions(token).then(actions => {
-                  this.setState({ noteInfo: info, noteActions: actions });
+    if (this.props.is_note) {
+      if (
+        this.state.noteInfo == null &&
+        this.state.noteActions == null &&
+        this.props.note != null
+      ) {
+        fetch(siteUrl + "/api/?query={getToken}")
+          .then(response => response.json())
+          .then(res => res.data.getToken)
+          .then(token => {
+            if (this.getNote(token))
+              this.getNote(token).then(info => {
+                if (this.getNoteLastActions(token))
+                  this.getNoteLastActions(token).then(actions => {
+                    this.setState({
+                      noteInfo: info,
+                      noteActions: actions
+                    });
+                  });
+              });
+          });
+      }
+    } else {
+      if (
+        this.state.groupInfo == null &&
+        this.state.groupContent == null &&
+        this.props.note != null
+      ) {
+        fetch(siteUrl + "/api/?query={getToken}")
+          .then(response => response.json())
+          .then(res => res.data.getToken)
+          .then(token => {
+            this.getContent(token).then(content => {
+              this.getNotegroup(token).then(info => {
+                this.setState({
+                  groupInfo: info,
+                  groupContent: content
                 });
+              });
             });
-        });
+          });
+      }
     }
   };
 
@@ -93,6 +164,9 @@ class InfoNote extends React.Component {
       return true;
     }
     if (this.state.noteInfo !== nextState.noteInfo) {
+      return true;
+    }
+    if (this.state.groupInfo !== nextState.groupInfo) {
       return true;
     }
     return false;
@@ -108,8 +182,42 @@ class InfoNote extends React.Component {
     window.open(siteUrl + `/download/${e}`);
   };
 
+  //Renders info about notegroup
+  renderGroupHeader = () => {
+    if (this.state.groupInfo != null) {
+      return (
+        <React.Fragment>
+          <h2>{this.state.groupInfo.name}</h2>
+        </React.Fragment>
+      );
+    }
+    return (
+      <div>
+        <br />
+        <i className="ld ld-ring ld-cycle" />
+      </div>
+    );
+  };
+
+  //Renders numbers of notes in notegroup
+  renderGroupElements = () => {
+    if (this.state.groupContent != null) {
+      return (
+        <React.Fragment>
+          <h2>{this.state.groupContent.length} notes</h2>
+        </React.Fragment>
+      );
+    }
+    return (
+      <div>
+        <br />
+        <i className="ld ld-ring ld-cycle" />
+      </div>
+    );
+  };
+
   //Renders header of info component
-  renderHeader = () => {
+  renderNoteHeader = () => {
     if (this.state.noteInfo != null) {
       return (
         <React.Fragment>
@@ -132,7 +240,7 @@ class InfoNote extends React.Component {
   };
 
   //Render actions
-  renderActions = () => {
+  renderNoteActions = () => {
     if (this.state.noteActions != null) {
       return this.state.noteActions.map(action => (
         <div key={action.idaction}>
@@ -150,16 +258,28 @@ class InfoNote extends React.Component {
 
   render() {
     if (this.props.visible) {
-      return (
-        <React.Fragment>
-          <div className={ComponentStyle.info}>
-            <i onClick={() => this.closeInfo()} className="fas fa-times" />
-            {this.renderHeader()}
-            <h3>Latest actions</h3>
-            {this.renderActions()}
-          </div>
-        </React.Fragment>
-      );
+      if (this.props.is_note) {
+        return (
+          <React.Fragment>
+            <div className={ComponentStyle.info}>
+              <i onClick={() => this.closeInfo()} className="fas fa-times" />
+              {this.renderNoteHeader()}
+              <h3>Latest actions</h3>
+              {this.renderNoteActions()}
+            </div>
+          </React.Fragment>
+        );
+      } else {
+        return (
+          <React.Fragment>
+            <div className={ComponentStyle.info}>
+              <i onClick={() => this.closeInfo()} className="fas fa-times" />
+              {this.renderGroupHeader()}
+              {this.renderGroupElements()}
+            </div>
+          </React.Fragment>
+        );
+      }
     } else {
       return <React.Fragment />;
     }
