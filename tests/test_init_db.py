@@ -1,5 +1,5 @@
 from init_db import db_init
-import os
+import pymysql
 import pytest
 
 
@@ -17,6 +17,10 @@ input_generator = generator()
 
 @pytest.mark.last
 def test_db_init(monkeypatch):
-    os.system('mysql -u root -e "DROP DATABASE pytatki"')
+    conn = pymysql.connect(host='127.0.0.1', user='pytatki', password='pytatki', charset="utf8mb4",
+                           cursorclass=pymysql.cursors.DictCursor)
+    c = conn.cursor()
+    c.execute("DROP DATABASE pytatki")
+    conn.close()
     monkeypatch.setattr('builtins.input', lambda x: next(input_generator))
     db_init()
