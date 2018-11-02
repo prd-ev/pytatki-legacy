@@ -12,7 +12,7 @@ from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
 from pytatki.main import APP, MAIL, CONFIG
-from pytatki.models import User
+from pytatki.models import User, get_user
 from pytatki.view_manager import login_manager, login_required
 from itsdangerous import URLSafeTimedSerializer
 from pytatki.api.graphql import generate_access_token
@@ -24,7 +24,7 @@ ts = URLSafeTimedSerializer(CONFIG['DEFAULT']['secret_key'])
 def valid_password(password):
     """Validation of password"""
     return re.search('[0-9]', password) and re.search('[A-Z]', password) \
-           and re.search('[a-z]', password)
+        and re.search('[a-z]', password)
 
 
 def valid_username(username):
@@ -36,11 +36,7 @@ def valid_username(username):
 @login_manager
 def user_info(username):
     """User info"""
-    con, conn = connection()
-    con.execute("SELECT iduser, login FROM user WHERE login = %s", escape_string(username))
-    user = con.fetchone()
-    con.close()
-    conn.close()
+    user = get_user(login=username)
     if user:
         con, conn = connection()
         con.execute("SELECT idnote, title, note_type FROM note_view WHERE creator_id = %s", escape_string(
@@ -58,7 +54,8 @@ def user_info(username):
 
 def send_confirmation_email(email):
     token = ts.dumps(email, salt='email-confirm-key')
-    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG['EMAIL']['EMAIL'], recipients=[email])
+    msg = Message("Pytatki - Potwierdź swój adres email",
+                  sender=CONFIG['EMAIL']['EMAIL'], recipients=[email])
     msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
@@ -250,7 +247,8 @@ def get_token_post():
     gc.collect()
     if app:
         response = Response()
-        response.headers = {'auth_status': 'success', 'access_token': generate_access_token(current_user['iduser'])}
+        response.headers = {'auth_status': 'success',
+                            'access_token': generate_access_token(current_user['iduser'])}
         return redirect(next_url + '?state=' + state, 302)
     flash("Wrong client_id", "warning")
     return redirect("/")

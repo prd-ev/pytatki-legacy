@@ -9,18 +9,33 @@ import gc
 from pytatki.main import CONFIG as Config
 
 
+def get_user(id_user=None, login=None, email=None):
+    """Returns user by given data"""
+    sql = "SELECT * FROM user WHERE {} = %s"
+    user_data = ()
+    if id_user:
+        sql = sql.format("iduser")
+        user_data = (escape_string(str(id_user)))
+    elif login:
+        sql = sql.format("login")
+        user_data = (escape_string(login))
+    elif email:
+        sql = sql.format("email")
+        user_data = (escape_string(email))
+    con, conn = connection()
+    con.execute(sql, user_data)
+    user_dict = con.fetchone()
+    user = User()
+    user.update(user_dict)
+    con.close()
+    conn.close()
+    return user
+
+
 @LM.user_loader
 def user_load(user_id):
     try:
-        con, conn = connection()
-        con.execute("SELECT * FROM user WHERE iduser = %s",
-                    escape_string(str(user_id)))
-        user_dict = con.fetchone()
-        user = User()
-        user.update(user_dict)
-        con.close()
-        conn.close()
-        gc.collect()
+        user = get_user(id_user=user_id)
         return user
     except Exception as error:
         # TODO: exception type
