@@ -1,5 +1,5 @@
 -- Thu Nov  1 22:44:41 2018
--- Name: tables.sql
+-- Name: create_database.sql
 -- Author: Patryk Niedźwiedziński
 -- Version: 02.00.0000
 
