@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS user (
   password VARCHAR(200) NOT NULL,
   email VARCHAR(45) NOT NULL,
   email_confirm BINARY(1) NOT NULL DEFAULT 0,
-  status_id INT NOT NULL,
+  status_id INT NOT NULL DEFAULT 1,
   PRIMARY KEY (iduser),
   INDEX fk_user_status_idx (status_id ASC),
   UNIQUE INDEX login_UNIQUE (login ASC),
