@@ -15,7 +15,7 @@ def generator():
 input_generator = generator()
 
 
-@pytest.mark.first
+@pytest.mark.last
 def test_db_init(monkeypatch):
     os.system('mysql -u root -e "DROP DATABASE pytatki"')
     monkeypatch.setattr('builtins.input', lambda x: next(input_generator))
