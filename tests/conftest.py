@@ -19,10 +19,12 @@ def create_db():
         raise Warning("Database exists")
     for query in parse_sql('sql/create-database.sql'):
         cursor.execute(query)
-    cursor.execute("SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
+    cursor.execute(
+        "SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
     user_exists = cursor.fetchone()
     if not user_exists:
-        cursor.execute("CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
+        cursor.execute(
+            "CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
     cursor.execute("GRANT ALL ON pytatki.* TO \'pytatki\'@\'127.0.0.1\'")
     conn.close()
 

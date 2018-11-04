@@ -23,7 +23,7 @@ def create_app(test_config=None):
     return app
 
 
-CONFIG = parse_config('config.ini')
+CONFIG = parse_config('config.json')
 if not CONFIG:
     print("An error occurred while parsing config file")
     exit("Error")
@@ -41,5 +41,6 @@ LM.init_app(APP)
 LM.login_view = 'login_get'
 BCRYPT = Bcrypt()
 MAIL = Mail(APP)
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'files')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), 'files')
 APP.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

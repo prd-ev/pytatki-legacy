@@ -264,7 +264,7 @@ def give_admin(identifier):
     if current_user.is_admin() and user and user['iduser'] != current_user:
         try:
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
-                        (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))
+                        (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['admingroup_id']))
             conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 user['login']), 'success')
@@ -277,7 +277,7 @@ def give_admin(identifier):
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if int(identifier) != int(CONFIG['IDENTIFIERS']['ADMIN_ID']):
+    if int(identifier) != int(CONFIG['IDENTIFIERS']['admin_id']):
         con, conn = connection()
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
@@ -285,7 +285,7 @@ def take_admin(identifier):
         if current_user.is_admin() and query:
             try:
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                            (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['ADMINGROUP_ID']))))
+                            (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['admingroup_id']))))
                 conn.commit()
                 flash('Odebrano uprawnienia administratora uzytkownikowi ' +
                       user['login'], 'success')
@@ -338,10 +338,10 @@ def add():
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
-            CONFIG['IDENTIFIERS']['NOTE_TYPE_FILE_ID'],
+            CONFIG['IDENTIFIERS']['note_type_file_id'],
             current_user['iduser'],
             form['notegroup_id'],
-            CONFIG['IDENTIFIERS']['STATUS_ACTIVE_ID'])
+            CONFIG['IDENTIFIERS']['status_active_id'])
         conn.commit()
         con.close()
         conn.close()

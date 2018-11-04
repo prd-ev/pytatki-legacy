@@ -7,7 +7,7 @@ from pytatki.config import parse_config
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
-CONFIG = parse_config('config.ini', check_db_configuration=False)
+CONFIG = parse_config('config.json', check_db_configuration=False)
 
 
 def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_USER'],
@@ -83,7 +83,7 @@ def remove_note(conn, idnote, iduser):
     conn.cursor().execute(
         "UPDATE note SET status_id = %s WHERE idnote = %s",
         (pymysql.escape_string(str(
-            CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote)))
+            CONFIG['IDENTIFIERS']['status_removed_id'])), pymysql.escape_string(str(idnote)))
     )
     create_action(conn, 'removes a note \'{}\''.format(
         str(idnote)), iduser, idnote)
