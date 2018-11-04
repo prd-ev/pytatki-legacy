@@ -2,18 +2,18 @@
 import json
 import os
 
-from flask import (flash, g, redirect, render_template, request, send_file,
-                   jsonify)
+from flask import (flash, g, jsonify, redirect, render_template, request,
+                   send_file)
 from flask_login import current_user
 from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
 from pytatki import __version__
-from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
-                               remove_note, remove_notegroup, create_note,
-                               has_access_to_note)
+from pytatki.dbconnect import (connection, create_note, has_access_to_note,
+                               note_exists, notegroup_empty, remove_note,
+                               remove_notegroup)
 from pytatki.main import APP, CONFIG
-from pytatki.models import User, get_user
+from pytatki.models import get_user
 from pytatki.view_manager import login_manager, nocache
 
 __author__ = 'Patryk Niedzwiedzinski'
