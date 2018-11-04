@@ -25,26 +25,24 @@ def get_user(id_user=None, login=None, email=None):
     con, conn = connection()
     con.execute(sql, user_data)
     user_dict = con.fetchone()
-    user = User()
+    if not user_dict:
+        return None
+    con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                (escape_string(str(user_dict['iduser'])), escape_string(str(Config['IDENTIFIERS']['admingroup_id']))))
+    admin = con.fetchone()
+    user = User(is_admin=bool(admin))
     user.update(user_dict)
     con.close()
     conn.close()
+    gc.collect()
     return user
 
 
 @LM.user_loader
 def user_load(user_id):
     try:
-        con, conn = connection()
-        con.execute("SELECT * FROM user WHERE iduser = %s",
-                    escape_string(str(user_id)))
-        user_dict = con.fetchone()
-        user = User()
-        user.update(user_dict)
-        user.id = user_dict["iduser"]
-        con.close()
-        conn.close()
-        gc.collect()
+        user = get_user(id_user=user_id)
+        user.id = user["iduser"]
         return user
     except Exception as error:
         # TODO: exception type
@@ -53,6 +51,12 @@ def user_load(user_id):
 
 
 class User(dict):
+    def __init__(self, is_admin):
+        self.is_admin = is_admin
+
+    def __repr__(self):
+        return "User: {}".format(self['login'])
+
     def check_password(self, password):
         if sha256_crypt.verify(password, self['password']):
             return True
@@ -64,17 +68,6 @@ class User(dict):
         return True
 
     def is_anonymous(self):
-        return False
-
-    def is_admin(self):
-        con, conn = connection()
-        con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                    (escape_string(str(self['iduser'])), escape_string(Config['IDENTIFIERS']['admingroup_id'])))
-        admin = con.fetchone()
-        con.close()
-        conn.close()
-        if admin:
-            return True
         return False
 
     def get_id(self):

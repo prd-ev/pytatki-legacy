@@ -13,7 +13,7 @@ from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
                                remove_note, remove_notegroup, create_note,
                                has_access_to_note)
 from pytatki.main import APP, CONFIG
-from pytatki.models import User
+from pytatki.models import User, get_user
 from pytatki.view_manager import login_manager, nocache
 
 __author__ = 'Patryk Niedzwiedzinski'
@@ -185,7 +185,7 @@ def about():
 @login_manager
 def admin():
     """Admin"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         return render_template('admin.html')
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
@@ -218,7 +218,7 @@ def delete_notegroup(identifier):
 @login_manager
 def delete_note(identifier):
     """Delete note"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         if note_exists(conn, identifier):
             conn.begin()
@@ -237,7 +237,7 @@ def delete_note(identifier):
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         con.execute("SELECT * FROM user")
         users_raw = con.fetchall()
@@ -245,8 +245,7 @@ def user_list():
         conn.close()
         users = []
         for user_dict in users_raw:
-            user = User()
-            user.update(user_dict)
+            user = get_user(id_user=user_dict['iduser'])
             users.append(user)
         return render_template('user_list.html', users=users)
     flash('Nie mozesz tego zrobic!', 'warning')
@@ -261,7 +260,7 @@ def give_admin(identifier):
     con.execute("SELECT * FROM user WHERE iduser = %s",
                 escape_string(identifier))
     user = con.fetchone()
-    if current_user.is_admin() and user and user['iduser'] != current_user:
+    if current_user.is_admin and user and user['iduser'] != current_user:
         try:
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
                         (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['admingroup_id']))
@@ -282,7 +281,7 @@ def take_admin(identifier):
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
         user = con.fetchone()
-        if current_user.is_admin() and query:
+        if current_user.is_admin and query:
             try:
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
                             (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['admingroup_id']))))
@@ -361,7 +360,7 @@ def add():
 @login_manager
 def admin_add_post():
     """Admin add"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
                     (escape_string(request.form['title']),
@@ -401,7 +400,7 @@ def admin_add_post():
 @login_manager
 def admin_add_get():
     """Admin add"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         con.execute("SELECT idnotegroup, folder_name, parent_id FROM notegroup_view WHERE iduser = %s",
                     escape_string(str(current_user['iduser'])))

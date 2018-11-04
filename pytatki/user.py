@@ -175,30 +175,17 @@ def register_get():
 
 @APP.route('/login/', methods=["POST"])
 def login_post():
-    try:
-        if current_user.is_authenticated:
-            flash('Już jesteś zalogowany!', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        con, conn = connection()
-        con.execute("SELECT * FROM user WHERE email = %s OR login = %s",
-                    (escape_string(request.form['username']), escape_string(request.form['username'])))
-        user_dict = con.fetchone()
-        user = User()
-        if user_dict is not None:
-            user.update(user_dict)
-        con.close()
-        conn.close()
-        gc.collect()
-        if user and sha256_crypt.verify(request.form['password'], user['password']):
-            remember_me = request.form['remember'] if 'remember' in request.form else False
-            login_user(user, remember=remember_me)
-            return redirect(request.args.get('next') if 'next' in request.args else '/app/')
-        return render_template('login.html', wrong=True)
-    except Exception as error:
-        flash('Błąd: ' + str(error), 'danger')
+    if current_user.is_authenticated:
+        flash('Już jesteś zalogowany!', 'warning')
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
         return redirect('/')
+    user = get_user(login=request.form['username'])
+    if user and sha256_crypt.verify(request.form['password'], user['password']):
+        remember_me = request.form['remember'] if 'remember' in request.form else False
+        login_user(user, remember=remember_me)
+        return redirect(request.args.get('next') if 'next' in request.args else '/app/')
+    return render_template('login.html', wrong=True)
 
 
 @APP.route('/login/', methods=["GET"])

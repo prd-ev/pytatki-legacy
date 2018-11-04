@@ -10,7 +10,7 @@
       {%else%}
       {{user['login']}}
       {%endif%}
-      {% if user.admin() %}
+      {% if user.is_admin %}
       <span class="ml-3 badge badge-primary">ADMIN</span>
       {% endif %}
     </h2>
