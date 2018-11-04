@@ -1,7 +1,9 @@
-import pymysql
-from pytatki.config import parse_config
-from passlib.hash import sha256_crypt
 import json
+
+import pymysql
+from passlib.hash import sha256_crypt
+
+from pytatki.config import parse_config
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 

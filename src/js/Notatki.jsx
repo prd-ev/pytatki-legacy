@@ -1,10 +1,11 @@
 import React from "react";
 import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
-import EditMode from './EditMode.jsx'
-import NotegroupList from './UsergroupList.jsx'
-import config from '../../config.json'
-import ComponentStyle from '../scss/Notatki.scss'
+import EditMode from './EditMode.jsx';
+import NotegroupList from './UsergroupList.jsx';
+import config from '../../config.json';
+import ComponentStyle from '../scss/Notatki.scss';
+import ConfirmDelete from './ConfirmDelete.jsx';
 
 const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
@@ -17,7 +18,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
-      usergroupChosen: false,
+      currentUsergroupName: "",
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -63,12 +64,12 @@ class Notatki extends React.Component {
     );
   };
 
-  getUsergroupRoot(usergroup) {
+  getUsergroupRoot(usergroupId) {
     const that = this;
     fetch(siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroup + ',access_token:"' + token + '")}')
+      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroupId + ',access_token:"' + token + '")}')
         .then(response => response.json())
         .then(myJson => Number(myJson.data.getRootId))
         .then(rootId => {
@@ -121,7 +122,7 @@ class Notatki extends React.Component {
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
-    if (this.state.usergroupChosen) {
+    if (this.state.currentUsergroupName) {
       if (this.state.data[this.state.currentDepth]) {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
@@ -129,7 +130,7 @@ class Notatki extends React.Component {
             content.push(<div className={ComponentStyle.noteWrapper} key={value.key}><div className={ComponentStyle.note} onClick={this.openNote} id={value.key}><p>
               {value.title}
             </p></div>
-              <div className={ComponentStyle.delete} onClick={this.deleteNote}>
+              <div className={ComponentStyle.delete} onClick={this.preDeleteNote}>
                 {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
               </div>
             </div>);
@@ -137,7 +138,7 @@ class Notatki extends React.Component {
             content.push(<div className={ComponentStyle.folderWrapper} key={value.key}><div className={ComponentStyle.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
               {value.title}
             </p></div>
-              <div className={ComponentStyle.delete} onClick={this.deleteFolder}>
+              <div className={ComponentStyle.delete} onClick={this.preDeleteFolder}>
                 {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
               </div>
             </div>);
@@ -202,32 +203,21 @@ class Notatki extends React.Component {
     }))
   }
 
-  deleteNote = (e) => {
-    let noteId = e.target.previousSibling.id.slice(4);
-    fetch(siteUrl + '/admin/delete/note/' + noteId, {
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
-    this.updateContent();
+  preDeleteNote = e => {
+    let note = e.target.parentElement.previousSibling.id.slice(4);
+    this.setState({
+      noteToDelete: note
+    })
   }
 
-  deleteFolder = (e) => {
-    let folderId = e.target.previousSibling.id;
-    fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
-    this.updateContent();
+  preDeleteFolder = e => {
+    let folder = e.target.parentElement.previousSibling.id;
+    this.setState({
+      folderToDelete: folder
+    })
   }
 
+  
 
   updateContent() {
     const that = this;
@@ -260,12 +250,13 @@ class Notatki extends React.Component {
   }
 
   updateCurrentUsergroup = e => {
-    this.getUsergroupRoot(e.target.id)
+    this.getUsergroupRoot(e.target.id);
+    let usergroupName = e.target.innerText;
     this.setState({
       currentDepth: 0,
       currentDirId: [],
       currentPath: [],
-      usergroupChosen: true
+      currentUsergroupName: usergroupName
     })
   }
 
@@ -274,18 +265,20 @@ class Notatki extends React.Component {
       <React.Fragment>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
         <div className={ComponentStyle.mainContent}>
+          <p>{this.state.currentUsergroupName}</p>
           <div className={ComponentStyle.actionBar} key="actionBar">
-            {this.state.usergroupChosen ? (
+            {this.state.currentUsergroupName ? (
               <AddNote uploadNote={this.uploadNote}></AddNote>
             ) : ("")}
-            {this.state.usergroupChosen ? (
+            {this.state.currentUsergroupName ? (
               <AddFolder addFolder={this.addFolder}></AddFolder>
             ) : ("")}
-            {this.state.usergroupChosen ? (
+            {this.state.currentUsergroupName ? (
               <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
             ) : ("")}
           </div>
-          {this.state.usergroupChosen && this.state.currentDepth ? (
+          <ConfirmDelete folderToDelete={this.state.folderToDelete} noteToDelete={this.state.noteToDelete} updateContent={this.updateContent} siteUrl={siteUrl} that={this} ></ConfirmDelete>
+          {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={ComponentStyle.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
               {this.showCurrentPath()}
@@ -296,7 +289,7 @@ class Notatki extends React.Component {
           </div>
         </div>
       </React.Fragment>
-      );
+    );
   };
 }
 
