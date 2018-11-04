@@ -32,11 +32,12 @@ nav {
     }
 }
 
-.btn {
+%btn {
     background-color: $primary;
     border-color: $primary;
     color: $white;
     box-shadow: 1px 1px 4px 0 $black;
+    cursor: pointer;
 
 
     &:active,
@@ -48,6 +49,10 @@ nav {
         box-shadow: 1px 1px 4px 0 $black;
     }
 
+}
+
+.btn{
+    @extend %btn;
 }
 
 .navbar-brand {
