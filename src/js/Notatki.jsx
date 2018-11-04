@@ -2,17 +2,17 @@ import React from "react";
 import AddNote from "./AddNote.jsx";
 import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx';
-import NotegroupList from './UsergroupList.jsx';
+import UsergroupList from './UsergroupList.jsx';
 import config from '../../config.json';
 import style from '../scss/Notatki.scss';
 import ConfirmDelete from './ConfirmDelete.jsx';
 
-const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      siteUrl: `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
       currentDepth: 0,
       data: [],
       currentPath: [],
@@ -66,10 +66,10 @@ class Notatki extends React.Component {
 
   getUsergroupRoot(usergroupId) {
     const that = this;
-    fetch(siteUrl + '/api?query={getToken}')
+    fetch(this.state.siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroupId + ',access_token:"' + token + '")}')
+      .then(token => fetch(this.state.siteUrl + '/api?query={getRootId(id_usergroup:' + usergroupId + ',access_token:"' + token + '")}')
         .then(response => response.json())
         .then(myJson => Number(myJson.data.getRootId))
         .then(rootId => {
@@ -81,10 +81,10 @@ class Notatki extends React.Component {
   }
 
   getContent(dir_id) {
-    return fetch(siteUrl + '/api?query={getToken}')
+    return fetch(this.state.siteUrl + '/api?query={getToken}')
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + dir_id + ',access_token:"' + token + '")}'))
+      .then(token => fetch(this.state.siteUrl + '/api?query={getContent(id_notegroup:' + dir_id + ',access_token:"' + token + '")}'))
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
 
@@ -94,7 +94,7 @@ class Notatki extends React.Component {
 
   openNote = (e) => {
     let id = e.target.id.slice(4);
-    window.open(siteUrl + `/download/${id}`);
+    window.open(this.state.siteUrl + `/download/${id}`);
   }
 
   prevFolder = () => {
@@ -151,50 +151,6 @@ class Notatki extends React.Component {
     }
     return null;
   };
-
-  uploadNote = (e) => {
-    e.preventDefault();
-    const form = document.getElementById('form');
-    const file = form[1].files[0];
-    const title = form[0].value;
-    var formData = new FormData();
-    formData.append('file', file);
-    formData.append('title', title);
-    formData.append('notegroup_id', this.state.currentDirId[this.state.currentDepth]);
-    fetch(siteUrl + '/add/', {
-      method: 'POST',
-      body: formData
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
-    this.updateContent();
-    e.target.querySelector("input").value = null;
-    e.target.querySelector("#file").value = null;
-  }
-
-  addFolder = (e) => {
-    e.preventDefault();
-    var formData = new FormData();
-    formData.append('title', document.getElementById('addFolderForm')[0].value);
-    formData.append('parent_id', this.state.currentDirId[this.state.currentDirId.length - 1]);
-    formData.append('class', '1');//dodać dynamicznie 
-    fetch(siteUrl + '/admin/add/', {
-      method: 'POST',
-      body: formData
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
-    this.updateContent();
-    e.target.querySelector("input").value = null;
-  }
 
   changeMode = (e) => {
     e.preventDefault();
@@ -263,21 +219,21 @@ class Notatki extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
+        <UsergoupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={this.state.siteUrl}></UsergoupList>
         <div className={style.mainContent}>
           <p className={style.usergroupName}>{this.state.currentUsergroupName}</p>
           <div className={style.actionBar} key="actionBar">
             {this.state.currentUsergroupName ? (
-              <AddNote uploadNote={this.uploadNote}></AddNote>
+              <AddNote that={this}></AddNote>
             ) : ("")}
             {this.state.currentUsergroupName ? (
-              <AddFolder addFolder={this.addFolder}></AddFolder>
+              <AddFolder that={this}></AddFolder>
             ) : ("")}
             {this.state.currentUsergroupName ? (
               <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
             ) : ("")}
           </div>
-          <ConfirmDelete folderToDelete={this.state.folderToDelete} noteToDelete={this.state.noteToDelete} updateContent={this.updateContent} siteUrl={siteUrl} that={this} ></ConfirmDelete>
+          <ConfirmDelete folderToDelete={this.state.folderToDelete} noteToDelete={this.state.noteToDelete} updateContent={this.updateContent} siteUrl={this.state.siteUrl} that={this} ></ConfirmDelete>
           {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={style.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
