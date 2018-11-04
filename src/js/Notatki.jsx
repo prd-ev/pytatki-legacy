@@ -4,7 +4,7 @@ import AddFolder from './AddFolder.jsx';
 import EditMode from './EditMode.jsx';
 import NotegroupList from './UsergroupList.jsx';
 import config from '../../config.json';
-import ComponentStyle from '../scss/Notatki.scss';
+import style from '../scss/Notatki.scss';
 import ConfirmDelete from './ConfirmDelete.jsx';
 
 const siteUrl = "http://" + config.default.host + ":" + config.default.port;
@@ -127,19 +127,19 @@ class Notatki extends React.Component {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
-            content.push(<div className={ComponentStyle.noteWrapper} key={value.key}><div className={ComponentStyle.note} onClick={this.openNote} id={value.key}><p>
+            content.push(<div className={style.noteWrapper} key={value.key}><div className={style.note} onClick={this.openNote} id={value.key}><p>
               {value.title}
             </p></div>
-              <div className={ComponentStyle.delete} onClick={this.preDeleteNote}>
-                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
+              <div className={style.delete}>
+                {this.state.editModeOn ? <i onClick={this.preDeleteNote} className="fas fa-times"></i> : null}
               </div>
             </div>);
           } else {
-            content.push(<div className={ComponentStyle.folderWrapper} key={value.key}><div className={ComponentStyle.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
+            content.push(<div className={style.folderWrapper} key={value.key}><div className={style.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
               {value.title}
             </p></div>
-              <div className={ComponentStyle.delete} onClick={this.preDeleteFolder}>
-                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
+              <div className={style.delete}>
+                {this.state.editModeOn ? <i onClick={this.preDeleteFolder} className="fas fa-times"></i> : null}
               </div>
             </div>);
           }
@@ -147,7 +147,7 @@ class Notatki extends React.Component {
         return content;
       }
     } else {
-      return <p className={ComponentStyle.no_group_chosen}>Wybierz grupę aby kontynuować</p>
+      return <p className={style.no_group_chosen}>Wybierz grupę aby kontynuować</p>
     }
     return null;
   };
@@ -264,9 +264,9 @@ class Notatki extends React.Component {
     return (
       <React.Fragment>
         <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
-        <div className={ComponentStyle.mainContent}>
-          <p>{this.state.currentUsergroupName}</p>
-          <div className={ComponentStyle.actionBar} key="actionBar">
+        <div className={style.mainContent}>
+          <p className={style.usergroupName}>{this.state.currentUsergroupName}</p>
+          <div className={style.actionBar} key="actionBar">
             {this.state.currentUsergroupName ? (
               <AddNote uploadNote={this.uploadNote}></AddNote>
             ) : ("")}
@@ -279,12 +279,12 @@ class Notatki extends React.Component {
           </div>
           <ConfirmDelete folderToDelete={this.state.folderToDelete} noteToDelete={this.state.noteToDelete} updateContent={this.updateContent} siteUrl={siteUrl} that={this} ></ConfirmDelete>
           {this.state.currentUsergroupName && this.state.currentDepth ? (
-            <div className={ComponentStyle.back}>
+            <div className={style.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
               {this.showCurrentPath()}
             </div>
           ) : ("")}
-          <div className={ComponentStyle.fetchedData} key="fetchedData">
+          <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
         </div>

@@ -9,11 +9,12 @@
     border-radius: 5px;
     background-color: $white;
     padding: 20px;
+    z-index: 999;
 
     span {
         @extend %btn;
         width: 40%;
-        margin: 10px;
+        margin: 5%;
         text-align: center;
         display: inline-block;
     }

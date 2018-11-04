@@ -44,6 +44,10 @@
     top: -5px;
     right: 0;
     cursor: pointer;
+
+    i {
+        padding: 5px;
+    }
 }
 
 .noteWrapper,
@@ -86,4 +90,9 @@
 
 .fetchedData {
     padding-top: 45px;
+}
+
+.usergroupName {
+    margin-top: 30px;
+    font-size: 30px;
 }
