@@ -32,17 +32,6 @@ def type_id(type_name):
     return file_type['idnote_type']
 
 
-def has_access_to_notegroup(id_notegroup, id_user):
-    """Returns true if user has access to notegroup, else false"""
-    con, conn = connection()
-    con.execute("SELECT iduser FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                (escape_string(str(id_user)), escape_string(str(id_notegroup))))
-    return_value = con.fetchone()
-    con.close()
-    conn.close()
-    return True if return_value else False
-
-
 def has_access_to_usergroup(id_usergroup, id_user):
     """Returns true if user has access to usergroup, else false"""
     con, conn = connection()

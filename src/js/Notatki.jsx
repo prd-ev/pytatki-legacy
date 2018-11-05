@@ -6,6 +6,15 @@ import UsergroupList from "./UsergroupList.jsx";
 import config from "../../config.json";
 import style from "../scss/Notatki.scss";
 import ConfirmDelete from "./ConfirmDelete.jsx";
+import InfoNote from "./InfoNote.jsx";
+import { ContextMenuTrigger } from "react-contextmenu";
+import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
+
+
+const MENU_TYPE = "DYNAMIC";
+function collect(props) {
+  return props;
+}
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -17,10 +26,56 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
-      currentUsergroupName: ""
+      currentUsergroupName: "",
+      is_note: null,
+      note: null,
+      infoVisible: false,
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
+
+  handleClick = (e, data, target) => {
+    if (data.action === "Open") {
+      this.openNote(data.name.slice(4));
+    }
+    if (data.action === "Properties") {
+      this.infoNote(data.is_note, data.name.slice(4));
+    }
+    if (data.action === "Delete") {
+      this.deleteNote_ContextMenu(data.name.slice(4));
+    }
+  };
+
+  handleClickGroup = (e, data, target) => {
+    if (data.action === "Properties") {
+      this.infoNote(data.is_note, data.name);
+    }
+    if (data.action === "Delete") {
+      this.deleteFolder_ContextMenu(data.name);
+    }
+  };
+
+  deleteFolder_ContextMenu = id => {
+    fetch(siteUrl + "/notegroup/" + id + "/delete/", {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    this.updateContent();
+  };
+
+  deleteNote_ContextMenu = id => {
+    fetch(siteUrl + "/admin/delete/note/" + id, {})
+      .then(response => response.text()) // if the response is a JSON object
+      .then(success => console.log(success)) // Handle the success response object
+      .catch(error => console.log(error)); // Handle the error response object
+    this.updateContent();
+  };
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
@@ -60,7 +115,7 @@ class Notatki extends React.Component {
     });
   };
 
-  getUsergroupRoot(usergroupId) {
+  getUsergroupRoot = usergroupId => {
     const that = this;
     fetch(this.state.siteUrl + "/api?query={getToken}")
       .then(response => response.json())
@@ -68,11 +123,11 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           this.state.siteUrl +
-            "/api?query={getRootId(id_usergroup:" +
-            usergroupId +
-            ',access_token:"' +
-            token +
-            '")}'
+          "/api?query={getRootId(id_usergroup:" +
+          usergroupId +
+          ',access_token:"' +
+          token +
+          '")}'
         )
           .then(response => response.json())
           .then(myJson => Number(myJson.data.getRootId))
@@ -92,23 +147,47 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           this.state.siteUrl +
-            "/api?query={getContent(id_notegroup:" +
-            dir_id +
-            ',access_token:"' +
-            token +
-            '")}'
+          "/api?query={getContent(id_notegroup:" +
+          dir_id +
+          ',access_token:"' +
+          token +
+          '")}'
         )
       )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
 
       .catch(error => console.log(error));
-  }
+  };
+
+  openNote = e => {
+    window.open(siteUrl + `/download/${e}`);
+  };
 
   openNote = e => {
     let id = e.target.id.slice(4);
     window.open(this.state.siteUrl + `/download/${id}`);
   };
+
+  openNoteClick = e => () => {
+    window.open(siteUrl + `/download/${e}`);
+  };
+
+  infoNote = (is_note, id) => {
+    this.setState({
+      is_note: is_note,
+      note: id,
+      infoVisible: true
+    });
+  };
+
+  closeInfo = () => {
+    this.setState({
+      is_note: null,
+      note: null,
+      infoVisible: false
+    });
+  }
 
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
@@ -154,6 +233,31 @@ class Notatki extends React.Component {
                     <i onClick={this.preDeleteNote} className="fas fa-times" />
                   ) : null}
                 </div>
+                <ContextMenuTrigger
+                  id={MENU_TYPE}
+                  holdToDisplay={1000}
+                  name={value.key}
+                  is_note={value.is_note}
+                  onItemClick={this.handleClick}
+                  collect={collect}
+                  key={value.key}
+                >
+                  <div
+                    id={value.key}
+                    className={ComponentStyle.note}
+                    onDoubleClick={this.openNoteClick(value.key.slice(4))}
+                  >
+                    <p>{value.title}</p>
+                  </div>
+                  <div
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteNote}
+                  >
+                    {this.state.editModeOn ? (
+                      <i className="fas fa-times" />
+                    ) : null}
+                  </div>
+                </ContextMenuTrigger>
               </div>
             );
           } else {
@@ -174,19 +278,48 @@ class Notatki extends React.Component {
                     />
                   ) : null}
                 </div>
+                <ContextMenuTrigger
+                  id="NOTEGROUP"
+                  holdToDisplay={1000}
+                  name={value.key}
+                  is_note={value.is_note}
+                  onItemClick={this.handleClickGroup}
+                  collect={collect}
+                  key={value.key}
+                >
+                  <div
+                    key={value.key}
+                    className={ComponentStyle.folder}
+                    onClick={this.changeCurrentDirectory}
+                    id={value.key}
+                  >
+                    <p onClick={this.changeCurrentDirectory} id={value.key}>
+                      {value.title}
+                    </p>
+                  </div>
+                  <div
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteFolder}
+                  >
+                    {this.state.editModeOn ? (
+                      <i className="fas fa-times" />
+                    ) : null}
+                  </div>
+                </ContextMenuTrigger>
               </div>
             );
           }
         }
         return content;
+      } else {
+        return (
+          <p className={ComponentStyle.no_group_chosen}>
+            Wybierz grupę aby kontynuować
+          </p>
+        );
       }
-    } else {
-      return (
-        <p className={style.no_group_chosen}>Wybierz grupę aby kontynuować</p>
-      );
     }
-    return null;
-  };
+  }
 
   changeMode = e => {
     e.preventDefault();
@@ -207,9 +340,39 @@ class Notatki extends React.Component {
     this.setState({
       folderToDelete: folder
     });
+  }
+
+  deleteNote = e => {
+    let noteId = e.target.previousSibling.id.slice(4);
+    fetch(siteUrl + "/admin/delete/note/" + noteId, {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    this.updateContent();
   };
 
-  updateContent() {
+  deleteFolder = e => {
+    let folderId = e.target.previousSibling.id;
+    fetch(siteUrl + "/notegroup/" + folderId + "/delete/", {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    this.updateContent();
+  };
+
+  updateContent = () => {
     const that = this;
     this.getContent(
       this.state.currentDirId[this.state.currentDirId.length - 1]
@@ -270,10 +433,11 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </div>
           <ConfirmDelete
+            //TODO:
             folderToDelete={this.state.folderToDelete}
             noteToDelete={this.state.noteToDelete}
             updateContent={this.updateContent}
@@ -286,11 +450,19 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
+          <InfoNote
+            note={this.state.note}
+            is_note={this.state.is_note}
+            visible={this.state.infoVisible}
+            closeInfoNotatki={this.closeInfo}
+          />
+          <ConnectedMenu />
+          <ConnectedGroupMenu />
         </div>
       </React.Fragment>
     );
