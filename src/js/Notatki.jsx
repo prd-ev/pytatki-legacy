@@ -1,12 +1,20 @@
 import React from "react";
 import AddNote from "./AddNote.jsx";
-import AddFolder from './AddFolder.jsx';
-import EditMode from './EditMode.jsx'
-import NotegroupList from './UsergroupList.jsx'
-import config from '../../config.json'
-import ComponentStyle from '../scss/Notatki.scss'
+import AddFolder from "./AddFolder.jsx";
+import EditMode from "./EditMode.jsx";
+import NotegroupList from "./UsergroupList.jsx";
+import InfoNote from "./InfoNote.jsx";
+import { ContextMenuTrigger } from "react-contextmenu";
+import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
+import config from "../../config.json";
+import ComponentStyle from "../scss/Notatki.scss";
 
 const siteUrl = "http://" + config.default.host + ":" + config.default.port;
+
+const MENU_TYPE = "DYNAMIC";
+function collect(props) {
+  return props;
+}
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -17,10 +25,56 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
-      usergroupChosen: false,
+      is_note: null,
+      note: null,
+      infoVisible: false,
+      usergroupChosen: false
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
+
+  handleClick = (e, data, target) => {
+    if (data.action === "Open") {
+      this.openNote(data.name.slice(4));
+    }
+    if (data.action === "Properties") {
+      this.infoNote(data.is_note, data.name.slice(4));
+    }
+    if (data.action === "Delete") {
+      this.deleteNote_ContextMenu(data.name.slice(4));
+    }
+  };
+
+  handleClickGroup = (e, data, target) => {
+    if (data.action === "Properties") {
+      this.infoNote(data.is_note, data.name);
+    }
+    if (data.action === "Delete") {
+      this.deleteFolder_ContextMenu(data.name);
+    }
+  };
+
+  deleteFolder_ContextMenu = id => {
+    fetch(siteUrl + "/notegroup/" + id + "/delete/", {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    this.updateContent();
+  };
+
+  deleteNote_ContextMenu = id => {
+    fetch(siteUrl + "/admin/delete/note/" + id, {})
+      .then(response => response.text()) // if the response is a JSON object
+      .then(success => console.log(success)) // Handle the success response object
+      .catch(error => console.log(error)); // Handle the error response object
+    this.updateContent();
+  };
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
@@ -38,15 +92,13 @@ class Notatki extends React.Component {
             object["is_note"] = true;
             folderContent.push(object);
           }
-        }
-        else {
+        } else {
           object["title"] = notegroup.folder_name;
           object["key"] = notegroup.idnotegroup;
           object["is_note"] = false;
           folderContent.push(object);
         }
       }
-      ;
       let updated_data = that.state.data;
       updated_data[that.state.currentDepth + 1] = folderContent;
       let updated_path = that.state.currentPath;
@@ -59,42 +111,77 @@ class Notatki extends React.Component {
         currentPath: updated_path,
         currentDirId: updated_dir_id
       }));
-    }
-    );
+    });
   };
 
-  getUsergroupRoot(usergroup) {
+  getUsergroupRoot = usergroup => {
     const that = this;
-    fetch(siteUrl + '/api?query={getToken}')
+    fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getRootId(id_usergroup:' + usergroup + ',access_token:"' + token + '")}')
-        .then(response => response.json())
-        .then(myJson => Number(myJson.data.getRootId))
-        .then(rootId => {
-          that.setState({
-            currentDirId: [rootId]
-          });
-          that.updateContent(rootId);
-        }));
-  }
+      .then(token =>
+        fetch(
+          siteUrl +
+            "/api?query={getRootId(id_usergroup:" +
+            usergroup +
+            ',access_token:"' +
+            token +
+            '")}'
+        )
+          .then(response => response.json())
+          .then(myJson => Number(myJson.data.getRootId))
+          .then(rootId => {
+            that.setState({
+              currentDirId: [rootId]
+            });
+            that.updateContent(rootId);
+          })
+      );
+  };
 
-  getContent(dir_id) {
-    return fetch(siteUrl + '/api?query={getToken}')
+  getContent = dir_id => {
+    return fetch(siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(siteUrl + '/api?query={getContent(id_notegroup:' + dir_id + ',access_token:"' + token + '")}'))
+      .then(token =>
+        fetch(
+          siteUrl +
+            "/api?query={getContent(id_notegroup:" +
+            dir_id +
+            ',access_token:"' +
+            token +
+            '")}'
+        )
+      )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
 
       .catch(error => console.log(error));
-  }
+  };
 
+  openNote = e => {
+    window.open(siteUrl + `/download/${e}`);
+  };
 
-  openNote = (e) => {
-    let id = e.target.id.slice(4);
-    window.open(siteUrl + `/download/${id}`);
-  }
+  openNoteClick = e => () => {
+    window.open(siteUrl + `/download/${e}`);
+  };
+
+  infoNote = (is_note, id) => {
+    this.setState({
+      is_note: is_note,
+      note: id,
+      infoVisible: true
+    });
+  };
+
+  closeInfo = () => {
+    this.setState({
+      is_note: null,
+      note: null,
+      infoVisible: false
+    });
+  };
 
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
@@ -108,7 +195,7 @@ class Notatki extends React.Component {
       currentDepth: depth,
       currentPath: path
     });
-  }
+  };
 
   showCurrentPath = () => {
     //Show current path from state
@@ -116,8 +203,8 @@ class Notatki extends React.Component {
     for (const folder of this.state.currentPath) {
       path = path + "/" + folder;
     }
-    return <span>{path}</span>
-  }
+    return <span>{path}</span>;
+  };
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
@@ -126,178 +213,292 @@ class Notatki extends React.Component {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
-            content.push(<div className={ComponentStyle.noteWrapper} key={value.key}><div className={ComponentStyle.note} onClick={this.openNote} id={value.key}><p>
-              {value.title}
-            </p></div>
-              <div className={ComponentStyle.delete} onClick={this.deleteNote}>
-                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
+            content.push(
+              <div className={ComponentStyle.noteWrapper} key={value.key}>
+                <ContextMenuTrigger
+                  id={MENU_TYPE}
+                  holdToDisplay={1000}
+                  name={value.key}
+                  is_note={value.is_note}
+                  onItemClick={this.handleClick}
+                  collect={collect}
+                  key={value.key}
+                >
+                  <div
+                    id={value.key}
+                    className={ComponentStyle.note}
+                    onDoubleClick={this.openNoteClick(value.key.slice(4))}
+                  >
+                    <p>{value.title}</p>
+                  </div>
+                  <div
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteNote}
+                  >
+                    {this.state.editModeOn ? (
+                      <i className="fas fa-times" />
+                    ) : null}
+                  </div>
+                </ContextMenuTrigger>
               </div>
-            </div>);
+            );
           } else {
-            content.push(<div className={ComponentStyle.folderWrapper} key={value.key}><div className={ComponentStyle.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
-              {value.title}
-            </p></div>
-              <div className={ComponentStyle.delete} onClick={this.deleteFolder}>
-                {this.state.editModeOn ? <i className="fas fa-times"></i> : null}
+            content.push(
+              <div className={ComponentStyle.folderWrapper}>
+                <ContextMenuTrigger
+                  id="NOTEGROUP"
+                  holdToDisplay={1000}
+                  name={value.key}
+                  is_note={value.is_note}
+                  onItemClick={this.handleClickGroup}
+                  collect={collect}
+                  key={value.key}
+                >
+                  <div
+                    key={value.key}
+                    className={ComponentStyle.folder}
+                    onClick={this.changeCurrentDirectory}
+                    id={value.key}
+                  >
+                    <p onClick={this.changeCurrentDirectory} id={value.key}>
+                      {value.title}
+                    </p>
+                  </div>
+                  <div
+                    className={ComponentStyle.delete}
+                    onClick={this.deleteFolder}
+                  >
+                    {this.state.editModeOn ? (
+                      <i className="fas fa-times" />
+                    ) : null}
+                  </div>
+                </ContextMenuTrigger>
               </div>
-            </div>);
+            );
           }
         }
         return content;
+      } else {
+        return (
+          <p className={ComponentStyle.no_group_chosen}>
+            Wybierz grupę aby kontynuować
+          </p>
+        );
       }
-    } else {
-      return <p className={ComponentStyle.no_group_chosen}>Wybierz grupę aby kontynuować</p>
     }
-    return null;
   };
 
-  uploadNote = (e) => {
+  uploadNote = e => {
     e.preventDefault();
-    const form = document.getElementById('form');
+    const form = document.getElementById("form");
     const file = form[1].files[0];
     const title = form[0].value;
     var formData = new FormData();
-    formData.append('file', file);
-    formData.append('title', title);
-    formData.append('notegroup_id', this.state.currentDirId[this.state.currentDepth]);
-    fetch(siteUrl + '/add/', {
-      method: 'POST',
-      body: formData
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
+    formData.append("file", file);
+    formData.append("title", title);
+    formData.append(
+      "notegroup_id",
+      this.state.currentDirId[this.state.currentDepth]
     );
+    fetch(siteUrl + "/add/", {
+      method: "POST",
+      body: formData
+    })
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    fetch(siteUrl + "/add/", {
+      method: "POST",
+      body: formData
+    })
+      .then(
+        response => response.text() // if the response is a JSON object
+      )
+      .then(
+        success => console.log(success) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     this.updateContent();
     e.target.querySelector("input").value = null;
     e.target.querySelector("#file").value = null;
-  }
+  };
 
-  addFolder = (e) => {
+  addFolder = e => {
     e.preventDefault();
     var formData = new FormData();
-    formData.append('title', document.getElementById('addFolderForm')[0].value);
-    formData.append('parent_id', this.state.currentDirId[this.state.currentDirId.length - 1]);
-    formData.append('class', '1');//dodać dynamicznie 
-    fetch(siteUrl + '/admin/add/', {
-      method: 'POST',
-      body: formData
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
+    formData.append("title", document.getElementById("addFolderForm")[0].value);
+    formData.append(
+      "parent_id",
+      this.state.currentDirId[this.state.currentDirId.length - 1]
     );
+    formData.append("class", "1"); //dodać dynamicznie
+    fetch(siteUrl + "/admin/add/", {
+      method: "POST",
+      body: formData
+    })
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
+    formData.append("class", "1"); //dodać dynamicznie
+    fetch(siteUrl + "/admin/add/", {
+      method: "POST",
+      body: formData
+    })
+      .then(
+        response => response.text() // if the response is a JSON object
+      )
+      .then(
+        success => console.log(success) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     this.updateContent();
     e.target.querySelector("input").value = null;
-  }
+  };
 
-  changeMode = (e) => {
+  changeMode = e => {
     e.preventDefault();
     this.setState(prevState => ({
       editModeOn: !prevState.editModeOn
-    }))
-  }
+    }));
+  };
 
-  deleteNote = (e) => {
+  deleteNote = e => {
     let noteId = e.target.previousSibling.id.slice(4);
-    fetch(siteUrl + '/admin/delete/note/' + noteId, {
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
+    fetch(siteUrl + "/admin/delete/note/" + noteId, {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     this.updateContent();
-  }
+  };
 
-  deleteFolder = (e) => {
+  deleteFolder = e => {
     let folderId = e.target.previousSibling.id;
-    fetch(siteUrl + '/notegroup/' + folderId + '/delete/', {
-    }).then(
-      response => response.json() // if the response is a JSON object
-    ).then(
-      success => alert(success.data) // Handle the success response object
-    ).catch(
-      error => console.log(error) // Handle the error response object
-    );
+    fetch(siteUrl + "/notegroup/" + folderId + "/delete/", {})
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert(success.data) // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
     this.updateContent();
-  }
+  };
 
-
-  updateContent() {
+  updateContent = () => {
     const that = this;
-    this.getContent(this.state.currentDirId[this.state.currentDirId.length - 1])
-      .then(innerJson => {
-        let folderContent = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          if (notegroup.idnote) {
-            if (notegroup.status_id != 2) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
-              folderContent.push(object);
-            }
-          }
-          else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
+    this.getContent(
+      this.state.currentDirId[this.state.currentDirId.length - 1]
+    ).then(innerJson => {
+      let folderContent = [];
+      for (const notegroup of innerJson) {
+        let object = {};
+        if (notegroup.idnote) {
+          if (notegroup.status_id != 2) {
+            object["title"] = notegroup.name;
+            object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
             folderContent.push(object);
           }
+        } else {
+          object["title"] = notegroup.folder_name;
+          object["key"] = notegroup.idnotegroup;
+          object["is_note"] = false;
+          folderContent.push(object);
         }
-        let updated_data = that.state.data;
-        updated_data[that.state.currentDepth] = folderContent;
-        that.setState({
-          data: updated_data,
-        });
+      }
+      let updated_data = that.state.data;
+      updated_data[that.state.currentDepth] = folderContent;
+      that.setState({
+        data: updated_data
       });
-  }
+    });
+  };
 
   updateCurrentUsergroup = e => {
-    this.getUsergroupRoot(e.target.id)
+    this.getUsergroupRoot(e.target.id);
     this.setState({
       currentDepth: 0,
       currentDirId: [],
       currentPath: [],
       usergroupChosen: true
-    })
-  }
+    });
+  };
 
   render() {
     return (
       <React.Fragment>
-        <NotegroupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={siteUrl}></NotegroupList>
+        <NotegroupList
+          updateUsergroup={this.updateCurrentUsergroup}
+          siteUrl={siteUrl}
+        />
         <div className={ComponentStyle.mainContent}>
           <div className={ComponentStyle.actionBar} key="actionBar">
             {this.state.usergroupChosen ? (
-              <AddNote uploadNote={this.uploadNote}></AddNote>
-            ) : ("")}
+              <AddNote uploadNote={this.uploadNote} />
+            ) : (
+              ""
+            )}
             {this.state.usergroupChosen ? (
-              <AddFolder addFolder={this.addFolder}></AddFolder>
-            ) : ("")}
+              <AddFolder addFolder={this.addFolder} />
+            ) : (
+              ""
+            )}
             {this.state.usergroupChosen ? (
-              <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-            ) : ("")}
+              <EditMode
+                changeMode={this.changeMode}
+                isOn={this.state.editModeOn}
+              />
+            ) : (
+              ""
+            )}
           </div>
           {this.state.usergroupChosen && this.state.currentDepth ? (
             <div className={ComponentStyle.back}>
-              <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
+              <i onClick={this.prevFolder} className="fas fa-arrow-left" />
               {this.showCurrentPath()}
             </div>
-          ) : ("")}
+          ) : (
+            ""
+          )}
           <div className={ComponentStyle.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
+          <InfoNote
+            note={this.state.note}
+            is_note={this.state.is_note}
+            visible={this.state.infoVisible}
+            closeInfoNotatki={this.closeInfo}
+          />
+          <ConnectedMenu />
+          <ConnectedGroupMenu />
         </div>
       </React.Fragment>
-      );
-  };
+    );
+  }
 }
 
 export default Notatki;
