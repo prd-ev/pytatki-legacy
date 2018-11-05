@@ -117,4 +117,6 @@ def insert_note(insert_user, insert_text_note_type, insert_test_notegroup):
     conn.commit()
     con.close()
     conn.close()
+    if note_id is None:
+        raise AssertionError()
     return note_id

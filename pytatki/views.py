@@ -220,7 +220,7 @@ def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
         con, conn = connection()
-        if note_exists(conn, identifier):
+        if note_exists(idnote=identifier):
             conn.begin()
             remove_note(conn, identifier, current_user['iduser'])
             conn.commit()

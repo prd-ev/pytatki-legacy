@@ -33,17 +33,18 @@ def create_usergroup(conn, name, description, parent_id='0'):
 
 def has_access_to_note(id_note, id_user):
     """Check if user has access to note"""
-    con, conn = connection()
-    con.execute("SELECT notegroup_id FROM note WHERE idnote = %s",
-                pymysql.escape_string(str(id_note)))
-    note = con.fetchone()
-    con.execute("SELECT 1 FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
-                (pymysql.escape_string(str(id_user)), pymysql.escape_string(str(note['notegroup_id']))))
-    has_access = con.fetchone()
-    con.close()
-    conn.close()
-    if has_access:
-        return True
+    if note_exists(idnote=id_note):
+        con, conn = connection()
+        con.execute("SELECT notegroup_id FROM note WHERE idnote = %s",
+                    pymysql.escape_string(str(id_note)))
+        note = con.fetchone()
+        con.execute("SELECT 1 FROM notegroup_view WHERE iduser = %s AND idnotegroup = %s",
+                    (pymysql.escape_string(str(id_user)), pymysql.escape_string(str(note['notegroup_id']))))
+        has_access = con.fetchone()
+        con.close()
+        conn.close()
+        if has_access:
+            return True
     return False
 
 
@@ -60,11 +61,21 @@ def get_note(id_note, id_user):
     return False
 
 
-def note_exists(conn, idnote):
+def note_exists(idnote=None, title=None, notegroup_id=None):
     """Checks if note exists"""
-    note_exists = conn.cursor().execute(
-        "SELECT * FROM note_view WHERE idnote = %s AND status_id = 1", pymysql.escape_string(str(idnote)))
-    return True if note_exists else False
+    con, conn = connection()
+    sql = "SELECT * FROM note WHERE {} AND status_id = 1"
+    args = (pymysql.escape_string(str(idnote)))
+    if idnote:
+        sql = sql.format("idnote= %s")
+    elif title and notegroup_id:
+        sql = sql.format("title = %s AND notegroup_id = %s")
+        args = (pymysql.escape_string(title),
+                pymysql.escape_string(str(notegroup_id)))
+    else:
+        return None
+    con.execute(sql, args)
+    return True if con.fetchone() else False
 
 
 def create_action(conn, content, iduser, idnote):
@@ -80,7 +91,7 @@ def create_action(conn, content, iduser, idnote):
 
 def remove_note(conn, idnote, iduser):
     """Removes a note"""
-    if has_access_to_note(id_note=idnote, id_user=iduser):
+    if has_access_to_note(idnote, iduser):
         conn.cursor().execute(
             "UPDATE note SET status_id = %s WHERE idnote = %s",
             (pymysql.escape_string(str(
@@ -157,21 +168,23 @@ def create_user(conn, login, password, email, status_id):
 
 
 def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_id):
-    c = conn.cursor()
-    c.execute(
-        "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)",
-        (
-            pymysql.escape_string(value),
-            pymysql.escape_string(title),
-            pymysql.escape_string(str(note_type_id)),
-            pymysql.escape_string(str(user_id)),
-            pymysql.escape_string(str(notegroup_id)),
-            pymysql.escape_string(str(status_id))
+    if note_exists(title=title, notegroup_id=notegroup_id):
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)",
+            (
+                pymysql.escape_string(value),
+                pymysql.escape_string(title),
+                pymysql.escape_string(str(note_type_id)),
+                pymysql.escape_string(str(user_id)),
+                pymysql.escape_string(str(notegroup_id)),
+                pymysql.escape_string(str(status_id))
+            )
         )
-    )
-    idnote = c.lastrowid
-    create_action(conn, "create note {}".format(title), user_id, idnote)
-    return idnote
+        idnote = c.lastrowid
+        create_action(conn, "create note {}".format(title), user_id, idnote)
+        return idnote
+    return None
 
 
 def remove_user(conn, iduser):
