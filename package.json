@@ -8,6 +8,7 @@
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "dev": "python3 run.py | npm run watch",
+    "setup": "cp examples/config.json .",
     "start": "uwsgi --ini config.ini"
   },
   "author": "Filip Wachowiak",
