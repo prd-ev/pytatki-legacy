@@ -179,7 +179,8 @@ def get_last_note_actions(idnote, iduser):
     con, conn = connection()
     con.execute("SELECT * FROM action WHERE note_id = %s ORDER BY date DESC",
                 pymysql.escape_string(str(idnote)))
-    last_actions = con.fetchmany(5)    last_actions = [
+    last_actions = con.fetchmany(5)
+    last_actions = [
         {
             'idaction': row['idaction'], 'content': row['content'], 'user_id': row['user_id'], 'date': row['date'].strftime('%I:%M %d.%m.%Y')
         }
