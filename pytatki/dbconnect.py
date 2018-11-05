@@ -80,13 +80,15 @@ def create_action(conn, content, iduser, idnote):
 
 def remove_note(conn, idnote, iduser):
     """Removes a note"""
-    conn.cursor().execute(
-        "UPDATE note SET status_id = %s WHERE idnote = %s",
-        (pymysql.escape_string(str(
-            CONFIG['IDENTIFIERS']['status_removed_id'])), pymysql.escape_string(str(idnote)))
-    )
-    create_action(conn, 'removes a note \'{}\''.format(
-        str(idnote)), iduser, idnote)
+    if has_access_to_note(id_note=idnote, id_user=iduser):
+        conn.cursor().execute(
+            "UPDATE note SET status_id = %s WHERE idnote = %s",
+            (pymysql.escape_string(str(
+                CONFIG['IDENTIFIERS']['status_removed_id'])), pymysql.escape_string(str(idnote)))
+        )
+        create_action(conn, 'removes a note \'{}\''.format(
+            str(idnote)), iduser, idnote)
+    return json.dumps({"data": "no permission"})
 
 
 def add_user_to_usergroup(conn, iduser, idusergroup):
