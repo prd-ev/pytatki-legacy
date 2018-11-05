@@ -1,12 +1,11 @@
 import React from "react";
 import AddNote from "./AddNote.jsx";
-import AddFolder from './AddFolder.jsx';
-import EditMode from './EditMode.jsx';
-import UsergroupList from './UsergroupList.jsx';
-import config from '../../config.json';
-import style from '../scss/Notatki.scss';
-import ConfirmDelete from './ConfirmDelete.jsx';
-
+import AddFolder from "./AddFolder.jsx";
+import EditMode from "./EditMode.jsx";
+import UsergroupList from "./UsergroupList.jsx";
+import config from "../../config.json";
+import style from "../scss/Notatki.scss";
+import ConfirmDelete from "./ConfirmDelete.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
@@ -18,7 +17,7 @@ class Notatki extends React.Component {
       currentPath: [],
       currentDirId: [],
       editModeOn: false,
-      currentUsergroupName: "",
+      currentUsergroupName: ""
     };
     //Download root folders and set state of data[0] to array of folder objects
   }
@@ -39,15 +38,13 @@ class Notatki extends React.Component {
             object["is_note"] = true;
             folderContent.push(object);
           }
-        }
-        else {
+        } else {
           object["title"] = notegroup.folder_name;
           object["key"] = notegroup.idnotegroup;
           object["is_note"] = false;
           folderContent.push(object);
         }
       }
-      ;
       let updated_data = that.state.data;
       updated_data[that.state.currentDepth + 1] = folderContent;
       let updated_path = that.state.currentPath;
@@ -60,42 +57,58 @@ class Notatki extends React.Component {
         currentPath: updated_path,
         currentDirId: updated_dir_id
       }));
-    }
-    );
+    });
   };
 
   getUsergroupRoot(usergroupId) {
     const that = this;
-    fetch(this.state.siteUrl + '/api?query={getToken}')
+    fetch(this.state.siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(this.state.siteUrl + '/api?query={getRootId(id_usergroup:' + usergroupId + ',access_token:"' + token + '")}')
-        .then(response => response.json())
-        .then(myJson => Number(myJson.data.getRootId))
-        .then(rootId => {
-          that.setState({
-            currentDirId: [rootId]
-          });
-          that.updateContent(rootId);
-        }));
+      .then(token =>
+        fetch(
+          this.state.siteUrl +
+            "/api?query={getRootId(id_usergroup:" +
+            usergroupId +
+            ',access_token:"' +
+            token +
+            '")}'
+        )
+          .then(response => response.json())
+          .then(myJson => Number(myJson.data.getRootId))
+          .then(rootId => {
+            that.setState({
+              currentDirId: [rootId]
+            });
+            that.updateContent(rootId);
+          })
+      );
   }
 
   getContent(dir_id) {
-    return fetch(this.state.siteUrl + '/api?query={getToken}')
+    return fetch(this.state.siteUrl + "/api?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
-      .then(token => fetch(this.state.siteUrl + '/api?query={getContent(id_notegroup:' + dir_id + ',access_token:"' + token + '")}'))
+      .then(token =>
+        fetch(
+          this.state.siteUrl +
+            "/api?query={getContent(id_notegroup:" +
+            dir_id +
+            ',access_token:"' +
+            token +
+            '")}'
+        )
+      )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
 
       .catch(error => console.log(error));
   }
 
-
-  openNote = (e) => {
+  openNote = e => {
     let id = e.target.id.slice(4);
     window.open(this.state.siteUrl + `/download/${id}`);
-  }
+  };
 
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
@@ -109,7 +122,7 @@ class Notatki extends React.Component {
       currentDepth: depth,
       currentPath: path
     });
-  }
+  };
 
   showCurrentPath = () => {
     //Show current path from state
@@ -117,8 +130,8 @@ class Notatki extends React.Component {
     for (const folder of this.state.currentPath) {
       path = path + "/" + folder;
     }
-    return <span>{path}</span>
-  }
+    return <span>{path}</span>;
+  };
 
   packContent = () => {
     //Show content of current depth form state (this.state.data)
@@ -127,82 +140,103 @@ class Notatki extends React.Component {
         var content = [];
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
-            content.push(<div className={style.noteWrapper} key={value.key}><div className={style.note} onClick={this.openNote} id={value.key}><p>
-              {value.title}
-            </p></div>
-              <div className={style.delete}>
-                {this.state.editModeOn ? <i onClick={this.preDeleteNote} className="fas fa-times"></i> : null}
+            content.push(
+              <div className={style.noteWrapper} key={value.key}>
+                <div
+                  className={style.note}
+                  onClick={this.openNote}
+                  id={value.key}
+                >
+                  <p>{value.title}</p>
+                </div>
+                <div className={style.delete}>
+                  {this.state.editModeOn ? (
+                    <i onClick={this.preDeleteNote} className="fas fa-times" />
+                  ) : null}
+                </div>
               </div>
-            </div>);
+            );
           } else {
-            content.push(<div className={style.folderWrapper} key={value.key}><div className={style.folder} onClick={this.changeCurrentDirectory} id={value.key}><p>
-              {value.title}
-            </p></div>
-              <div className={style.delete}>
-                {this.state.editModeOn ? <i onClick={this.preDeleteFolder} className="fas fa-times"></i> : null}
+            content.push(
+              <div className={style.folderWrapper} key={value.key}>
+                <div
+                  className={style.folder}
+                  onClick={this.changeCurrentDirectory}
+                  id={value.key}
+                >
+                  <p>{value.title}</p>
+                </div>
+                <div className={style.delete}>
+                  {this.state.editModeOn ? (
+                    <i
+                      onClick={this.preDeleteFolder}
+                      className="fas fa-times"
+                    />
+                  ) : null}
+                </div>
               </div>
-            </div>);
+            );
           }
         }
         return content;
       }
     } else {
-      return <p className={style.no_group_chosen}>Wybierz grupę aby kontynuować</p>
+      return (
+        <p className={style.no_group_chosen}>Wybierz grupę aby kontynuować</p>
+      );
     }
     return null;
   };
 
-  changeMode = (e) => {
+  changeMode = e => {
     e.preventDefault();
     this.setState(prevState => ({
       editModeOn: !prevState.editModeOn
-    }))
-  }
+    }));
+  };
 
   preDeleteNote = e => {
     let note = e.target.parentElement.previousSibling.id.slice(4);
     this.setState({
       noteToDelete: note
-    })
-  }
+    });
+  };
 
   preDeleteFolder = e => {
     let folder = e.target.parentElement.previousSibling.id;
     this.setState({
       folderToDelete: folder
-    })
-  }
-
-  
+    });
+  };
 
   updateContent() {
     const that = this;
-    this.getContent(this.state.currentDirId[this.state.currentDirId.length - 1])
-      .then(innerJson => {
-        let folderContent = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          if (notegroup.idnote) {
-            if (notegroup.status_id != 2) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
-              folderContent.push(object);
-            }
-          }
-          else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
+    this.getContent(
+      this.state.currentDirId[this.state.currentDirId.length - 1]
+    ).then(innerJson => {
+      let folderContent = [];
+      for (const notegroup of innerJson) {
+        let object = {};
+        if (notegroup.idnote) {
+          if (notegroup.status_id != 2) {
+            object["title"] = notegroup.name;
+            object["key"] = "note" + notegroup.idnote;
+            object["is_note"] = true;
             folderContent.push(object);
           }
+        } else {
+          object["title"] = notegroup.folder_name;
+          object["key"] = notegroup.idnotegroup;
+          object["is_note"] = false;
+          folderContent.push(object);
         }
-        let updated_data = that.state.data;
-        updated_data[that.state.currentDepth] = folderContent;
-        that.setState({
-          data: updated_data,
-        });
+      }
+      let updated_data = that.state.data;
+      updated_data[that.state.currentDepth] = folderContent;
+      that.setState({
+        data: updated_data
       });
+    });
   }
 
   updateCurrentUsergroup = e => {
@@ -213,40 +247,54 @@ class Notatki extends React.Component {
       currentDirId: [],
       currentPath: [],
       currentUsergroupName: usergroupName
-    })
-  }
+    });
+  };
 
   render() {
     return (
       <React.Fragment>
-        <UsergoupList updateUsergroup={this.updateCurrentUsergroup} siteUrl={this.state.siteUrl}></UsergoupList>
+        <UsergroupList
+          updateUsergroup={this.updateCurrentUsergroup}
+          siteUrl={this.state.siteUrl}
+        />
         <div className={style.mainContent}>
-          <p className={style.usergroupName}>{this.state.currentUsergroupName}</p>
+          <p className={style.usergroupName}>
+            {this.state.currentUsergroupName}
+          </p>
           <div className={style.actionBar} key="actionBar">
+            {this.state.currentUsergroupName ? <AddNote that={this} /> : ""}
+            {this.state.currentUsergroupName ? <AddFolder that={this} /> : ""}
             {this.state.currentUsergroupName ? (
-              <AddNote that={this}></AddNote>
-            ) : ("")}
-            {this.state.currentUsergroupName ? (
-              <AddFolder that={this}></AddFolder>
-            ) : ("")}
-            {this.state.currentUsergroupName ? (
-              <EditMode changeMode={this.changeMode} isOn={this.state.editModeOn}></EditMode>
-            ) : ("")}
+              <EditMode
+                changeMode={this.changeMode}
+                isOn={this.state.editModeOn}
+              />
+            ) : (
+              ""
+            )}
           </div>
-          <ConfirmDelete folderToDelete={this.state.folderToDelete} noteToDelete={this.state.noteToDelete} updateContent={this.updateContent} siteUrl={this.state.siteUrl} that={this} ></ConfirmDelete>
+          <ConfirmDelete
+            folderToDelete={this.state.folderToDelete}
+            noteToDelete={this.state.noteToDelete}
+            updateContent={this.updateContent}
+            siteUrl={this.state.siteUrl}
+            that={this}
+          />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={style.back}>
-              <i onClick={this.prevFolder} className="fas fa-arrow-left"></i>
+              <i onClick={this.prevFolder} className="fas fa-arrow-left" />
               {this.showCurrentPath()}
             </div>
-          ) : ("")}
+          ) : (
+            ""
+          )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
         </div>
       </React.Fragment>
     );
-  };
+  }
 }
 
 export default Notatki;
