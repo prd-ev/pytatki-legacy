@@ -5,7 +5,7 @@ import json
 
 __author__ = "Filip Wachowiak & Patryk Niedzwiedzinski"
 
-CONFIG = parse_config('config.ini', check_db_configuration=False)
+CONFIG = parse_config('config.json', check_db_configuration=False)
 
 
 def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_USER'],
@@ -81,7 +81,7 @@ def remove_note(conn, idnote, iduser):
     conn.cursor().execute(
         "UPDATE note SET status_id = %s WHERE idnote = %s",
         (pymysql.escape_string(str(
-            CONFIG['IDENTIFIERS']['STATUS_REMOVED_ID'])), pymysql.escape_string(str(idnote)))
+            CONFIG['IDENTIFIERS']['status_removed_id'])), pymysql.escape_string(str(idnote)))
     )
     create_action(conn, 'removes a note \'{}\''.format(
         str(idnote)), iduser, idnote)
@@ -175,8 +175,7 @@ def get_last_note_actions(idnote, iduser):
     con, conn = connection()
     con.execute("SELECT * FROM action WHERE note_id = %s ORDER BY date DESC",
                 pymysql.escape_string(str(idnote)))
-    last_actions = con.fetchmany(5)
-    last_actions = [
+    last_actions = con.fetchmany(5)    last_actions = [
         {
             'idaction': row['idaction'], 'content': row['content'], 'user_id': row['user_id'], 'date': row['date'].strftime('%I:%M %d.%m.%Y')
         }
@@ -193,7 +192,6 @@ def remove_user(conn, iduser):
     conn.cursor().execute("DELETE FROM user WHERE iduser = %s",
                           pymysql.escape_string(str(iduser)))
     # TODO: other tables
-
 
 def has_access_to_notegroup(id_notegroup, id_user):
     """Returns true if user has access to notegroup, else false"""

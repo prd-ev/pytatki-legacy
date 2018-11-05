@@ -1,18 +1,13 @@
-from configparser import ConfigParser
+"""Module for loading configuration file"""
+import json
 
 
 def parse_config(filename, check_email=False, check_uwsgi=False, check_db_configuration=True):
-    config = ConfigParser()
     with open(filename) as fp:
-        config.read_file(fp, source='config.ini')
-    config.sections()
+        config = json.load(fp)
     if 'DEFAULT' not in config:
         print("No DEFAULT section")
         return False
-    if 'uwsgi' in config:
-        print("uwsgi configuration found - you can run it with `uwsgi --ini config.ini`")
-        if check_uwsgi:
-            return False
     if 'DATABASE' not in config:
         print("Database configuration not found")
         return False
@@ -28,4 +23,4 @@ def parse_config(filename, check_email=False, check_uwsgi=False, check_db_config
 
 
 if __name__ == '__main__':
-    parse_config('../config.ini')
+    parse_config('config.json')
