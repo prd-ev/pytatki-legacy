@@ -1,7 +1,9 @@
-import pymysql
 import json
+
+import pymysql
+
 from init_db import parse_sql
-from pytatki.dbconnect import (connection, create_note,
+from pytatki.dbconnect import (connection, create_action, create_note,
                                create_note_type, create_notegroup,
                                create_status, create_user, create_usergroup,
                                has_access_to_note, note_exists,
@@ -96,3 +98,14 @@ def test_remove_note(insert_note):
         raise AssertionError()
     _.close()
     conn.close()
+
+
+def test_has_access_to_notegroup(insert_notegroup):
+    if has_access_to_notegroup(1, 1) != True:
+        raise AssertionError()
+
+
+def test_get_notegroup(insert_notegroup):
+    if get_notegroup(1, 1) != json.dumps({'idnotegroup': 1, 'name': 'test', 'parent_id': 0}):
+        print(get_notegroup(1, 1))
+        raise AssertionError()

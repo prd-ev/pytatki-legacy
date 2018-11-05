@@ -1,7 +1,7 @@
 from flask_graphql import GraphQLView
 from pytatki.main import APP
 
-from pytatki.dbconnect import connection, get_note
+from pytatki.dbconnect import connection, get_note, get_last_note_actions, get_notegroup
 import gc
 from flask_login import current_user
 from pytatki.views import find_notegroup_children, get_root_id, post_note, add_tag_to_note, get_usergroups_of_user
@@ -16,23 +16,27 @@ def generate_access_token(id_user, expiration=3600):
     s = TimedJSONWebSignatureSerializer(APP.secret_key, expires_in=expiration)
     return s.dumps({'id': id_user})
 
+
 def verify_auth_token(token):
-        s = TimedJSONWebSignatureSerializer(APP.secret_key)
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None
-        except BadSignature:
-            return None
-        return data
+    s = TimedJSONWebSignatureSerializer(APP.secret_key)
+    try:
+        data = s.loads(token)
+    except SignatureExpired:
+        return None
+    except BadSignature:
+        return None
+    return data
+
 
 def auth(func, token):
     def some_func(*args, **kwargs):
         return func(*args, **kwargs) if verify_auth_token(token) else "Invalid or expired access_token"
     return some_func
 
+
 def resolve_raises(*_):
     raise Exception("Throws!")
+
 
 def executeSQL(query, *args, **kwargs):
     con, conn = connection()
@@ -43,6 +47,7 @@ def executeSQL(query, *args, **kwargs):
     gc.collect()
     return result
 
+
 QueryRootType = GraphQLObjectType(
     name='QueryRoot',
     fields={
@@ -51,14 +56,25 @@ QueryRootType = GraphQLObjectType(
             args={
                 'ident': GraphQLArgument(GraphQLInt)
             },
-            resolver=lambda obj, info, ident: executeSQL("SELECT * FROM user WHERE iduser = %s", escape_string(str(ident)))
+            resolver=lambda obj, info, ident: executeSQL(
+                "SELECT * FROM user WHERE iduser = %s", escape_string(str(ident)))
         ),
         'getNoteByParentId': GraphQLField(
             type=GraphQLString,
             args={
                 'parent_id': GraphQLArgument(GraphQLInt)
             },
-            resolver=lambda obj, info, parent_id: executeSQL("SELECT title FROM note_view WHERE parent_id = %s", escape_string(str(parent_id)))
+            resolver=lambda obj, info, parent_id: executeSQL(
+                "SELECT title FROM note_view WHERE parent_id = %s", escape_string(str(parent_id)))
+        ),
+        'getNotegroupById': GraphQLField(
+            type=GraphQLString,
+            args={
+                'notegroup_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, notegroup_id, access_token: get_notegroup(
+                notegroup_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getContent': GraphQLField(
             type=GraphQLString,
@@ -78,6 +94,15 @@ QueryRootType = GraphQLObjectType(
             resolver=lambda obj, info, id_note, access_token: get_note(
                 id_note, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
+        'getNoteLastActions': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_note': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_note, access_token: get_last_note_actions(
+                id_note, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
         'getRootId': GraphQLField(
             type=GraphQLString,
             args={
@@ -92,16 +117,19 @@ QueryRootType = GraphQLObjectType(
             args={
                 'access_token': GraphQLArgument(GraphQLString)
             },
-            resolver=lambda obj, info, access_token: get_usergroups_of_user(verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+            resolver=lambda obj, info, access_token: get_usergroups_of_user(verify_auth_token(
+                access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getToken': GraphQLField(
             type=GraphQLString,
-            resolver=lambda obj, info: generate_access_token(current_user['iduser']).decode('ascii') if current_user.is_authenticated else "You need to authenticate this app"
+            resolver=lambda obj, info: generate_access_token(current_user['iduser']).decode(
+                'ascii') if current_user.is_authenticated else "You need to authenticate this app"
         ),
         'checkToken': GraphQLField(
             type=GraphQLString,
             args={'access_token': GraphQLArgument(GraphQLString)},
-            resolver=lambda obj, info, access_token: verify_auth_token(access_token)
+            resolver=lambda obj, info, access_token: verify_auth_token(
+                access_token)
         )
     }
 )
@@ -141,4 +169,5 @@ MutationRootType = GraphQLObjectType(
 schema = GraphQLSchema(QueryRootType, MutationRootType)
 
 APP.add_url_rule('/api/', view_func=GraphQLView.as_view('api', schema=schema))
-APP.add_url_rule('/graphiql/', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
+APP.add_url_rule(
+    '/graphiql/', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))

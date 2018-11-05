@@ -9,7 +9,8 @@
     "watch": "webpack --mode development --watch",
     "dev": "python3 run.py | npm run watch",
     "setup": "cp examples/config.json .",
-    "start": "uwsgi --ini config.ini"
+    "start": "uwsgi --ini config.ini",
+    "start2": "source venv/bin/activate.fish && uwsgi --ini config.ini"
   },
   "author": "Filip Wachowiak",
   "license": "MIT",
@@ -24,7 +25,7 @@
     "autoprefixer": "^9.1.5",
     "babel-loader": "^8.0.4",
     "css-loader": "^1.0.0",
-    "mini-css-extract-plugin": "^0.4.3",
+    "mini-css-extract-plugin": "^0.4.4",
     "node-sass": "^4.9.3",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^7.1.0",
@@ -35,6 +36,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "react": "^16.5.2",
+    "react-contextmenu": "^2.9.4",
     "react-dom": "^16.5.2"
   },
   "directories": {
