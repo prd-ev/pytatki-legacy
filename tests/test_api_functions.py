@@ -38,13 +38,6 @@ def test_user_has_access_to_note(insert_note):
 
 
 def test_get_note(insert_note, monkeypatch):
-    class MockConn(Mock):
-        @staticmethod
-        def fetchone():
-            yield json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})
-
-    monkeypatch.setattr('pytatki.dbconnect.connection',
-                        lambda: mock_connection(json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})))
     if get_note(1, 1) != json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'status_id': 1, 'note_type': 'text', 'creator_id': 1, 'creator_login': 'test', 'notegroup_id': 1, 'notegroup_name': 'test'}):
         print(get_note(1, 1))
         raise AssertionError()
@@ -122,7 +115,8 @@ def test_create_note(insert_user):
 
 def test_remove_note(insert_note):
     _, conn = connection()
-    remove_note(conn, 1, 1)
+    success = remove_note(conn, 1, 1)
+    conn.commit()
     if note_exists(idnote=1) is not False:
         raise AssertionError()
     _.close()

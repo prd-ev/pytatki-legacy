@@ -92,6 +92,7 @@ def create_action(conn, content, iduser, idnote):
 def remove_note(conn, idnote, iduser):
     """Removes a note"""
     if has_access_to_note(idnote, iduser):
+        print("has")
         conn.cursor().execute(
             "UPDATE note SET status_id = %s WHERE idnote = %s",
             (pymysql.escape_string(str(
@@ -99,6 +100,7 @@ def remove_note(conn, idnote, iduser):
         )
         create_action(conn, 'removes a note \'{}\''.format(
             str(idnote)), iduser, idnote)
+        return json.dumps({'data': 'success'})
     return json.dumps({"data": "no permission"})
 
 
