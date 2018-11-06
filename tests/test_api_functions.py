@@ -8,8 +8,27 @@ from pytatki.dbconnect import (connection, create_action, create_note,
                                create_status, create_user, create_usergroup,
                                has_access_to_note, note_exists,
                                notegroup_empty, remove_note, remove_notegroup,
-                               create_action, get_note, create_note)
+                               create_action, get_note, create_note,
+                               get_notegroup, has_access_to_notegroup)
 from pytatki.views import type_id, has_access_to_usergroup
+
+
+def mock_connection(value):
+    class Mock:
+        @staticmethod
+        def execute(sql, args):
+            pass
+
+        @staticmethod
+        def close():
+            pass
+
+    class MockConn(Mock):
+        @staticmethod
+        def fetchone():
+            return json.dumps(value)
+    conn = MockConn
+    return conn, conn
 
 
 def test_user_has_access_to_note(insert_note):
@@ -59,25 +78,8 @@ def test_remove_notegroup(insert_notegroup, insert_usergroup):
 
 
 def test_note_exists(insert_note, monkeypatch):
-    def mock_connection():
-        class MockConn:
-            @staticmethod
-            def execute(sql, args):
-                pass
-
-            @staticmethod
-            def close():
-                pass
-
-            @staticmethod
-            def fetchone():
-                return json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})
-
-        conn = MockConn
-        return conn, conn
-
     monkeypatch.setattr('pytatki.dbconnect.connection',
-                        lambda: mock_connection())
+                        lambda: mock_connection(json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})))
     if note_exists(idnote=1) is not True:
         print(note_exists(idnote=1))
         raise AssertionError()
