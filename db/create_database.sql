@@ -8,6 +8,7 @@ SET @dbname = IF(@dbname, @dbname, 'pytatki');
 -- -----------------------------------------------------
 -- Create database
 -- -----------------------------------------------------
-PREPARE stmt FROM CONCAT('CREATE DATABASE ', @dbname);
+SET @sql = CONCAT('CREATE DATABASE ', @dbname);
+PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
