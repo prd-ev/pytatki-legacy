@@ -1,6 +1,6 @@
 from flask_graphql import GraphQLView
 from pytatki.main import APP
-
+from pytatki.api.graphql.functions import api_create_usergroup
 from pytatki.dbconnect import connection, get_note, get_last_note_actions, get_notegroup
 import gc
 from flask_login import current_user
@@ -162,6 +162,16 @@ MutationRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, tag, note_id, access_token: add_tag_to_note(
                 tag, note_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'createUsergroup': GraphQLField(
+            type=GraphQLString,
+            args={
+                'name': GraphQLArgument(GraphQLString),
+                'description': GraphQLArgument(GraphQLString),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, name, description, access_token: api_create_usergroup(
+                name, description, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         )
     }
 )
