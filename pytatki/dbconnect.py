@@ -168,7 +168,7 @@ def create_user(conn, login, password, email, status_id):
 
 
 def create_note(conn, value, title, note_type_id, user_id, notegroup_id, status_id):
-    if note_exists(title=title, notegroup_id=notegroup_id):
+    if not note_exists(title=title, notegroup_id=notegroup_id):
         c = conn.cursor()
         c.execute(
             "INSERT INTO note (value, title, note_type_id, user_id, notegroup_id, status_id) VALUES (%s, %s, %s, %s, %s, %s)",

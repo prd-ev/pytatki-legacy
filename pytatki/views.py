@@ -9,7 +9,7 @@ from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
 from pytatki import __version__
-from pytatki.dbconnect import (connection, create_note, has_access_to_note, 
+from pytatki.dbconnect import (connection, create_note, has_access_to_note,
                                has_access_to_notegroup,
                                note_exists, notegroup_empty, remove_note,
                                remove_notegroup)
@@ -312,7 +312,6 @@ def add():
                 filename = secure_filename(request_file.filename)
             else:
                 return jsonify({'data': "File unsecure"})
-            print(filename)
             if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
                 if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
                     os.makedirs(os.path.join(
@@ -320,10 +319,10 @@ def add():
                 request_file.save(os.path.join(
                     APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
         else:
-            return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
+            return jsonify({'data': 'Nieobslugiwane rozszerzenie'}), 501
         con, conn = connection()
         conn.begin()
-        create_note(
+        added = create_note(
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
@@ -334,7 +333,9 @@ def add():
         conn.commit()
         con.close()
         conn.close()
-        return jsonify({'data': 'Notatka zostala dodana!'})
+        if not added:
+            return jsonify({'data': 'failed'}), 500
+        return jsonify({'data': 'Notatka zostala dodana!'}), 201
     else:
         con, conn = connection()
         con.execute(

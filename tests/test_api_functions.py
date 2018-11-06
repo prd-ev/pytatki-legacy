@@ -13,16 +13,17 @@ from pytatki.dbconnect import (connection, create_action, create_note,
 from pytatki.views import type_id, has_access_to_usergroup
 
 
+class Mock:
+    @staticmethod
+    def execute(sql, args):
+        pass
+
+    @staticmethod
+    def close():
+        pass
+
+
 def mock_connection(value):
-    class Mock:
-        @staticmethod
-        def execute(sql, args):
-            pass
-
-        @staticmethod
-        def close():
-            pass
-
     class MockConn(Mock):
         @staticmethod
         def fetchone():
@@ -36,7 +37,14 @@ def test_user_has_access_to_note(insert_note):
         raise AssertionError()
 
 
-def test_get_note(insert_note):
+def test_get_note(insert_note, monkeypatch):
+    class MockConn(Mock):
+        @staticmethod
+        def fetchone():
+            yield json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})
+
+    monkeypatch.setattr('pytatki.dbconnect.connection',
+                        lambda: mock_connection(json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})))
     if get_note(1, 1) != json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'status_id': 1, 'note_type': 'text', 'creator_id': 1, 'creator_login': 'test', 'notegroup_id': 1, 'notegroup_name': 'test'}):
         print(get_note(1, 1))
         raise AssertionError()
@@ -82,6 +90,8 @@ def test_note_exists(insert_note, monkeypatch):
                         lambda: mock_connection(json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})))
     if note_exists(idnote=1) is not True:
         print(note_exists(idnote=1))
+        raise AssertionError()
+    if note_exists(title='Test', notegroup_id=1) is not True:
         raise AssertionError()
 
 
