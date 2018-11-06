@@ -1,16 +1,16 @@
 import React from "react";
 import { MenuItem, connectMenu, ContextMenu } from "react-contextmenu";
-import ComponentStyle from "../scss/ContextMenu.scss";
+import style from "../scss/ContextMenu.scss";
 
 const NoteMenu = props => {
   const { id, trigger } = props;
   const handleItemClick = trigger ? trigger.onItemClick : null;
 
   return (
-    <ContextMenu id={id} className={ComponentStyle.contextmenu}>
+    <ContextMenu id={id} className={style.contextmenu}>
       {trigger && (
         <MenuItem
-          className={ComponentStyle.contextmenu_item}
+          className={style.contextmenu_item}
           onClick={handleItemClick}
           data={{ action: "Open" }}
         >
@@ -19,7 +19,7 @@ const NoteMenu = props => {
       )}
       {trigger && (
         <MenuItem
-          className={ComponentStyle.contextmenu_item}
+          className={style.contextmenu_item}
           onClick={handleItemClick}
           data={{ action: "Properties" }}
         >
@@ -28,7 +28,7 @@ const NoteMenu = props => {
       )}
       {trigger && (
         <MenuItem
-          className={ComponentStyle.contextmenu_item}
+          className={style.contextmenu_item}
           onClick={handleItemClick}
           data={{ action: "Delete" }}
         >
@@ -44,10 +44,10 @@ const NoteGroupMenu = props => {
   const handleItemClick = trigger ? trigger.onItemClick : null;
 
   return (
-    <ContextMenu id={id} className={ComponentStyle.contextmenu}>
+    <ContextMenu id={id} className={style.contextmenu}>
       {trigger && (
         <MenuItem
-          className={ComponentStyle.contextmenu_item}
+          className={style.contextmenu_item}
           onClick={handleItemClick}
           data={{ action: "Properties" }}
         >
@@ -56,7 +56,7 @@ const NoteGroupMenu = props => {
       )}
       {trigger && (
         <MenuItem
-          className={ComponentStyle.contextmenu_item}
+          className={style.contextmenu_item}
           onClick={handleItemClick}
           data={{ action: "Delete" }}
         >

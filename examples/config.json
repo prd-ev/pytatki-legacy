@@ -3,7 +3,8 @@
     "secret_key": "change_it",
     "DEBUG": true,
     "HOST": "127.0.0.1",
-    "PORT": 5000
+    "PORT": 5000,
+    "HTTPS": false
   },
   "EMAIL": {
     "MAIL_SERVER": "smtp.gmail.com",

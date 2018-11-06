@@ -2,7 +2,7 @@ import React from "react";
 import config from "../../config.json";
 import ComponentStyle from "../scss/Info.scss";
 
-const siteUrl = "http://" + config.default.host + ":" + config.default.port;
+const siteUrl = "http://" + config.DEFAULT.HOST + ":" + config.DEFAULT.PORT;
 
 class InfoNote extends React.Component {
   constructor(props) {
