@@ -58,12 +58,29 @@ def test_remove_notegroup(insert_notegroup, insert_usergroup):
     conn.close()
 
 
-def test_note_exists(insert_note):
-    _, conn = connection()
+def test_note_exists(insert_note, monkeypatch):
+    def mock_connection():
+        class MockConn:
+            @staticmethod
+            def execute(sql, args):
+                pass
+
+            @staticmethod
+            def close():
+                pass
+
+            @staticmethod
+            def fetchone():
+                return json.dumps({'idnote': 1, 'value': 'test', 'title': 'Test', 'note_type_id': 1, 'user_id': 1, 'notegroup_id': 1, 'status_id': 1})
+
+        conn = MockConn
+        return conn, conn
+
+    monkeypatch.setattr('pytatki.dbconnect.connection',
+                        lambda: mock_connection())
     if note_exists(idnote=1) is not True:
+        print(note_exists(idnote=1))
         raise AssertionError()
-    _.close()
-    conn.close()
 
 
 def test_create_action(insert_user):
