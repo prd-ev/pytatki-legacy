@@ -9,14 +9,15 @@ import ConfirmDelete from "./ConfirmDelete.jsx";
 import InfoNote from "./InfoNote.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
-
-
+import AddUsergroup from "./CreateUsergroup.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      siteUrl: config.DEFAULT.HTTPS ? `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`:`http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
+      siteUrl: config.DEFAULT.HTTPS
+        ? `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`
+        : `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
       currentDepth: 0,
       data: [],
       currentPath: [],
@@ -25,7 +26,7 @@ class Notatki extends React.Component {
       currentUsergroupName: "",
       is_note: null,
       note: null,
-      infoVisible: false,
+      infoVisible: false
     };
   }
 
@@ -95,7 +96,9 @@ class Notatki extends React.Component {
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
-          `${this.state.siteUrl}/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
+          `${
+            this.state.siteUrl
+          }/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
         )
           .then(response => response.json())
           .then(myJson => Number(myJson.data.getRootId))
@@ -106,7 +109,7 @@ class Notatki extends React.Component {
             that.updateContent(rootId);
           })
       );
-  }
+  };
 
   getContent(dir_id) {
     return fetch(this.state.siteUrl + "/api?query={getToken}")
@@ -114,14 +117,16 @@ class Notatki extends React.Component {
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
-          `${this.state.siteUrl}/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
+          `${
+            this.state.siteUrl
+          }/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
         )
       )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
 
       .catch(error => console.log(error));
-  };
+  }
 
   openNote = e => {
     window.open(`${this.state.siteUrl}/download/${e}`);
@@ -150,7 +155,7 @@ class Notatki extends React.Component {
       note: null,
       infoVisible: false
     });
-  }
+  };
 
   prevFolder = () => {
     //Update current path and decrease depth (if 1 or higher)
@@ -183,14 +188,13 @@ class Notatki extends React.Component {
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
             content.push(
-
               <ContextMenuTrigger
                 id="DYNAMIC"
                 holdToDisplay={1000}
                 name={value.key}
                 is_note={value.is_note}
                 onItemClick={this.handleClick}
-                collect={(props) => props}
+                collect={props => props}
                 key={value.key}
               >
                 <div className={style.noteWrapper} key={value.key}>
@@ -203,7 +207,10 @@ class Notatki extends React.Component {
                   </div>
                   <div className={style.delete}>
                     {this.state.editModeOn ? (
-                      <i onClick={this.preDeleteNote} className="fas fa-times" />
+                      <i
+                        onClick={this.preDeleteNote}
+                        className="fas fa-times"
+                      />
                     ) : null}
                   </div>
                 </div>
@@ -217,7 +224,7 @@ class Notatki extends React.Component {
                 name={value.key}
                 is_note={value.is_note}
                 onItemClick={this.handleClickGroup}
-                collect={(props) => props}
+                collect={props => props}
                 key={value.key}
               >
                 <div className={style.folderWrapper} key={value.key}>
@@ -245,12 +252,15 @@ class Notatki extends React.Component {
       }
     } else {
       return (
-        <p className={style.no_group_chosen}>
-          Wybierz grupę aby kontynuować
-          </p>
+        <React.Fragment>
+          <p className={style.no_group_chosen}>Wybierz grupę aby kontynuować</p>
+          <div align="center">
+            <AddUsergroup that={this} />
+          </div>
+        </React.Fragment>
       );
     }
-  }
+  };
 
   changeMode = e => {
     e.preventDefault();
@@ -281,7 +291,7 @@ class Notatki extends React.Component {
     this.setState({
       folderToDelete: folder
     });
-  }
+  };
 
   deleteNote = e => {
     let noteId = e.target.previousSibling.id.slice(4);
@@ -341,7 +351,7 @@ class Notatki extends React.Component {
         data: updated_data
       });
     });
-  }
+  };
 
   updateCurrentUsergroup = e => {
     this.getUsergroupRoot(e.target.id);
@@ -374,8 +384,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-                ""
-              )}
+              ""
+            )}
           </div>
           <ConfirmDelete that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
@@ -384,8 +394,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-              ""
-            )}
+            ""
+          )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
