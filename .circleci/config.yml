@@ -22,7 +22,7 @@ jobs:
             . venv/bin/activate
             pip install -r requirements/dev.txt
       - run:
-          name: Copy config.ini
+          name: Copy config.json
           command: |
             cp examples/config.json .
       - run:

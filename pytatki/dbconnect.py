@@ -123,16 +123,17 @@ def create_notegroup(conn, name, idusergroup, parent_id='0'):
     return idnotegroup
 
 
-def notegroup_empty(conn, idnotegroup):
+def notegroup_empty(idnotegroup):
     """Checks if notegroup is empty"""
-    not_empty = conn.cursor().execute(
+    con, conn = connection()
+    not_empty = con.execute(
         "SELECT * FROM note WHERE notegroup_id = %s AND status_id = 1", pymysql.escape_string(str(idnotegroup)))
-    return False if not_empty else True
+    return False if con.fetchone() else True
 
 
 def remove_notegroup(conn, idnotegroup):
     """Important function"""
-    if notegroup_empty(conn, idnotegroup):
+    if notegroup_empty(idnotegroup):
         print("x")
         c = conn.cursor()
         c.execute("DELETE FROM usergroup_has_notegroup WHERE notegroup_id = %s",

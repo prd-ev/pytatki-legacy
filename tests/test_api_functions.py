@@ -56,7 +56,7 @@ def test_has_access_to_usergroup(insert_usergroup):
 def test_notegroup_empty(insert_notegroup, insert_usergroup):
     _, conn = connection()
     notegroup_id = insert_notegroup(conn, 'test_empty', insert_usergroup)
-    if notegroup_empty(conn, notegroup_id) is not True:
+    if notegroup_empty(notegroup_id) is not True:
         raise AssertionError()
     _.close()
     conn.close()

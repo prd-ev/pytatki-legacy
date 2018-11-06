@@ -192,7 +192,7 @@ def delete_user(identifier):
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
     con, conn = connection()
-    if notegroup_empty(conn, identifier):
+    if notegroup_empty(identifier):
         conn.begin()
         remove_notegroup(conn, identifier)
         conn.commit()
