@@ -5,13 +5,18 @@
   "main": "/js/index.js",
   "scripts": {
     "test": "jest",
-    "test-watch" : "jest --watchAll",
+    "test-watch": "jest --watchAll",
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "dev": "python3 run.py | npm run watch",
     "setup": "cp examples/config.json .",
     "start": "uwsgi --ini config.ini",
     "start2": "source venv/bin/activate.fish && uwsgi --ini config.ini"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^.+\\.(css|less|scss)$": "identity-obj-proxy"
+    }
   },
   "author": "Filip Wachowiak",
   "license": "MIT",
@@ -24,12 +29,17 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/register": "^7.0.0",
     "autoprefixer": "^9.1.5",
+    "babel-core": "^7.0.0-bridge",
+    "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.4",
     "css-loader": "^1.0.0",
+    "enzyme-adapter-react-16": "^1.6.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^23.6.0",
     "mini-css-extract-plugin": "^0.4.4",
     "node-sass": "^4.9.3",
     "postcss-loader": "^3.0.0",
+    "react-test-renderer": "^16.6.0",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.20.2",
