@@ -4,7 +4,7 @@ import ComponentStyle from '../scss/ConfirmDelete.scss';
 export default function ConfirmDelete(props) {
     let deleteNote = e => () => {
         let noteId = e;
-        fetch(props.siteUrl + '/admin/delete/note/' + noteId, {
+        fetch(props.that.state.siteUrl + '/admin/delete/note/' + noteId, {
         }).then(
             response => response.json() // if the response is a JSON object
         ).then(
@@ -15,12 +15,12 @@ export default function ConfirmDelete(props) {
         props.that.setState({
             noteToDelete: null
         })
-        props.updateContent();
+        props.that.updateContent();
     }
 
     let deleteFolder = e => () => {
         let folderId = e;
-        fetch(props.siteUrl + '/notegroup/' + folderId + '/delete/', {
+        fetch(props.that.state.siteUrl + '/notegroup/' + folderId + '/delete/', {
         }).then(
             response => response.json() // if the response is a JSON object
         ).then(
@@ -31,22 +31,22 @@ export default function ConfirmDelete(props) {
         props.that.setState({
             folderToDelete: null
         })
-        props.updateContent();
+        props.that.updateContent();
     }
 
-    if (props.noteToDelete) {
+    if (props.that.state.noteTonoteToDelete) {
         return (
             <div className={ComponentStyle.deleteConfirmation}>
                 <p>Jesteś pewien, że chcesz usunąć tą notatkę?</p>
-                <span onClick={deleteNote(props.noteToDelete)}>Tak</span>
+                <span onClick={deleteNote(props.that.state.noteToDelete)}>Tak</span>
                 <span onClick={() => props.that.setState({ noteToDelete: null })}>Nie</span>
             </div>
         )
-    } else if (props.folderToDelete) {
+    } else if (props.that.state.folderToDelete) {
         return (
             <div className={ComponentStyle.deleteConfirmation}>
                 <p>Jesteś pewien, że chcesz usunąć ten folder?</p>
-                <span onClick={deleteFolder(props.folderToDelete)}>Tak</span>
+                <span onClick={deleteFolder(props.that.state.folderToDelete)}>Tak</span>
                 <span onClick={() => props.that.setState({ folderToDelete: null })}>Nie</span>
             </div>
         )

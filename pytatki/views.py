@@ -9,7 +9,8 @@ from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
 from pytatki import __version__
-from pytatki.dbconnect import (connection, create_note, has_access_to_note,
+from pytatki.dbconnect import (connection, create_note, has_access_to_note, 
+                               has_access_to_notegroup,
                                note_exists, notegroup_empty, remove_note,
                                remove_notegroup)
 from pytatki.main import APP, CONFIG

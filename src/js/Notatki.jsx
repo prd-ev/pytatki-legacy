@@ -31,10 +31,9 @@ class Notatki extends React.Component {
       note: null,
       infoVisible: false,
     };
-    //Download root folders and set state of data[0] to array of folder objects
   }
 
-  handleClick = (e, data, target) => {
+  handleClick = (e, data) => {
     if (data.action === "Open") {
       this.openNote(data.name.slice(4));
     }
@@ -42,7 +41,7 @@ class Notatki extends React.Component {
       this.infoNote(data.is_note, data.name.slice(4));
     }
     if (data.action === "Delete") {
-      this.deleteNote_ContextMenu(data.name.slice(4));
+      this.preDeleteNote(data.name.slice(4));
     }
   };
 
@@ -51,30 +50,8 @@ class Notatki extends React.Component {
       this.infoNote(data.is_note, data.name);
     }
     if (data.action === "Delete") {
-      this.deleteFolder_ContextMenu(data.name);
+      this.preDeleteFolder(data.name);
     }
-  };
-
-  deleteFolder_ContextMenu = id => {
-    fetch(siteUrl + "/notegroup/" + id + "/delete/", {})
-      .then(
-        response => response.json() // if the response is a JSON object
-      )
-      .then(
-        success => alert(success.data) // Handle the success response object
-      )
-      .catch(
-        error => console.log(error) // Handle the error response object
-      );
-    this.updateContent();
-  };
-
-  deleteNote_ContextMenu = id => {
-    fetch(siteUrl + "/admin/delete/note/" + id, {})
-      .then(response => response.text()) // if the response is a JSON object
-      .then(success => console.log(success)) // Handle the success response object
-      .catch(error => console.log(error)); // Handle the error response object
-    this.updateContent();
   };
 
   changeCurrentDirectory = e => {
@@ -117,17 +94,12 @@ class Notatki extends React.Component {
 
   getUsergroupRoot = usergroupId => {
     const that = this;
-    fetch(this.state.siteUrl + "/api?query={getToken}")
+    fetch(`${this.state.siteUrl}/api?query={getToken}`)
       .then(response => response.json())
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
-          this.state.siteUrl +
-          "/api?query={getRootId(id_usergroup:" +
-          usergroupId +
-          ',access_token:"' +
-          token +
-          '")}'
+          `${this.state.siteUrl}/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
         )
           .then(response => response.json())
           .then(myJson => Number(myJson.data.getRootId))
@@ -146,12 +118,7 @@ class Notatki extends React.Component {
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
-          this.state.siteUrl +
-          "/api?query={getContent(id_notegroup:" +
-          dir_id +
-          ',access_token:"' +
-          token +
-          '")}'
+          `${this.state.siteUrl}/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
         )
       )
       .then(response => response.json())
@@ -161,16 +128,16 @@ class Notatki extends React.Component {
   };
 
   openNote = e => {
-    window.open(siteUrl + `/download/${e}`);
+    window.open(`${this.state.siteUrl}/download/${e}`);
   };
 
   openNote = e => {
     let id = e.target.id.slice(4);
-    window.open(this.state.siteUrl + `/download/${id}`);
+    window.open(`${this.state.siteUrl}/download/${id}`);
   };
 
   openNoteClick = e => () => {
-    window.open(siteUrl + `/download/${e}`);
+    window.open(`${this.state.siteUrl}/download/${e}`);
   };
 
   infoNote = (is_note, id) => {
@@ -220,104 +187,72 @@ class Notatki extends React.Component {
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
             content.push(
-              <div className={style.noteWrapper} key={value.key}>
-                <div
-                  className={style.note}
-                  onClick={this.openNote}
-                  id={value.key}
-                >
-                  <p>{value.title}</p>
-                </div>
-                <div className={style.delete}>
-                  {this.state.editModeOn ? (
-                    <i onClick={this.preDeleteNote} className="fas fa-times" />
-                  ) : null}
-                </div>
-                <ContextMenuTrigger
-                  id={MENU_TYPE}
-                  holdToDisplay={1000}
-                  name={value.key}
-                  is_note={value.is_note}
-                  onItemClick={this.handleClick}
-                  collect={collect}
-                  key={value.key}
-                >
+
+              <ContextMenuTrigger
+                id={MENU_TYPE}
+                holdToDisplay={1000}
+                name={value.key}
+                is_note={value.is_note}
+                onItemClick={this.handleClick}
+                collect={collect}
+                key={value.key}
+              >
+                <div className={style.noteWrapper} key={value.key}>
                   <div
+                    className={style.note}
+                    onClick={this.openNote}
                     id={value.key}
-                    className={ComponentStyle.note}
-                    onDoubleClick={this.openNoteClick(value.key.slice(4))}
                   >
                     <p>{value.title}</p>
                   </div>
-                  <div
-                    className={ComponentStyle.delete}
-                    onClick={this.deleteNote}
-                  >
+                  <div className={style.delete}>
                     {this.state.editModeOn ? (
-                      <i className="fas fa-times" />
+                      <i onClick={this.preDeleteNote} className="fas fa-times" />
                     ) : null}
                   </div>
-                </ContextMenuTrigger>
-              </div>
+                </div>
+              </ContextMenuTrigger>
             );
           } else {
             content.push(
-              <div className={style.folderWrapper} key={value.key}>
-                <div
-                  className={style.folder}
-                  onClick={this.changeCurrentDirectory}
-                  id={value.key}
-                >
-                  <p>{value.title}</p>
-                </div>
-                <div className={style.delete}>
-                  {this.state.editModeOn ? (
-                    <i
-                      onClick={this.preDeleteFolder}
-                      className="fas fa-times"
-                    />
-                  ) : null}
-                </div>
-                <ContextMenuTrigger
-                  id="NOTEGROUP"
-                  holdToDisplay={1000}
-                  name={value.key}
-                  is_note={value.is_note}
-                  onItemClick={this.handleClickGroup}
-                  collect={collect}
-                  key={value.key}
-                >
+              <ContextMenuTrigger
+                id="NOTEGROUP"
+                holdToDisplay={1000}
+                name={value.key}
+                is_note={value.is_note}
+                onItemClick={this.handleClickGroup}
+                collect={collect}
+                key={value.key}
+              >
+                <div className={style.folderWrapper} key={value.key}>
                   <div
-                    key={value.key}
-                    className={ComponentStyle.folder}
+                    className={style.folder}
                     onClick={this.changeCurrentDirectory}
                     id={value.key}
                   >
-                    <p onClick={this.changeCurrentDirectory} id={value.key}>
-                      {value.title}
-                    </p>
+                    <p>{value.title}</p>
                   </div>
-                  <div
-                    className={ComponentStyle.delete}
-                    onClick={this.deleteFolder}
-                  >
+                  <div className={style.delete}>
                     {this.state.editModeOn ? (
-                      <i className="fas fa-times" />
+                      <i
+                        onClick={this.preDeleteFolder}
+                        className="fas fa-times"
+                      />
                     ) : null}
                   </div>
-                </ContextMenuTrigger>
-              </div>
+                </div>
+              </ContextMenuTrigger>
             );
           }
         }
         return content;
-      } else {
-        return (
-          <p className={ComponentStyle.no_group_chosen}>
-            Wybierz grupę aby kontynuować
-          </p>
-        );
       }
+    } else {
+      return (
+        <p className={style.no_group_chosen}>
+          Wybierz grupę aby kontynuować
+          </p>
+      );
     }
   }
 
@@ -329,14 +264,24 @@ class Notatki extends React.Component {
   };
 
   preDeleteNote = e => {
-    let note = e.target.parentElement.previousSibling.id.slice(4);
+    let note;
+    if (isNaN(e)) {
+      note = e.target.parentElement.previousSibling.id.slice(4);
+    } else {
+      note = e;
+    }
     this.setState({
       noteToDelete: note
     });
   };
 
   preDeleteFolder = e => {
-    let folder = e.target.parentElement.previousSibling.id;
+    let folder;
+    if (isNaN(e)) {
+      folder = e.target.parentElement.previousSibling.id;
+    } else {
+      folder = e;
+    }
     this.setState({
       folderToDelete: folder
     });
@@ -344,7 +289,7 @@ class Notatki extends React.Component {
 
   deleteNote = e => {
     let noteId = e.target.previousSibling.id.slice(4);
-    fetch(siteUrl + "/admin/delete/note/" + noteId, {})
+    fetch(`${this.state.siteUrl}/admin/delete/note/${noteId}`)
       .then(
         response => response.json() // if the response is a JSON object
       )
@@ -359,7 +304,7 @@ class Notatki extends React.Component {
 
   deleteFolder = e => {
     let folderId = e.target.previousSibling.id;
-    fetch(siteUrl + "/notegroup/" + folderId + "/delete/", {})
+    fetch(`${this.state.siteUrl}/notegroup/${folderId}/delete/`)
       .then(
         response => response.json() // if the response is a JSON object
       )
@@ -436,14 +381,7 @@ class Notatki extends React.Component {
                 ""
               )}
           </div>
-          <ConfirmDelete
-            //TODO:
-            folderToDelete={this.state.folderToDelete}
-            noteToDelete={this.state.noteToDelete}
-            updateContent={this.updateContent}
-            siteUrl={this.state.siteUrl}
-            that={this}
-          />
+          <ConfirmDelete that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={style.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left" />
