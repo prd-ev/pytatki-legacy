@@ -34,7 +34,7 @@ export default function ConfirmDelete(props) {
         props.that.updateContent();
     }
 
-    if (props.that.state.noteTonoteToDelete) {
+    if (props.that.state.noteToDelete) {
         return (
             <div className={ComponentStyle.deleteConfirmation}>
                 <p>Jesteś pewien, że chcesz usunąć tą notatkę?</p>

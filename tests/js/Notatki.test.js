@@ -3,6 +3,6 @@ describe("Test the test", () => {
         console.log("object");
     });
     it("should work", () => {
-        expect(40 + 2).toEqual(42);
+        expect(42).toEqual(42);
     })
 });

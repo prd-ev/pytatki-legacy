@@ -185,12 +185,12 @@ class Notatki extends React.Component {
             content.push(
 
               <ContextMenuTrigger
-                id={"DYNAMIC"}
+                id="DYNAMIC"
                 holdToDisplay={1000}
                 name={value.key}
                 is_note={value.is_note}
                 onItemClick={this.handleClick}
-                collect={collect}
+                collect={(props) => props}
                 key={value.key}
               >
                 <div className={style.noteWrapper} key={value.key}>
