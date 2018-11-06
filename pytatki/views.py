@@ -301,6 +301,8 @@ def allowed_file(filename):
 def add():
     """Add new note"""
     if request.method == 'POST':
+        if note_exists(title=request.form['title'], notegroup_id=request.form['notegroup_id']):
+            return jsonify({'data': 'name in use'}), 400
         form = request.form
         if 'file' not in request.files:
             return jsonify({'data': 'No file part'})
