@@ -11,16 +11,12 @@ import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 
 
-const MENU_TYPE = "DYNAMIC";
-function collect(props) {
-  return props;
-}
 
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      siteUrl: `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
+      siteUrl: config.DEFAULT.HTTPS ? `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`:`http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
       currentDepth: 0,
       data: [],
       currentPath: [],
@@ -45,7 +41,7 @@ class Notatki extends React.Component {
     }
   };
 
-  handleClickGroup = (e, data, target) => {
+  handleClickGroup = (e, data) => {
     if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name);
     }
@@ -189,7 +185,7 @@ class Notatki extends React.Component {
             content.push(
 
               <ContextMenuTrigger
-                id={MENU_TYPE}
+                id={"DYNAMIC"}
                 holdToDisplay={1000}
                 name={value.key}
                 is_note={value.is_note}
@@ -221,7 +217,7 @@ class Notatki extends React.Component {
                 name={value.key}
                 is_note={value.is_note}
                 onItemClick={this.handleClickGroup}
-                collect={collect}
+                collect={(props) => props}
                 key={value.key}
               >
                 <div className={style.folderWrapper} key={value.key}>
