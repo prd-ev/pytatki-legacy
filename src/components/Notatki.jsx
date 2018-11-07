@@ -9,14 +9,14 @@ import ConfirmDelete from "./ConfirmDelete.jsx";
 import InfoNote from "./InfoNote.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
-import AddUsergroup from "./CreateUsergroup.jsx";
+import AddUsergroup from "./AddUsergroup.jsx";
 
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       siteUrl: config.DEFAULT.HTTPS
-        ? `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`
+        ? `https://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`
         : `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
       currentDepth: 0,
       data: [],
@@ -43,6 +43,7 @@ class Notatki extends React.Component {
   };
 
   handleClickGroup = (e, data) => {
+    console.log(e)
     if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name);
     }
@@ -97,7 +98,7 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           `${
-            this.state.siteUrl
+          this.state.siteUrl
           }/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
         )
           .then(response => response.json())
@@ -118,7 +119,7 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           `${
-            this.state.siteUrl
+          this.state.siteUrl
           }/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
         )
       )
@@ -188,6 +189,7 @@ class Notatki extends React.Component {
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
             content.push(
+              // Start note loop 
               <ContextMenuTrigger
                 id="DYNAMIC"
                 holdToDisplay={1000}
@@ -217,6 +219,7 @@ class Notatki extends React.Component {
               </ContextMenuTrigger>
             );
           } else {
+            // Start usergroup loop
             content.push(
               <ContextMenuTrigger
                 id="NOTEGROUP"
@@ -293,36 +296,6 @@ class Notatki extends React.Component {
     });
   };
 
-  deleteNote = e => {
-    let noteId = e.target.previousSibling.id.slice(4);
-    fetch(`${this.state.siteUrl}/admin/delete/note/${noteId}`)
-      .then(
-        response => response.json() // if the response is a JSON object
-      )
-      .then(
-        success => alert(success.data) // Handle the success response object
-      )
-      .catch(
-        error => console.log(error) // Handle the error response object
-      );
-    this.updateContent();
-  };
-
-  deleteFolder = e => {
-    let folderId = e.target.previousSibling.id;
-    fetch(`${this.state.siteUrl}/notegroup/${folderId}/delete/`)
-      .then(
-        response => response.json() // if the response is a JSON object
-      )
-      .then(
-        success => alert(success.data) // Handle the success response object
-      )
-      .catch(
-        error => console.log(error) // Handle the error response object
-      );
-    this.updateContent();
-  };
-
   updateContent = () => {
     const that = this;
     this.getContent(
@@ -384,8 +357,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </div>
           <ConfirmDelete that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
@@ -394,8 +367,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>

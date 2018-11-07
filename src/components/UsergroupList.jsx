@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ComponentStyle from '../scss/UsergroupList.scss'
+import style from '../scss/UsergroupList.scss'
 
 export default class UsergroupList extends Component {
   constructor(props) {
@@ -50,7 +50,7 @@ export default class UsergroupList extends Component {
 
   render() {
     return (
-      <div className={ComponentStyle.sidebar}>
+      <div className={style.sidebar}>
         <p>Klasy</p>
         <ul>
           {this.state.usergroups}
