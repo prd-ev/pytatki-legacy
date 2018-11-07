@@ -1,32 +1,33 @@
-const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = (env, argv) => {
-  const devMode = argv.mode !== 'production';
+  const devMode = argv.mode !== "production";
   return {
     plugins: [
       new MiniCssExtractPlugin({
         filename: "style.css"
       })
     ],
-    entry: ["@babel/polyfill","./src/js/index.js"],
+    entry: ["@babel/polyfill", "./src/components/index.js"],
     output: {
       path: path.resolve(__dirname, "./pytatki/static"),
       filename: "bundle.js"
     },
     devtool: "source-map",
     module: {
-      rules: [{
+      rules: [
+        {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
           loader: "babel-loader",
           options: {
-            cwd: './'
-          },
+            cwd: "./"
+          }
         },
         {
           test: /\.s?css$/,
-          exclude: [/node_modules/,/global.scss/],
+          exclude: [/node_modules/, /global.scss/],
           use: [
             devMode ? "style-loader" : MiniCssExtractPlugin.loader,
             "css-loader?modules&localIdentName=[local]---[hash:base64:5]",
@@ -44,6 +45,6 @@ module.exports = (env, argv) => {
           ]
         }
       ]
-    },
+    }
   };
 };
