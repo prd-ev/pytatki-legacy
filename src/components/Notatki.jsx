@@ -43,7 +43,7 @@ class Notatki extends React.Component {
   };
 
   handleClickGroup = (e, data) => {
-    console.log(e)
+    console.log(e);
     if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name);
     }
@@ -98,7 +98,7 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           `${
-          this.state.siteUrl
+            this.state.siteUrl
           }/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
         )
           .then(response => response.json())
@@ -119,7 +119,7 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           `${
-          this.state.siteUrl
+            this.state.siteUrl
           }/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
         )
       )
@@ -189,7 +189,7 @@ class Notatki extends React.Component {
         for (const value of this.state.data[this.state.currentDepth]) {
           if (value.is_note) {
             content.push(
-              // Start note loop 
+              // Start note loop
               <ContextMenuTrigger
                 id="DYNAMIC"
                 holdToDisplay={1000}
@@ -199,21 +199,23 @@ class Notatki extends React.Component {
                 collect={props => props}
                 key={value.key}
               >
-                <div className={style.noteWrapper} key={value.key}>
-                  <div
-                    className={style.note}
-                    onClick={this.openNote}
-                    id={value.key}
-                  >
-                    <p>{value.title}</p>
-                  </div>
-                  <div className={style.delete}>
-                    {this.state.editModeOn ? (
-                      <i
-                        onClick={this.preDeleteNote}
-                        className="fas fa-times"
-                      />
-                    ) : null}
+                <div className={style.elementWrapper} key={value.key}>
+                  <div className={style.noteWrapper} key={value.key}>
+                    <div
+                      className={style.note}
+                      onClick={this.openNote}
+                      id={value.key}
+                    >
+                      <p>{value.title}</p>
+                    </div>
+                    <div className={style.delete}>
+                      {this.state.editModeOn ? (
+                        <i
+                          onClick={this.preDeleteNote}
+                          className="fas fa-times"
+                        />
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </ContextMenuTrigger>
@@ -230,21 +232,23 @@ class Notatki extends React.Component {
                 collect={props => props}
                 key={value.key}
               >
-                <div className={style.folderWrapper} key={value.key}>
-                  <div
-                    className={style.folder}
-                    onClick={this.changeCurrentDirectory}
-                    id={value.key}
-                  >
-                    <p>{value.title}</p>
-                  </div>
-                  <div className={style.delete}>
-                    {this.state.editModeOn ? (
-                      <i
-                        onClick={this.preDeleteFolder}
-                        className="fas fa-times"
-                      />
-                    ) : null}
+                <div className={style.elementWrapper} key={value.key}>
+                  <div className={style.folderWrapper} key={value.key}>
+                    <div
+                      className={style.folder}
+                      onClick={this.changeCurrentDirectory}
+                      id={value.key}
+                    >
+                      <p>{value.title}</p>
+                    </div>
+                    <div className={style.delete}>
+                      {this.state.editModeOn ? (
+                        <i
+                          onClick={this.preDeleteFolder}
+                          className="fas fa-times"
+                        />
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </ContextMenuTrigger>
@@ -287,7 +291,7 @@ class Notatki extends React.Component {
   preDeleteFolder = e => {
     let folder;
     if (isNaN(e)) {
-      console.log(e)
+      console.log(e);
       folder = e.target.parentElement.previousSibling.id;
     } else {
       folder = e;
@@ -358,8 +362,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-                ""
-              )}
+              ""
+            )}
           </div>
           <ConfirmDelete that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
@@ -368,8 +372,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-              ""
-            )}
+            ""
+          )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
