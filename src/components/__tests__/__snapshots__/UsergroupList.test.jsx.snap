@@ -7,6 +7,9 @@ exports[`Snapshot test renders as expected 1`] = `
   <p>
     Klasy
   </p>
-  <ul />
+  <ul>
+    Grupa pierwsza
+    2E
+  </ul>
 </div>
 `;

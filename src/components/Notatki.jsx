@@ -287,6 +287,7 @@ class Notatki extends React.Component {
   preDeleteFolder = e => {
     let folder;
     if (isNaN(e)) {
+      console.log(e)
       folder = e.target.parentElement.previousSibling.id;
     } else {
       folder = e;

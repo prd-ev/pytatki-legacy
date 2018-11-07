@@ -1,6 +1,10 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import UsergroupList from '../UsergroupList.jsx';
+import { shallow } from 'enzyme';
+import Enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+Enzyme.configure({ adapter: new Adapter() });
 
 describe('Snapshot test', () => {
     beforeEach(() => {
@@ -28,9 +32,10 @@ describe('Snapshot test', () => {
     })
 
     it('renders as expected', () => {
-        const tree = renderer.create(<UsergroupList />)
-            .toJSON();
-        setTimeout(1000);
-        expect(tree).toMatchSnapshot();
+        const wrapper = shallow(<UsergroupList />)
+        wrapper.setState({
+            usergroups: ["Grupa pierwsza","2E"]
+        })
+        expect(wrapper).toMatchSnapshot();
     })
 })
