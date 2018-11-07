@@ -9,11 +9,7 @@ module.exports = (env, argv) => {
         filename: "style.css"
       })
     ],
-<<<<<<< HEAD
     entry: ["./src/components/index.js"],
-=======
-    entry: ["@babel/polyfill", "./src/components/index.js"],
->>>>>>> e4ede041db6e4e438e7b09081e6811bb922f961a
     output: {
       path: path.resolve(__dirname, "./pytatki/static"),
       filename: "bundle.js"
