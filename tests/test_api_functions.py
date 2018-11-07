@@ -9,8 +9,9 @@ from pytatki.dbconnect import (connection, create_action, create_note,
                                has_access_to_note, note_exists,
                                notegroup_empty, remove_note, remove_notegroup,
                                create_action, get_note, create_note,
-                               get_notegroup, has_access_to_notegroup)
-from pytatki.views import type_id, has_access_to_usergroup
+                               get_notegroup, has_access_to_notegroup,
+                               get_type_id, get_usergroups_of_user,
+                               has_access_to_usergroup)
 
 
 class Mock:
@@ -44,7 +45,7 @@ def test_get_note(insert_note, monkeypatch):
 
 
 def test_type_id(insert_text_note_type):
-    if 1 != type_id('text'):
+    if 1 != get_type_id('text'):
         raise AssertionError()
 
 
@@ -131,4 +132,9 @@ def test_has_access_to_notegroup(insert_notegroup):
 def test_get_notegroup(insert_notegroup):
     if get_notegroup(1, 1) != json.dumps({'idnotegroup': 1, 'name': 'test', 'parent_id': 0}):
         print(get_notegroup(1, 1))
+        raise AssertionError()
+
+
+def test_get_usergroups_of_user(insert_usergroup):
+    if str(get_usergroups_of_user(1)) != '[{"idusergroup": 1, "name": "test", "color": "#ffffff", "description": "test", "image_path": "img/default.jpg"}]':
         raise AssertionError()

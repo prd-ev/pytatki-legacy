@@ -4,8 +4,8 @@ import pytest
 from init_db import parse_sql
 from pytatki.dbconnect import (add_user_to_usergroup, connection, create_note,
                                create_note_type, create_notegroup,
-                               create_status, create_user, create_usergroup)
-from pytatki.views import has_access_to_usergroup
+                               create_status, create_user, create_usergroup,
+                               has_access_to_usergroup)
 
 
 @pytest.fixture(scope='session', autouse=True)

@@ -23,27 +23,6 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 
                       'rtf', 'cpp'}
 
 
-def type_id(type_name):
-    con, conn = connection()
-    con.execute("SELECT idnote_type FROM note_type WHERE name = %s",
-                escape_string(type_name))
-    file_type = con.fetchone()
-    con.close()
-    conn.close()
-    return file_type['idnote_type']
-
-
-def has_access_to_usergroup(id_usergroup, id_user):
-    """Returns true if user has access to usergroup, else false"""
-    con, conn = connection()
-    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-    return_value = con.fetchone()
-    con.close()
-    conn.close()
-    return True if return_value else False
-
-
 def find_notegroup_children(id_notegroup, id_user):
     """Generate dict with recurent children of usergroup"""
     if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
@@ -68,22 +47,6 @@ def find_notegroup_children(id_notegroup, id_user):
             for note in notes:
                 children.append(note)
     return json.dumps(children, ensure_ascii=False)
-
-
-def get_root_id(id_usergroup, id_user):
-    """Get if of root directory in usergroup"""
-    if has_access_to_usergroup(id_usergroup, id_user):
-        con, conn = connection()
-        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s AND parent_id = 0",
-                    (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-        root_id = con.fetchone()
-        if not root_id:
-            return "No root folder" + str(id_user)
-        root_id = root_id['idnotegroup']
-        con.close()
-        conn.close()
-        return root_id
-    return "Access denied"
 
 
 def add_tag_to_note(tag, id_note, id_user):
@@ -139,17 +102,6 @@ def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user
                 escape_string(str(note_id)))
     note = con.fetchone()
     return note
-
-
-def get_usergroups_of_user(iduser):
-    """Get list of usergroups"""
-    con, conn = connection()
-    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s",
-                escape_string(str(iduser)))
-    usergroups = con.fetchall()
-    con.close()
-    conn.close()
-    return json.dumps(usergroups, ensure_ascii=False)
 
 
 @APP.route('/')
