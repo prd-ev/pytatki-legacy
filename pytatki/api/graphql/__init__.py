@@ -1,10 +1,10 @@
 from flask_graphql import GraphQLView
 from pytatki.main import APP
 from pytatki.api.graphql.functions import api_create_usergroup
-from pytatki.dbconnect import connection, get_note, get_last_note_actions, get_notegroup
+from pytatki.dbconnect import connection, get_note, get_last_note_actions, get_notegroup, get_root_id,  get_usergroups_of_user
 import gc
 from flask_login import current_user
-from pytatki.views import find_notegroup_children, get_root_id, post_note, add_tag_to_note, get_usergroups_of_user
+from pytatki.views import find_notegroup_children, post_note, add_tag_to_note
 from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLObjectType
 from graphql.type.scalars import GraphQLString, GraphQLInt
 from graphql.type.schema import GraphQLSchema

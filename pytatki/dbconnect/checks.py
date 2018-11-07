@@ -5,6 +5,17 @@ from pytatki.dbconnect.main import connection
 __author__ = "Patryk Niedźwiedziński"
 
 
+def has_access_to_usergroup(id_usergroup, id_user):
+    """Returns true if user has access to usergroup, else false"""
+    con, conn = connection()
+    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
+                (pymysql.escape_string(str(id_user)), pymysql.escape_string(str(id_usergroup))))
+    return_value = con.fetchone()
+    con.close()
+    conn.close()
+    return True if return_value else False
+
+
 def has_access_to_note(id_note, id_user):
     """Check if user has access to note"""
     if note_exists(idnote=id_note):
