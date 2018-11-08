@@ -25,7 +25,7 @@ describe('Notatki unit', () => {
                 })
             }
         })
-        jest.mock('../config.json', () => ({
+        jest.mock('../../config.json', () => ({
         }), { virtual: true })
     })
 
