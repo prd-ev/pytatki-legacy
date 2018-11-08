@@ -98,7 +98,7 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           `${
-            this.state.siteUrl
+          this.state.siteUrl
           }/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
         )
           .then(response => response.json())
@@ -119,7 +119,7 @@ class Notatki extends React.Component {
       .then(token =>
         fetch(
           `${
-            this.state.siteUrl
+          this.state.siteUrl
           }/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
         )
       )
@@ -130,16 +130,12 @@ class Notatki extends React.Component {
   }
 
   openNote = e => {
-    window.open(`${this.state.siteUrl}/download/${e}`);
-  };
-
-  openNote = e => {
-    let id = e.target.id.slice(4);
+    let id = e;
+    if (isNaN(e)) {
+      id = e.target.id.slice(4);
+    }
     window.open(`${this.state.siteUrl}/download/${id}`);
-  };
-
-  openNoteClick = e => () => {
-    window.open(`${this.state.siteUrl}/download/${e}`);
+    return Number(id);
   };
 
   infoNote = (is_note, id) => {
@@ -363,8 +359,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </div>
           <ConfirmDelete that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
@@ -373,8 +369,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
