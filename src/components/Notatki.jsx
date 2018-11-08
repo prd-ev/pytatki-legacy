@@ -43,7 +43,6 @@ class Notatki extends React.Component {
   };
 
   handleClickGroup = (e, data) => {
-    console.log(e);
     if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name);
     }
