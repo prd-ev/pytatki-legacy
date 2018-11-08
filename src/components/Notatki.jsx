@@ -130,16 +130,12 @@ class Notatki extends React.Component {
   }
 
   openNote = e => {
-    window.open(`${this.state.siteUrl}/download/${e}`);
-  };
-
-  openNote = e => {
-    let id = e.target.id.slice(4);
+    let id = e;
+    if (isNaN(e)) {
+      id = e.target.id.slice(4);
+    }
     window.open(`${this.state.siteUrl}/download/${id}`);
-  };
-
-  openNoteClick = e => () => {
-    window.open(`${this.state.siteUrl}/download/${e}`);
+    return Number(id);
   };
 
   infoNote = (is_note, id) => {
@@ -284,21 +280,22 @@ class Notatki extends React.Component {
       note = e;
     }
     this.setState({
-      noteToDelete: note
+      noteToDelete: Number(note)
     });
+    return Number(note);
   };
 
   preDeleteFolder = e => {
     let folder;
     if (isNaN(e)) {
-      console.log(e);
       folder = e.target.parentElement.previousSibling.id;
     } else {
       folder = e;
     }
     this.setState({
-      folderToDelete: folder
+      folderToDelete: Number(folder)
     });
+    return Number(folder);
   };
 
   updateContent = () => {

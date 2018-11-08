@@ -1,12 +1,8 @@
 import React from "react";
 import UsergroupList from "../UsergroupList.jsx";
 import { shallow } from "enzyme";
-import Enzyme from "enzyme";
-import Adapter from "enzyme-adapter-react-16";
 
-Enzyme.configure({ adapter: new Adapter() });
-
-describe("Snapshot test", () => {
+describe("UsergroupList snapshot", () => {
   beforeEach(() => {
     window.fetch = jest.fn(link => {
       if (link.includes("getToken")) {
@@ -37,12 +33,11 @@ describe("Snapshot test", () => {
       }
     });
   });
+  const delay = () => new Promise(res => setTimeout(res));
 
-  it("renders as expected", () => {
+  it("renders as expected", async () => {
     const wrapper = shallow(<UsergroupList />);
-    wrapper.setState({
-      usergroups: ["Grupa pierwsza", "2E"]
-    });
+    await delay();
     expect(wrapper).toMatchSnapshot();
   });
 });
