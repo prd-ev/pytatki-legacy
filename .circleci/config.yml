@@ -29,3 +29,17 @@ jobs:
           command: |
             . venv/bin/activate
             pytest
+  test:
+    docker:
+      - image: circleci/node:4.8.2
+    steps:
+      - checkout
+      - run:
+          name: Update npm 
+          command: 'sudo npm install -g npm@latest'
+      - run:
+          name: Install Node dependencies
+          command: 'npm install --dev'
+      - run:
+          name: Run react tests
+          command: 'npm test'
