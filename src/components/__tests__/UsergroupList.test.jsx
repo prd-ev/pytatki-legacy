@@ -30,12 +30,12 @@ describe('Snapshot test', () => {
             }
         })
     })
+    const delay = () => new Promise(res => setTimeout(res));
 
-    it('renders as expected', () => {
+    it('renders as expected', async () => {
         const wrapper = shallow(<UsergroupList />)
-        wrapper.setState({
-            usergroups: ["Grupa pierwsza","2E"]
-        })
+        await  delay();
         expect(wrapper).toMatchSnapshot();
+
     })
 })
