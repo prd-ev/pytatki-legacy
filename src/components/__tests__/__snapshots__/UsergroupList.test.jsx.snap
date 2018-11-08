@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Snapshot test renders as expected 1`] = `
+exports[`UsergroupList snapshot renders as expected 1`] = `
 <div
   className="sidebar"
 >

@@ -6,7 +6,7 @@ import Adapter from 'enzyme-adapter-react-16';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-describe('Snapshot test', () => {
+describe('UsergroupList snapshot', () => {
     beforeEach(() => {
         window.fetch = jest.fn((link) => {
             if (link.includes('getToken')) {

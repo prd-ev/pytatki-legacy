@@ -19,7 +19,8 @@
     },
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
-    ]
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/enzymeConfig.js"
   },
   "author": "Filip Wachowiak",
   "license": "MIT",
