@@ -92,14 +92,14 @@ class Notatki extends React.Component {
 
   getUsergroupRoot = usergroupId => {
     const that = this;
-    fetch(`${this.state.siteUrl}/api?query={getToken}`)
+    fetch(`${this.state.siteUrl}/api/?query={getToken}`)
       .then(response => response.json())
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
           `${
             this.state.siteUrl
-          }/api?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
+          }/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
         )
           .then(response => response.json())
           .then(myJson => Number(myJson.data.getRootId))
@@ -113,14 +113,14 @@ class Notatki extends React.Component {
   };
 
   getContent(dir_id) {
-    return fetch(this.state.siteUrl + "/api?query={getToken}")
+    return fetch(this.state.siteUrl + "/api/?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
       .then(token =>
         fetch(
           `${
             this.state.siteUrl
-          }/api?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
+          }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
         )
       )
       .then(response => response.json())
