@@ -32,13 +32,19 @@ describe('Snapshot test', () => {
     })
 
 
-    it('renders as expected', () => {
-        const wrapper = shallow(<Notatki />);
-        expect(wrapper.instance().preDeleteNote(2));
+    const wrapper = shallow(<Notatki />);
+    it('PreDeleteNote finds id correctly when direct', () => {
+        expect(wrapper.instance().preDeleteNote(2)).toEqual(2);
     })
 
-    it('renders as expectedd', () => {
-        const wrapper = shallow(<Notatki />);
-        expect(wrapper.instance().preDeleteNote({ "target":{"parentElement":{"previousSibling":{"id":"note3"}}}}));
+    it('PreDeleteNote finds id correctly when event.target', () => {
+        expect(wrapper.instance().preDeleteNote({ "target":{"parentElement":{"previousSibling":{"id":"note3"}}}})).toBe(3);
+    })
+    it('PreDeleteFolder finds id correctly when direct', () => {
+        expect(wrapper.instance().preDeleteFolder(2)).toEqual(2);
+    })
+
+    it('PreDeleteFolder finds id correctly when event.target', () => {
+        expect(wrapper.instance().preDeleteFolder({ "target":{"parentElement":{"previousSibling":{"id":"3"}}}})).toBe(3);
     })
 })

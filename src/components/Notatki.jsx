@@ -284,8 +284,9 @@ class Notatki extends React.Component {
       note = e;
     }
     this.setState({
-      noteToDelete: note
+      noteToDelete: Number(note)
     });
+    return Number(note);
   };
 
   preDeleteFolder = e => {
@@ -297,8 +298,9 @@ class Notatki extends React.Component {
       folder = e;
     }
     this.setState({
-      folderToDelete: folder
+      folderToDelete: Number(folder)
     });
+    return Number(folder)
   };
 
   updateContent = () => {
