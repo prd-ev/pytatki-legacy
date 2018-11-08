@@ -2,7 +2,7 @@ from flask_graphql import GraphQLView
 from pytatki.main import APP, CONFIG
 from pytatki.api.graphql.functions import api_create_usergroup
 from pytatki.security import ts
-from pytatki.dbconnect import connection, has_access_to_usergroup, get_note, get_last_note_actions, get_notegroup, get_root_id,  get_usergroups_of_user
+from pytatki.dbconnect import connection, has_access_to_usergroup, get_note, get_last_note_actions, get_notegroup, get_root_id,  get_usergroups_of_user, get_users_of_usergroup
 import gc
 from flask_login import current_user
 from pytatki.views import find_notegroup_children, post_note, add_tag_to_note
@@ -136,6 +136,15 @@ QueryRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, id_usergroup, access_token: invite(
                 verify_auth_token(access_token)['id'], id_usergroup) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'getMembers': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_usergroup, access_token: get_users_of_usergroup(
+                id_usergroup, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getToken': GraphQLField(
             type=GraphQLString,
