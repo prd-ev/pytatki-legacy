@@ -123,16 +123,16 @@ class InfoNote extends React.Component {
           .then(response => response.json())
           .then(res => res.data.getToken)
           .then(token => {
-            if (this.getNote(token))
-              this.getNote(token).then(info => {
-                if (this.getNoteLastActions(token))
-                  this.getNoteLastActions(token).then(actions => {
+            this.getNote(token).then(info => {
+              if (info)
+                this.getNoteLastActions(token).then(actions => {
+                  if (actions)
                     this.setState({
                       noteInfo: info,
                       noteActions: actions
                     });
-                  });
-              });
+                });
+            });
           });
       }
     } else {
@@ -146,12 +146,14 @@ class InfoNote extends React.Component {
           .then(res => res.data.getToken)
           .then(token => {
             this.getContent(token).then(content => {
-              this.getNotegroup(token).then(info => {
-                this.setState({
-                  groupInfo: info,
-                  groupContent: content
+              if (content)
+                this.getNotegroup(token).then(info => {
+                  if (info)
+                    this.setState({
+                      groupInfo: info,
+                      groupContent: content
+                    });
                 });
-              });
             });
           });
       }

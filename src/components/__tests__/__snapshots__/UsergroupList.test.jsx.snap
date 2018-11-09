@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Snapshot test renders as expected 1`] = `
+exports[`UsergroupList snapshot renders as expected 1`] = `
 <div
   className="sidebar"
 >
@@ -8,8 +8,26 @@ exports[`Snapshot test renders as expected 1`] = `
     Klasy
   </p>
   <ul>
-    Grupa pierwsza
-    2E
+    <li
+      key="1"
+    >
+      <button
+        className="btn"
+        id={1}
+      >
+        grupa
+      </button>
+    </li>
+    <li
+      key="2"
+    >
+      <button
+        className="btn"
+        id={2}
+      >
+        grupa42
+      </button>
+    </li>
   </ul>
 </div>
 `;

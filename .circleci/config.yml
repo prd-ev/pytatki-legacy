@@ -4,7 +4,7 @@
 #
 version: 2
 jobs:
-  build:
+  pytest:
     docker:
       - image: circleci/python:3.6.1
       - image: circleci/mariadb:10.2
@@ -29,3 +29,26 @@ jobs:
           command: |
             . venv/bin/activate
             pytest
+  jest:
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - run:
+          name: Update npm 
+          command: 'sudo npm install -g npm@latest'
+      - run:
+          name: Install Node dependencies
+          command: 'npm install --dev'
+      - run:
+          name: Copy default config
+          command: cp examples/config.json ./
+      - run:
+          name: Run react tests
+          command: 'npm test'
+workflows:
+  version: 2
+  pytest_and_jest:
+    jobs:
+      - pytest
+      - jest

@@ -31,7 +31,7 @@ def create_action(conn, content, iduser, idnote):
     )
 
 
-def create_notegroup(conn, name, idusergroup, parent_id='0'):
+def create_notegroup(conn, name, idusergroup, parent_id=0):
     """Insert new notegroup into the database in given usergroup using given connection and returns its id"""
     c = conn.cursor()
     c.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)",

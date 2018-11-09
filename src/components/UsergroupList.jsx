@@ -23,7 +23,7 @@ export default class UsergroupList extends Component {
       })
       .then(token =>
         fetch(
-          siteUrl + '/api?query={getUsergroups(access_token:"' + token + '")}'
+          siteUrl + '/api/?query={getUsergroups(access_token:"' + token + '")}'
         )
       )
       .then(response => response.json())
