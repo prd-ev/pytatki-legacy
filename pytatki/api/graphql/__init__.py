@@ -32,7 +32,7 @@ def verify_auth_token(token):
 def invite(iduser, idusergroup):
     if has_access_to_usergroup(idusergroup, iduser):
         token = ts.dumps(idusergroup, salt=APP.secret_key)
-        return token
+        return "{}/join/{}".format(CONFIG['HOST'], token)
     return "perimission denied"
 
 
