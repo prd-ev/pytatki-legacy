@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import ComponentStyle from "../scss/AddContent.scss";
 
 const AddUsergroup = props => {

@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import style from "../scss/UsergroupList.scss";
 
-export default class UsergroupList extends Component {
+export default class UsergroupList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ComponentStyle from "../scss/EditMode.scss";
 
 const EditMode = props => {
   if (props.isOn) {
@@ -25,4 +24,4 @@ EditMode.propTypes = {
   changeMode: PropTypes.func
 };
 
-export default EditMode;
+export default React.memo(EditMode);

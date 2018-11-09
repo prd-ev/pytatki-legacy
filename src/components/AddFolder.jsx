@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import ComponentStyle from "../scss/AddContent.scss";
 
 const AddFolder = props => {
@@ -83,4 +83,4 @@ const AddFolder = props => {
   );
 };
 
-export default AddFolder;
+export default React.memo(AddFolder);
