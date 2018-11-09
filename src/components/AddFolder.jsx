@@ -8,7 +8,7 @@ const AddFolder = props => {
     formData.append("title", document.getElementById("addFolderForm")[0].value);
     formData.append(
       "parent_id",
-      props.that.state.currentDirId[props.that.state.currentDirId.length - 1]
+      props.that.state.currentDirId[props.that.state.currentDepth]
     );
     formData.append("class", "1"); //dodać dynamicznie
     fetch(props.that.state.siteUrl + "/admin/add/", {
