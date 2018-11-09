@@ -4,29 +4,24 @@ import ComponentStyle from "../scss/AddContent.scss";
 const AddUsergroup = props => {
   let addUsergroup = e => {
     e.preventDefault();
-    fetch(props.that.state.siteUrl + "/api/?query={getToken}")
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token => {
-        fetch(
-          props.that.state.siteUrl +
-            `/api/?query=mutation{createUsergroup(name: "${
-              document.getElementById("addUsergroupForm")[0].value
-            }", description: "${
-              document.getElementById("addUsergroupForm")[1].value
-            }", access_token: "${token}")}`,
-          { method: "POST" }
-        )
-          .then(
-            response => response.json() // if the response is a JSON object
-          )
-          .then(
-            success => alert("success") // Handle the success response object
-          )
-          .catch(
-            error => console.log(error) // Handle the error response object
-          );
-      });
+    fetch(
+      props.that.state.siteUrl +
+      `/api/?query=mutation{createUsergroup(name: "${
+      document.getElementById("addUsergroupForm")[0].value
+      }", description: "${
+      document.getElementById("addUsergroupForm")[1].value
+      }", access_token: "${props.that.state.token}")}`,
+      { method: "POST" }
+    )
+      .then(
+        response => response.json() // if the response is a JSON object
+      )
+      .then(
+        success => alert("success") // Handle the success response object
+      )
+      .catch(
+        error => console.log(error) // Handle the error response object
+      );
   };
 
   return (

@@ -32,11 +32,11 @@ class InfoNote extends React.Component {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-          "/api/?query={getNoteById(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        "/api/?query={getNoteById(id_note:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
       )
         .then(response => {
           //Convert response to json
@@ -53,11 +53,11 @@ class InfoNote extends React.Component {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-          "/api/?query={getNoteLastActions(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        "/api/?query={getNoteLastActions(id_note:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
       )
         .then(response => {
           //Convert data to json
@@ -74,11 +74,11 @@ class InfoNote extends React.Component {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-          "/api/?query={getNotegroupById(notegroup_id:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        "/api/?query={getNotegroupById(notegroup_id:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
       )
         .then(response => {
           //Convert response to json
@@ -95,11 +95,11 @@ class InfoNote extends React.Component {
     if (this.props.note != null)
       return fetch(
         siteUrl +
-          "/api/?query={getContent(id_notegroup:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        "/api/?query={getContent(id_notegroup:" +
+        this.props.note +
+        ',access_token:"' +
+        token +
+        '")}'
       )
         .then(response => {
           //Convert response to json
@@ -119,13 +119,9 @@ class InfoNote extends React.Component {
         this.state.noteActions == null &&
         this.props.note != null
       ) {
-        fetch(siteUrl + "/api/?query={getToken}")
-          .then(response => response.json())
-          .then(res => res.data.getToken)
-          .then(token => {
-            this.getNote(token).then(info => {
+            this.getNote(this.props.token).then(info => {
               if (info)
-                this.getNoteLastActions(token).then(actions => {
+                this.getNoteLastActions(this.props.token).then(actions => {
                   if (actions)
                     this.setState({
                       noteInfo: info,
@@ -133,7 +129,6 @@ class InfoNote extends React.Component {
                     });
                 });
             });
-          });
       }
     } else {
       if (
@@ -141,21 +136,16 @@ class InfoNote extends React.Component {
         this.state.groupContent == null &&
         this.props.note != null
       ) {
-        fetch(siteUrl + "/api/?query={getToken}")
-          .then(response => response.json())
-          .then(res => res.data.getToken)
-          .then(token => {
-            this.getContent(token).then(content => {
-              if (content)
-                this.getNotegroup(token).then(info => {
-                  if (info)
-                    this.setState({
-                      groupInfo: info,
-                      groupContent: content
-                    });
+        this.getContent(this.props.token).then(content => {
+          if (content)
+            this.getNotegroup(this.props.token).then(info => {
+              if (info)
+                this.setState({
+                  groupInfo: info,
+                  groupContent: content
                 });
             });
-          });
+        });
       }
     }
   };

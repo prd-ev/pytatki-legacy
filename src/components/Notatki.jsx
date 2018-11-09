@@ -26,8 +26,10 @@ class Notatki extends React.Component {
       currentUsergroupName: "",
       is_note: null,
       note: null,
-      infoVisible: false
+      infoVisible: false,
+      token: null
     };
+    this.getToken();
   }
 
   handleClick = (e, data) => {
@@ -89,43 +91,39 @@ class Notatki extends React.Component {
     });
   };
 
+  getToken = () => {
+    const that = this;
+    if (!this.state.token) {
+      fetch(`${this.state.siteUrl}/api/?query={getToken}`)
+        .then(response => response.json())
+        .then(res => res.data.getToken)
+        .then(token =>
+          that.setState({
+            token: token
+          }));
+    }
+  }
+
   getUsergroupRoot = usergroupId => {
     const that = this;
-    fetch(`${this.state.siteUrl}/api/?query={getToken}`)
+    fetch(`${this.state.siteUrl}/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${this.state.token}")}`)
       .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          `${
-            this.state.siteUrl
-          }/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
-        )
-          .then(response => response.json())
-          .then(myJson => Number(myJson.data.getRootId))
-          .then(rootId => {
-            that.setState({
-              currentDirId: [rootId]
-            });
-            that.updateContent(rootId);
-          })
-      );
+      .then(myJson => Number(myJson.data.getRootId))
+      .then(rootId => {
+        that.setState({
+          currentDirId: [rootId]
+        });
+        that.updateContent(rootId);
+      })
   };
 
   getContent(dir_id) {
-    return fetch(this.state.siteUrl + "/api/?query={getToken}")
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          `${
-            this.state.siteUrl
-          }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
-        )
-      )
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getContent))
-
-      .catch(error => console.log(error));
+    return (
+      fetch(`${this.state.siteUrl}/api/?query={getContent(id_notegroup:${dir_id},access_token:"${this.state.token}")}`)
+        .then(response => response.json())
+        .then(myJson => JSON.parse(myJson.data.getContent))
+        .catch(error => console.log(error))
+    )
   }
 
   openNote = e => {
@@ -344,6 +342,7 @@ class Notatki extends React.Component {
         <UsergroupList
           updateUsergroup={this.updateCurrentUsergroup}
           siteUrl={this.state.siteUrl}
+          token={this.state.token}
         />
         <div className={style.mainContent}>
           <p className={style.usergroupName}>
@@ -358,8 +357,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </div>
           <ConfirmDelete that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
@@ -368,8 +367,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
@@ -378,6 +377,7 @@ class Notatki extends React.Component {
             is_note={this.state.is_note}
             visible={this.state.infoVisible}
             closeInfoNotatki={this.closeInfo}
+            token={this.state.token}
           />
           <ConnectedMenu />
           <ConnectedGroupMenu />
