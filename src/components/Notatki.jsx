@@ -7,6 +7,7 @@ import config from "../../config.json";
 import style from "../scss/Notatki.scss";
 import ConfirmDelete from "./ConfirmDelete.jsx";
 import InfoNote from "./InfoNote.jsx";
+import ListOfUsers from "./ListOfUsers.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import AddUsergroup from "./AddUsergroup.jsx";
@@ -334,11 +335,13 @@ class Notatki extends React.Component {
   updateCurrentUsergroup = e => {
     this.getUsergroupRoot(e.target.id);
     let usergroupName = e.target.innerText;
+    let usergroupId = e.target.id;
     this.setState({
       currentDepth: 0,
       currentDirId: [],
       currentPath: [],
-      currentUsergroupName: usergroupName
+      currentUsergroupName: usergroupName,
+      currentUsergroupId: usergroupId
     });
   };
 
@@ -356,6 +359,11 @@ class Notatki extends React.Component {
           <div className={style.actionBar} key="actionBar">
             {this.state.currentUsergroupName ? <AddNote that={this} /> : ""}
             {this.state.currentUsergroupName ? <AddFolder that={this} /> : ""}
+            {this.state.currentUsergroupId ? (
+              <ListOfUsers usergroup={this.state.currentUsergroupId} />
+            ) : (
+              ""
+            )}
             {this.state.currentUsergroupName ? (
               <EditMode
                 changeMode={this.changeMode}
