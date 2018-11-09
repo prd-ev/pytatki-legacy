@@ -341,6 +341,53 @@ class Notatki extends React.Component {
     });
   };
 
+  listOfUsers = () => {
+    return (
+      <div>
+        <button
+          type="button"
+          className="btn bar"
+          data-toggle="modal"
+          data-target="#listOfUsers"
+        >
+          Lista uzytkowników
+        </button>
+        <div className="modal" tabIndex="-1" role="dialog" id="listOfUsers">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Lista uzytkowników</h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <ListOfUsers
+                  usergroup={this.state.currentUsergroupId}
+                  siteUrl={this.state.siteUrl}
+                />
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   render() {
     return (
       <React.Fragment>
@@ -355,11 +402,7 @@ class Notatki extends React.Component {
           <div className={style.actionBar} key="actionBar">
             {this.state.currentUsergroupName ? <AddNote that={this} /> : ""}
             {this.state.currentUsergroupName ? <AddFolder that={this} /> : ""}
-            {this.state.currentUsergroupId ? (
-              <ListOfUsers usergroup={this.state.currentUsergroupId} />
-            ) : (
-              ""
-            )}
+            {this.state.currentUsergroupId ? this.listOfUsers() : ""}
             {this.state.currentUsergroupName ? (
               <EditMode
                 changeMode={this.changeMode}

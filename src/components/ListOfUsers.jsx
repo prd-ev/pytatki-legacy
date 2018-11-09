@@ -17,7 +17,7 @@ export default class ListOfUsers extends React.PureComponent {
       .then(token =>
         fetch(
           siteUrl +
-            `/api?query={getMembers(id_usergroup: ${
+            `/api/?query={getMembers(id_usergroup: ${
               this.props.usergroup
             }, access_token:"${token}")}`
         )
@@ -28,6 +28,10 @@ export default class ListOfUsers extends React.PureComponent {
   }
 
   render() {
-    return <div>Users</div>;
+    if (this.state.users) {
+      return <div>{this.state.users.map(user => user.login)}</div>;
+    } else {
+      return "";
+    }
   }
 }
