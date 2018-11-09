@@ -1,5 +1,5 @@
 import React from "react";
-import ComponentStyle from "../scss/AddContent.scss";
+import style from "../scss/AddContent.scss";
 
 const AddFolder = props => {
   let addFolder = e => {
@@ -57,7 +57,7 @@ const AddFolder = props => {
             <div className="modal-body">
               <form
                 id="addFolderForm"
-                className={ComponentStyle.form}
+                className={style.form}
                 onSubmit={addFolder}
               >
                 <label htmlFor="folderTitle">Tytuł folderu</label>

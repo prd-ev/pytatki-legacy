@@ -10,7 +10,7 @@ import InfoNote from "./InfoNote.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import AddUsergroup from "./AddUsergroup.jsx";
-
+import ChangeIcon from './ChangeIcon.jsx';
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
@@ -27,7 +27,8 @@ class Notatki extends React.Component {
       is_note: null,
       note: null,
       infoVisible: false,
-      token: null
+      token: null,
+      idToChangeIcon: null
     };
     this.getToken();
   }
@@ -35,11 +36,9 @@ class Notatki extends React.Component {
   handleClick = (e, data) => {
     if (data.action === "Open") {
       this.openNote(data.name.slice(4));
-    }
-    if (data.action === "Properties") {
+    } else if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name.slice(4));
-    }
-    if (data.action === "Delete") {
+    } else if (data.action === "Delete") {
       this.preDeleteNote(data.name.slice(4));
     }
   };
@@ -47,9 +46,10 @@ class Notatki extends React.Component {
   handleClickGroup = (e, data) => {
     if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name);
-    }
-    if (data.action === "Delete") {
+    } else if (data.action === "Delete") {
       this.preDeleteFolder(data.name);
+    } else if (data.action === "Change icon") {
+      this.preChangeIcon(data.name);
     }
   };
 
@@ -295,6 +295,12 @@ class Notatki extends React.Component {
     return Number(folder);
   };
 
+  preChangeIcon = id => {
+    this.setState({
+      idToChangeIcon: id
+    })
+  }
+
   updateContent = () => {
     const that = this;
     setTimeout(() => {
@@ -363,6 +369,7 @@ class Notatki extends React.Component {
               )}
           </div>
           <ConfirmDelete that={this} />
+          <ChangeIcon that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={style.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left" />
