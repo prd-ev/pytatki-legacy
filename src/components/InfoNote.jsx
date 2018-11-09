@@ -1,6 +1,6 @@
 import React from "react";
 import config from "../../config.json";
-import ComponentStyle from "../scss/Info.scss";
+import style from "../scss/Info.scss";
 
 const siteUrl = "http://" + config.DEFAULT.HOST + ":" + config.DEFAULT.PORT;
 
@@ -253,7 +253,7 @@ class InfoNote extends React.Component {
       if (this.props.is_note) {
         return (
           <React.Fragment>
-            <div className={ComponentStyle.info}>
+            <div className={style.info}>
               <i onClick={() => this.closeInfo()} className="fas fa-times" />
               {this.renderNoteHeader()}
               <h3>Latest actions</h3>
@@ -264,7 +264,7 @@ class InfoNote extends React.Component {
       } else {
         return (
           <React.Fragment>
-            <div className={ComponentStyle.info}>
+            <div className={style.info}>
               <i onClick={() => this.closeInfo()} className="fas fa-times" />
               {this.renderGroupHeader()}
               {this.renderGroupElements()}
