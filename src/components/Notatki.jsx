@@ -297,32 +297,34 @@ class Notatki extends React.Component {
 
   updateContent = () => {
     const that = this;
-    this.getContent(
-      this.state.currentDirId[this.state.currentDirId.length - 1]
-    ).then(innerJson => {
-      let folderContent = [];
-      for (const notegroup of innerJson) {
-        let object = {};
-        if (notegroup.idnote) {
-          if (notegroup.status_id != 2) {
-            object["title"] = notegroup.name;
-            object["key"] = "note" + notegroup.idnote;
-            object["is_note"] = true;
+    setTimeout(() => {
+      this.getContent(
+        this.state.currentDirId[this.state.currentDepth]
+      ).then(innerJson => {
+        let folderContent = [];
+        for (const notegroup of innerJson) {
+          let object = {};
+          if (notegroup.idnote) {
+            if (notegroup.status_id != 2) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+              folderContent.push(object);
+            }
+          } else {
+            object["title"] = notegroup.folder_name;
+            object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
             folderContent.push(object);
           }
-        } else {
-          object["title"] = notegroup.folder_name;
-          object["key"] = notegroup.idnotegroup;
-          object["is_note"] = false;
-          folderContent.push(object);
         }
-      }
-      let updated_data = that.state.data;
-      updated_data[that.state.currentDepth] = folderContent;
-      that.setState({
-        data: updated_data
+        let updated_data = that.state.data;
+        updated_data[that.state.currentDepth] = folderContent;
+        that.setState({
+          data: updated_data
+        });
       });
-    });
+    }, 100)
   };
 
   updateCurrentUsergroup = e => {
