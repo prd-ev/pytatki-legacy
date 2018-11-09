@@ -81,7 +81,9 @@ export default class ListOfUsers extends React.PureComponent {
             </button>
           </div>
           <div className="modal-body">
-            {this.state.users.map(user => user.login)}
+            {this.state.users.map(user => (
+              <p key={user.iduser}>{user.login}</p>
+            ))}
           </div>
         </div>
       );
