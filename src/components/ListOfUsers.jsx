@@ -1,17 +1,16 @@
 import React from "react";
 
-export default class ListOfUsers extends React.PureComponent {
+export default class ListOfUsers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       users: null
     };
-    this.fetchUsers();
+    this.fetchData();
   }
 
-  fetchUsers() {
+  fetchData() {
     const siteUrl = this.props.siteUrl;
-    this.invitationLink();
     return fetch(siteUrl + "/api/?query={getToken}")
       .then(response => response.json())
       .then(res => res.data.getToken)
@@ -22,29 +21,35 @@ export default class ListOfUsers extends React.PureComponent {
               this.props.usergroup
             }, access_token:"${token}")}`
         )
-      )
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getMembers))
-      .then(data => this.setState({ users: data }));
+          .then(response => response.json())
+          .then(myJson => JSON.parse(myJson.data.getMembers))
+          .then(data =>
+            fetch(
+              siteUrl +
+                `/api/?query={generateInvitationLink(id_usergroup: ${
+                  this.props.usergroup
+                }, access_token:"${token}")}`
+            )
+              .then(response => response.json())
+              .then(myJson => myJson.data.generateInvitationLink)
+              .then(link => this.setState({ link: link, users: data }))
+          )
+      );
   }
 
-  invitationLink = () => {
-    const siteUrl = this.props.siteUrl;
-    return fetch(siteUrl + "/api/?query={getToken}")
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          siteUrl +
-            `/api/?query={generateInvitationLink(id_usergroup: ${
-              this.props.usergroup
-            }, access_token:"${token}")}`
-        )
-      )
-      .then(response => response.json())
-      .then(myJson => myJson.data.generateInvitationLink)
-      .then(data => this.setState({ link: data }));
-  };
+  shouldComponentUpdate(nextProps, nextState) {
+    if (String(this.state.users) != String(nextState.users)) {
+      return true;
+    }
+    if (this.props.usergroup != nextProps.usergroup) {
+      return true;
+    }
+    return false;
+  }
+
+  componentDidUpdate() {
+    this.fetchData();
+  }
 
   render() {
     if (this.state.users && this.state.link) {
