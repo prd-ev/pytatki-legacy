@@ -76,6 +76,7 @@ To configure database run `init_db.py` script.
 
 ```
 pytest
+jest
 ```
 
 ## Built With

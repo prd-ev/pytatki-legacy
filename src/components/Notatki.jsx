@@ -11,7 +11,7 @@ import ListOfUsers from "./ListOfUsers.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import AddUsergroup from "./AddUsergroup.jsx";
-
+import ChangeIcon from './ChangeIcon.jsx';
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
@@ -27,18 +27,19 @@ class Notatki extends React.Component {
       currentUsergroupName: "",
       is_note: null,
       note: null,
-      infoVisible: false
+      infoVisible: false,
+      token: null,
+      idToChangeIcon: null
     };
+    this.getToken();
   }
 
   handleClick = (e, data) => {
     if (data.action === "Open") {
       this.openNote(data.name.slice(4));
-    }
-    if (data.action === "Properties") {
+    } else if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name.slice(4));
-    }
-    if (data.action === "Delete") {
+    } else if (data.action === "Delete") {
       this.preDeleteNote(data.name.slice(4));
     }
   };
@@ -46,9 +47,10 @@ class Notatki extends React.Component {
   handleClickGroup = (e, data) => {
     if (data.action === "Properties") {
       this.infoNote(data.is_note, data.name);
-    }
-    if (data.action === "Delete") {
+    } else if (data.action === "Delete") {
       this.preDeleteFolder(data.name);
+    } else if (data.action === "Change icon") {
+      this.preChangeIcon(data.name);
     }
   };
 
@@ -90,43 +92,39 @@ class Notatki extends React.Component {
     });
   };
 
+  getToken = () => {
+    const that = this;
+    if (!this.state.token) {
+      fetch(`${this.state.siteUrl}/api/?query={getToken}`)
+        .then(response => response.json())
+        .then(res => res.data.getToken)
+        .then(token =>
+          that.setState({
+            token: token
+          }));
+    }
+  }
+
   getUsergroupRoot = usergroupId => {
     const that = this;
-    fetch(`${this.state.siteUrl}/api/?query={getToken}`)
+    fetch(`${this.state.siteUrl}/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${this.state.token}")}`)
       .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          `${
-            this.state.siteUrl
-          }/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${token}")}`
-        )
-          .then(response => response.json())
-          .then(myJson => Number(myJson.data.getRootId))
-          .then(rootId => {
-            that.setState({
-              currentDirId: [rootId]
-            });
-            that.updateContent(rootId);
-          })
-      );
+      .then(myJson => Number(myJson.data.getRootId))
+      .then(rootId => {
+        that.setState({
+          currentDirId: [rootId]
+        });
+        that.updateContent(rootId);
+      })
   };
 
   getContent(dir_id) {
-    return fetch(this.state.siteUrl + "/api/?query={getToken}")
-      .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
-        fetch(
-          `${
-            this.state.siteUrl
-          }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${token}")}`
-        )
-      )
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getContent))
-
-      .catch(error => console.log(error));
+    return (
+      fetch(`${this.state.siteUrl}/api/?query={getContent(id_notegroup:${dir_id},access_token:"${this.state.token}")}`)
+        .then(response => response.json())
+        .then(myJson => JSON.parse(myJson.data.getContent))
+        .catch(error => console.log(error))
+    )
   }
 
   openNote = e => {
@@ -298,34 +296,42 @@ class Notatki extends React.Component {
     return Number(folder);
   };
 
+  preChangeIcon = id => {
+    this.setState({
+      idToChangeIcon: id
+    })
+  }
+
   updateContent = () => {
     const that = this;
-    this.getContent(
-      this.state.currentDirId[this.state.currentDirId.length - 1]
-    ).then(innerJson => {
-      let folderContent = [];
-      for (const notegroup of innerJson) {
-        let object = {};
-        if (notegroup.idnote) {
-          if (notegroup.status_id != 2) {
-            object["title"] = notegroup.name;
-            object["key"] = "note" + notegroup.idnote;
-            object["is_note"] = true;
+    setTimeout(() => {
+      this.getContent(
+        this.state.currentDirId[this.state.currentDepth]
+      ).then(innerJson => {
+        let folderContent = [];
+        for (const notegroup of innerJson) {
+          let object = {};
+          if (notegroup.idnote) {
+            if (notegroup.status_id != 2) {
+              object["title"] = notegroup.name;
+              object["key"] = "note" + notegroup.idnote;
+              object["is_note"] = true;
+              folderContent.push(object);
+            }
+          } else {
+            object["title"] = notegroup.folder_name;
+            object["key"] = notegroup.idnotegroup;
+            object["is_note"] = false;
             folderContent.push(object);
           }
-        } else {
-          object["title"] = notegroup.folder_name;
-          object["key"] = notegroup.idnotegroup;
-          object["is_note"] = false;
-          folderContent.push(object);
         }
-      }
-      let updated_data = that.state.data;
-      updated_data[that.state.currentDepth] = folderContent;
-      that.setState({
-        data: updated_data
+        let updated_data = that.state.data;
+        updated_data[that.state.currentDepth] = folderContent;
+        that.setState({
+          data: updated_data
+        });
       });
-    });
+    }, 100)
   };
 
   updateCurrentUsergroup = e => {
@@ -379,6 +385,7 @@ class Notatki extends React.Component {
         <UsergroupList
           updateUsergroup={this.updateCurrentUsergroup}
           siteUrl={this.state.siteUrl}
+          token={this.state.token}
         />
         <div className={style.mainContent}>
           <p className={style.usergroupName}>
@@ -394,18 +401,19 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </div>
           <ConfirmDelete that={this} />
+          <ChangeIcon that={this} />
           {this.state.currentUsergroupName && this.state.currentDepth ? (
             <div className={style.back}>
               <i onClick={this.prevFolder} className="fas fa-arrow-left" />
               {this.showCurrentPath()}
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
@@ -414,6 +422,7 @@ class Notatki extends React.Component {
             is_note={this.state.is_note}
             visible={this.state.infoVisible}
             closeInfoNotatki={this.closeInfo}
+            token={this.state.token}
           />
           <ConnectedMenu />
           <ConnectedGroupMenu />

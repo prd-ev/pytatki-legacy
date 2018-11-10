@@ -1,5 +1,5 @@
 import React from "react";
-import ComponentStyle from "../scss/AddContent.scss";
+import style from "../scss/AddContent.scss";
 
 const AddNote = props => {
   let uploadNote = e => {
@@ -60,7 +60,7 @@ const AddNote = props => {
             <div className="modal-body">
               <form
                 id="form"
-                className={ComponentStyle.form}
+                className={style.form}
                 onSubmit={uploadNote}
               >
                 <label htmlFor="noteTitle">Tytuł notatki</label>
@@ -90,4 +90,4 @@ const AddNote = props => {
   );
 };
 
-export default AddNote;
+export default React.memo(AddNote);

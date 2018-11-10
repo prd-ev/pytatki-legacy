@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import ComponentStyle from "../scss/AddContent.scss";
+import React from "react";
+import style from "../scss/AddContent.scss";
 
 const AddFolder = props => {
   let addFolder = e => {
@@ -8,7 +8,7 @@ const AddFolder = props => {
     formData.append("title", document.getElementById("addFolderForm")[0].value);
     formData.append(
       "parent_id",
-      props.that.state.currentDirId[props.that.state.currentDirId.length - 1]
+      props.that.state.currentDirId[props.that.state.currentDepth]
     );
     formData.append("class", "1"); //dodać dynamicznie
     fetch(props.that.state.siteUrl + "/admin/add/", {
@@ -57,7 +57,7 @@ const AddFolder = props => {
             <div className="modal-body">
               <form
                 id="addFolderForm"
-                className={ComponentStyle.form}
+                className={style.form}
                 onSubmit={addFolder}
               >
                 <label htmlFor="folderTitle">Tytuł folderu</label>
@@ -83,4 +83,4 @@ const AddFolder = props => {
   );
 };
 
-export default AddFolder;
+export default React.memo(AddFolder);

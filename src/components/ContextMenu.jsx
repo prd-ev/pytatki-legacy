@@ -58,6 +58,15 @@ const NoteGroupMenu = props => {
         <MenuItem
           className={style.contextmenu_item}
           onClick={handleItemClick}
+          data={{ action: "Change icon" }}
+        >
+          Zmień ikonę
+        </MenuItem>
+      )}
+      {trigger && (
+        <MenuItem
+          className={style.contextmenu_item}
+          onClick={handleItemClick}
           data={{ action: "Delete" }}
         >
           Usuń

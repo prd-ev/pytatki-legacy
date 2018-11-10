@@ -9,15 +9,22 @@ module.exports = (env, argv) => {
         filename: "style.css"
       })
     ],
-    entry: ["./src/components/index.js"],
+    entry: {
+      vendor: ['react', 'react-dom', 'prop-types', 'react-contextmenu'],
+      app: ["./src/components/index.js"]
+    },
     output: {
       path: path.resolve(__dirname, "./pytatki/static"),
-      filename: "bundle.js"
+      filename: "[name].bundle.js"
+    },
+    optimization: {
+      splitChunks: {
+        chunks: 'async'
+      }
     },
     devtool: "source-map",
     module: {
-      rules: [
-        {
+      rules: [{
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
           loader: "babel-loader",
