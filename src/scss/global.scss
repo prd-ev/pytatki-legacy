@@ -10,6 +10,7 @@
   grid-template-rows: 290px auto;
   grid-column-gap: 30px;
 }
+
 .row {
   margin-right: 0;
 }
@@ -140,4 +141,16 @@ nav {
 
 .react-contextmenu-wrapper {
   display: inline-block;
+}
+
+@media only screen and (max-width: 767px) {
+  .landing-content {
+    .brand {
+      font-size: 53px;
+    }
+
+    .badge {
+      font-size: 12px;
+    }
+  }
 }
