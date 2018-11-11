@@ -3,6 +3,7 @@
 exports[`UsergroupList snapshot renders as expected 1`] = `
 <div
   className="sidebar"
+  id="sidebar"
 >
   <p>
     Klasy
