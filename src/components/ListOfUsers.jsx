@@ -57,7 +57,17 @@ export default class ListOfUsers extends React.Component {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Lista uzytkowników</h5>
-            <br />
+            <button
+              type="button"
+              className="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            Zaproś nowych uzytkowników
             <textarea
               id="link"
               value={this.state.link}
@@ -76,19 +86,19 @@ export default class ListOfUsers extends React.Component {
             >
               Copy
             </button>
-            <button
-              type="button"
-              className="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div className="modal-body">
+            <hr />
             {this.state.users.map(user => (
               <p key={user.iduser}>{user.login}</p>
             ))}
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
           </div>
         </div>
       );

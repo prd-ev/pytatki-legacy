@@ -11,7 +11,7 @@ import ListOfUsers from "./ListOfUsers.jsx";
 import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import AddUsergroup from "./AddUsergroup.jsx";
-import ChangeIcon from './ChangeIcon.jsx';
+import ChangeIcon from "./ChangeIcon.jsx";
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
@@ -101,13 +101,20 @@ class Notatki extends React.Component {
         .then(token =>
           that.setState({
             token: token
-          }));
+          })
+        );
     }
-  }
+  };
 
   getUsergroupRoot = usergroupId => {
     const that = this;
-    fetch(`${this.state.siteUrl}/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${this.state.token}")}`)
+    fetch(
+      `${
+        this.state.siteUrl
+      }/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${
+        this.state.token
+      }")}`
+    )
       .then(response => response.json())
       .then(myJson => Number(myJson.data.getRootId))
       .then(rootId => {
@@ -115,16 +122,20 @@ class Notatki extends React.Component {
           currentDirId: [rootId]
         });
         that.updateContent(rootId);
-      })
+      });
   };
 
   getContent(dir_id) {
-    return (
-      fetch(`${this.state.siteUrl}/api/?query={getContent(id_notegroup:${dir_id},access_token:"${this.state.token}")}`)
-        .then(response => response.json())
-        .then(myJson => JSON.parse(myJson.data.getContent))
-        .catch(error => console.log(error))
+    return fetch(
+      `${
+        this.state.siteUrl
+      }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${
+        this.state.token
+      }")}`
     )
+      .then(response => response.json())
+      .then(myJson => JSON.parse(myJson.data.getContent))
+      .catch(error => console.log(error));
   }
 
   openNote = e => {
@@ -299,39 +310,39 @@ class Notatki extends React.Component {
   preChangeIcon = id => {
     this.setState({
       idToChangeIcon: id
-    })
-  }
+    });
+  };
 
   updateContent = () => {
     const that = this;
     setTimeout(() => {
-      this.getContent(
-        this.state.currentDirId[this.state.currentDepth]
-      ).then(innerJson => {
-        let folderContent = [];
-        for (const notegroup of innerJson) {
-          let object = {};
-          if (notegroup.idnote) {
-            if (notegroup.status_id != 2) {
-              object["title"] = notegroup.name;
-              object["key"] = "note" + notegroup.idnote;
-              object["is_note"] = true;
+      this.getContent(this.state.currentDirId[this.state.currentDepth]).then(
+        innerJson => {
+          let folderContent = [];
+          for (const notegroup of innerJson) {
+            let object = {};
+            if (notegroup.idnote) {
+              if (notegroup.status_id != 2) {
+                object["title"] = notegroup.name;
+                object["key"] = "note" + notegroup.idnote;
+                object["is_note"] = true;
+                folderContent.push(object);
+              }
+            } else {
+              object["title"] = notegroup.folder_name;
+              object["key"] = notegroup.idnotegroup;
+              object["is_note"] = false;
               folderContent.push(object);
             }
-          } else {
-            object["title"] = notegroup.folder_name;
-            object["key"] = notegroup.idnotegroup;
-            object["is_note"] = false;
-            folderContent.push(object);
           }
+          let updated_data = that.state.data;
+          updated_data[that.state.currentDepth] = folderContent;
+          that.setState({
+            data: updated_data
+          });
         }
-        let updated_data = that.state.data;
-        updated_data[that.state.currentDepth] = folderContent;
-        that.setState({
-          data: updated_data
-        });
-      });
-    }, 100)
+      );
+    }, 100);
   };
 
   updateCurrentUsergroup = e => {
@@ -364,15 +375,6 @@ class Notatki extends React.Component {
               usergroup={this.state.currentUsergroupId}
               siteUrl={this.state.siteUrl}
             />
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -401,8 +403,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-                ""
-              )}
+              ""
+            )}
           </div>
           <ConfirmDelete that={this} />
           <ChangeIcon that={this} />
@@ -412,8 +414,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-              ""
-            )}
+            ""
+          )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
