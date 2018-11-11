@@ -5,7 +5,7 @@ export default class UsergroupList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      usergroups: []
+      usergroups: <i className="ld ld-ring ld-cycle" />
     };
     this.getUsergroups();
   }
