@@ -150,6 +150,8 @@ nav {
 }
 
 @media only screen and (max-width: 575px) {
+
+  //Landing page
   .landing-content {
     .brand {
       font-size: 53px;
@@ -160,6 +162,7 @@ nav {
     }
   }
 
+  //Login site
   .login-row {
     margin: 100px 15px;
 
@@ -169,6 +172,7 @@ nav {
     }
   }
 
+  //Register site
   .register-row {
     margin: 50px 15px;
 
@@ -176,5 +180,16 @@ nav {
       text-align: center;
       margin-bottom: 35px;
     }
+  }
+
+  //App site
+  .grid-wrapper {
+    display: inline-block;
+  }
+  nav{
+    width: 70vw;
+    background-color: lightblue;
+    position: fixed;
+    height: 50vh;
   }
 }

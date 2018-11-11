@@ -13,6 +13,7 @@
     <link rel="stylesheet" type="text/css" href="/static/loading.css" />
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous" async></script>
+    <script src="{{url_for('static', filename='hammer.min.js')}}" async></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous" async></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
@@ -21,7 +22,7 @@
 
 <body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}">
     <div class="grid-wrapper">
-        <nav class="mb-2">
+        <nav>
             <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
                 <span class="align-middle">Pytatki</span>
                 <span class="badge">beta</span>
