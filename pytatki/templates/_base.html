@@ -8,8 +8,8 @@
     <li class="nav-item">
         <a class="nav-link" href="/logout">Wyloguj się</a>
     </li>
-    {% else %}
-    <li class="nav-item{% if page_id == 'register' %} active{% endif %}">
+    {% elif page_id == 'register' %}
+    <li class="nav-item">
         <a role="presentation" class="nav-link" data-toggle="modal" data-target="#register" href="#">
             Zarejestruj się
         </a>

@@ -1,16 +1,17 @@
-{% extends "_base.html" %}
-
 {% set page_id = 'register' %}
 
+{% extends "_base.html" %}
+
 {% block content %}
-  <div class="row register-row">
+<div class="row register-row">
     <div class="col-lg-4">
     </div>
     <div class="col-lg-4 bg-white m-2 rounded" style="padding:15px;">
-      <h3>Rejestracja</h3>
-		<form id="form" method=post action="{{url_for('register_post', next=request.args.get('next'))}}">
+        <h3>Rejestracja</h3>
+        <form id="form" method=post action="{{url_for('register_post', next=request.args.get('next'))}}">
             <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{% endif %}" autofocus placeholder="Nazwa użytkownika">
+                <input autocapitalize="none" class="form-control" id="reg_username" name="username" type="text" value="{% if form %}{{form['username']}}{% endif %}"
+                    autofocus placeholder="Nazwa użytkownika">
                 {% if used_username %}
                 <small class="form-text text-danger">
                     Ta nazwa użytkownika jest już zajęta!
@@ -28,7 +29,8 @@
                 {% endif %}
             </div>
             <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="email" name="email" type="email" value="{% if form %}{{form['email']}}{% endif %}" placeholder="Adres email">
+                <input autocapitalize="none" class="form-control" id="email" name="email" type="email" value="{% if form %}{{form['email']}}{% endif %}"
+                    placeholder="Adres email">
                 {% if wrong_email %}
                 <small class="form-text text-danger">
                     Niepoprawny adres email!
@@ -36,7 +38,8 @@
                 {% endif %}
             </div>
             <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło">
+                <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value=""
+                    placeholder="Hasło">
                 <ul id="pass" class="bg-white m-2 p-2 rounded" style="width: 80%; padding: .375rem .75rem; display: none; position: absolute; z-index: 999; -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);">
                     <li id="letter" class="text-danger ml-4"><small class="form-text"><b>Duże</b> i <b>małe</b> litery</small></li>
                     <li id="number" class="text-danger ml-4"><small class="form-text"><b>Cyfry</b></small></li>
@@ -44,7 +47,8 @@
                 </ul>
             </div>
             <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password" value="" placeholder="Powtórz hasło">
+                <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password" value=""
+                    placeholder="Powtórz hasło">
                 {% if wrong_password %}
                 <small class="form-text text-danger">
                     Błędne hasło
@@ -52,8 +56,10 @@
                 {% endif %}
             </div>
             <div class="form-check">
-                <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked" {% if form %}{{form['accept_tos']}}{% endif %}>
-                <label class="form-check-label" for="accept_tos">Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17 stycznia 2018r.)</label>
+                <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked" {% if
+                    form %}{{form['accept_tos']}}{% endif %}>
+                <label class="form-check-label" for="accept_tos">Akceptuję Warunki użytkowania i Politykę prywatności
+                    (zaktualizowana 17 stycznia 2018r.)</label>
                 {% if not_accept %}
                 <small class="form-text text-danger">
                     Aby się zarejestrować musisz zaakceptować!
@@ -61,15 +67,16 @@
                 {% endif %}
             </div><br>
             <input id="submit" class="btn btn-primary" disabled="disabled" type=submit value="Zarejestruj się">
-		</form>
-	</div>
+        </form>
+    </div>
     <div class="col-lg-4">
     </div>
-  </div>
+</div>
 <script>
     var form = document.getElementById("form");
 
     var username = document.getElementById("username");
+    var register_username = document.getElementById("reg_username");
     var email = document.getElementById("email");
     var password = document.getElementById("password");
     var confirm = document.getElementById("confirm");
@@ -80,23 +87,27 @@
     var username_status = false;
     var email_status = false;
 
-    var pass = {letter: false, number: false, length: false};
+    var pass = {
+        letter: false,
+        number: false,
+        length: false
+    };
     var pass_status = false;
 
     var pass_confirm = false
 
-    password.onfocus = function() {
+    password.onfocus = function () {
         document.getElementById("pass").style.display = "block";
     }
 
-    password.onblur = function() {
+    password.onblur = function () {
         document.getElementById("pass").style.display = "none";
     }
 
-    password.onkeyup = function() {
-    var lowerCaseLetters = /[a-z]/g;
+    password.onkeyup = function () {
+        var lowerCaseLetters = /[a-z]/g;
         var upperCaseLetters = /[A-Z]/g;
-        if(password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
+        if (password.value.match(lowerCaseLetters) && password.value.match(upperCaseLetters)) {
             letter.classList.remove("text-danger");
             letter.classList.add("text-success");
             pass.letter = true;
@@ -107,7 +118,7 @@
         }
 
         var numbers = /[0-9]/g;
-        if(password.value.match(numbers)) {
+        if (password.value.match(numbers)) {
             number.classList.remove("text-danger");
             number.classList.add("text-success");
             pass.number = true;
@@ -117,7 +128,7 @@
             pass.number = false;
         }
 
-        if(password.value.length >= 8) {
+        if (password.value.length >= 8) {
             length.classList.remove("text-danger");
             length.classList.add("text-success");
             pass.length = true;
@@ -127,44 +138,38 @@
             pass.length = false;
         }
 
-        if(pass.letter && pass.number && pass.length) {
+        if (pass.letter && pass.number && pass.length) {
             pass_status = true;
-        }else{
+        } else {
             pass_status = false;
         }
     }
 
+    form.onchange = function () {
 
-
-
-
-
-    form.onchange = function() {
-
-        if(password.value == confirm.value) {
-                pass_confirm = true;
-        }else{
-                pass_confirm = false;
+        if (password.value == confirm.value) {
+            pass_confirm = true;
+        } else {
+            pass_confirm = false;
         }
-        if(email.value != "") {
+        if (email.value != "") {
             email_status = true;
-        }else{
+        } else {
             email_status = false;
         }
-        if(email.value != "") {
+        if (email.value != "") {
             email_status = true;
-        }else{
+        } else {
             email_status = false;
         }
-        if(username.value != "") {
+        if (username.value != "" || register_username.value != "") {
             username_status = true;
-        }else{
+        } else {
             username_status = false;
         }
-        console.log(pass_status, pass_confirm, username_status, email_status);
-        if(pass_status && pass_confirm && username_status && email_status) {
+        if (pass_status && pass_confirm && username_status && email_status) {
             document.getElementById("submit").disabled = "";
-        }else{
+        } else {
             document.getElementById("submit").disabled = "disabled";
         }
     }

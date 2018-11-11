@@ -61,7 +61,7 @@
                             <div class="container">
                                 <form id="form" method=post action="/register/">
                                     <div class="form-group">
-                                        <input autocapitalize="none" class="form-control" id="username" name="username"
+                                        <input autocapitalize="none" class="form-control" id="reg_username" name="username"
                                             type="text" value="" placeholder="Nazwa użytkownika">
                                     </div>
                                     <div class="form-group">
@@ -272,7 +272,7 @@
                     }
                 }
             </script>
-            {%endif%} {% if page_id != 'login' %}
+            {%endif%} {% if page_id != 'login' and page_id != 'register' %}
             <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true" style="text-align: left;">
                 <div class="modal-dialog">
