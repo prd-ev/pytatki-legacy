@@ -21,6 +21,8 @@
 </head>
 
 <body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}">
+    <div id="openSwipeArea"></div>
+    <div id="closeSwipeArea"></div>
     <div class="grid-wrapper">
         <nav>
             <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">

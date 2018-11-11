@@ -64,7 +64,7 @@ export default class UsergroupList extends React.PureComponent {
 
   render() {
     return (
-      <div className={style.sidebar}>
+      <div id="sidebar" className={style.sidebar}>
         <p>Klasy</p>
         <ul>{this.state.usergroups}</ul>
       </div>

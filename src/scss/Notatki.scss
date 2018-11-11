@@ -9,14 +9,14 @@
   background-image: url("/static/images/note.svg");
   background-size: cover;
   display: inline-block;
-  height: 150px;
-  width: 150px;
+  width: 110px;
+  height: 110px;
   border-radius: 10px;
   vertical-align: top;
   cursor: pointer;
 
   p {
-    margin: 150px 20px 20px 27px;
+    margin: 110px 20px 20px 27px;
     pointer-events: none;
     font-size: 18px;
   }
@@ -27,8 +27,8 @@
   background-size: cover;
   background-position: center;
   display: inline-block;
-  width: 150px;
-  height: 130px;
+  width: 110px;
+  height: 90px;
   margin-top: 10px;
   margin-left: 0;
   margin-right: 0;
@@ -38,7 +38,7 @@
   p {
     pointer-events: none;
     font-size: 18px;
-    margin: 140px 15px 15px;
+    margin: 90px 15px 15px;
   }
 }
 
@@ -54,13 +54,8 @@
 }
 
 .elementWrapper {
-  padding: 10px;
-  margin: 10px;
-  //box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.6);
-  //border: solid 1px #2c2c2c;
-  border-radius: 5px;
-  width: 180px;
-  height: 200px;
+  width: 135px;
+  height: 150px;
   text-align: center;
 }
 
@@ -69,6 +64,7 @@
   margin-bottom: 50px;
   position: relative;
   display: inline-block;
+  z-index: 20;
 }
 
 .mainContent {
@@ -77,10 +73,10 @@
 }
 
 .actionBar {
-  margin-top: 20px;
 
-  & > div {
+  &>div {
     display: inline-block;
+    z-index: 20;
 
     button {
       margin-right: 15px;
@@ -92,6 +88,7 @@
   margin-top: 10px;
   font-size: 30px;
   position: absolute;
+  z-index: 20;
 
   span {
     cursor: default;
@@ -117,4 +114,13 @@
   padding: 5px;
   border: solid 1px black;
   border-radius: 5px;
+}
+
+@media only screen and (max-width: 575px) {
+  .fetchedData {
+    padding: 45px 20px;
+  }
+  .mainContent{
+    padding: 20px;
+  }
 }
