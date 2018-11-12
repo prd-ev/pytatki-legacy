@@ -10,6 +10,7 @@
   grid-template-rows: 290px auto;
   grid-column-gap: 30px;
 }
+
 .row {
   margin-right: 0;
 }
@@ -38,6 +39,9 @@ nav {
   color: $white;
   box-shadow: 1px 1px 4px 0 $black;
   cursor: pointer;
+  max-width: 200px;
+  margin-top: 10px;
+  z-index: 20;
 
   &:active,
   &:hover,
@@ -54,7 +58,7 @@ nav {
 }
 
 .bar {
-  width: 160px;
+  width: 140px;
 }
 
 .navbar-brand {
@@ -93,6 +97,7 @@ nav {
   }
 }
 
+//Landing page
 .landing-content {
   margin: 33vh auto 0;
   color: $black;
@@ -128,6 +133,7 @@ nav {
     font-size: 24px;
     color: $primary;
     padding: 3px 55px;
+    text-decoration: none;
 
     &:hover {
       text-decoration: none;
@@ -138,6 +144,131 @@ nav {
   }
 }
 
+
 .react-contextmenu-wrapper {
   display: inline-block;
+}
+
+.login-row,
+.register-row {
+  margin: 100px auto;
+  max-width: 400px;
+}
+
+footer a {
+  margin: auto;
+}
+
+@media only screen and (max-width: 575px) {
+
+  //Landing page
+  .landing-content {
+    .brand {
+      font-size: 53px;
+    }
+
+    .badge {
+      font-size: 12px;
+    }
+  }
+
+  //Login site
+  .login-row {
+    margin: 100px 15px;
+
+    h3 {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+  }
+
+  //Register site
+  .register-row {
+    margin: 50px 15px;
+
+    h3 {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+  }
+
+  //App site
+  .grid-wrapper {
+    display: inline-block;
+  }
+
+  nav {
+    width: 70vw;
+    background-color: lightblue;
+    position: fixed;
+    height: 50vh;
+    left: -70vw;
+    z-index: 999;
+  }
+
+  .navOpen {
+    left: 0;
+  }
+
+  #openSwipeArea {
+    height: 100vh;
+    width: 30vw;
+    position: absolute;
+    z-index: 10;
+  }
+
+  #closeSwipeArea {
+    height: 100vh;
+    width: 30vw;
+    position: absolute;
+    right: 0;
+    z-index: 10;
+  }
+}
+
+
+@keyframes move_wave {
+  0% {
+    transform: translateX(0) translateZ(0) scaleY(1)
+  }
+
+  50% {
+    transform: translateX(-25%) translateZ(0) scaleY(0.55)
+  }
+
+  100% {
+    transform: translateX(-50%) translateZ(0) scaleY(1)
+  }
+}
+
+.wave {
+  position: fixed;
+  left: 0;
+  top: 55vh;
+  width: 200%;
+  height: 45vh;
+  background-repeat: repeat no-repeat;
+  background-position: 0 bottom;
+  transform-origin: center bottom;
+}
+
+.waveTop {
+  background-size: 50% 28vh;
+  z-index: 15;
+  opacity: 0.5;
+  animation: move-wave 3s;
+  animation-delay: 1s;
+}
+
+.waveMiddle {
+  background-size: 50% 30vh;
+  z-index: 10;
+  opacity: 0.75;
+  animation: move_wave 10s linear infinite;
+}
+
+.waveBottom {
+  background-size: 50% 29vh;
+  z-index: 5;
+  animation: move_wave 15s linear infinite;
 }

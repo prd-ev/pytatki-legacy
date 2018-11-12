@@ -3,7 +3,6 @@ import Notatki from '../Notatki.jsx';
 import { shallow } from 'enzyme';
 
 describe('Notatki unit', () => {
-    beforeEach(() => {
         window.fetch = jest.fn((link) => {
             if (link.includes('/api?query={getUsergroups')) {
                 return Promise.resolve({
@@ -25,7 +24,6 @@ describe('Notatki unit', () => {
                 })
             }
         })
-    })
 
 
     const wrapper = shallow(<Notatki />);

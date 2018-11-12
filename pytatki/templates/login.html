@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    <nav class="mb-2">
+    <nav>
         <a class="navbar-brand" href="/" style="height: 45px">
             <span class="align-middle">Pytatki</span>
             <span class="badge">beta</span>
@@ -39,10 +39,8 @@
             {% endfor %} {% endif %} {% endwith %}
         </div>
     </div>
-    <div class="row login-row">
-        <div class="col-lg-4">
-        </div>
-        <div class="col-lg-4 bg-white rounded m-2" style="padding:15px;">
+    <div class="login-row">
+        <div>
             <h3>Logowanie</h3>
             <form method=post action="{% if request.args.get('next') %}{{request.path + " ?next=" + request.args.get('next')}}{%else%}/login/{%endif%}">
                 <div class="form-group">

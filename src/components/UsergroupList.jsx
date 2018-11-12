@@ -5,7 +5,7 @@ export default class UsergroupList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      usergroups: []
+      usergroups: <i className="ld ld-ring ld-cycle" />
     };
     this.getUsergroups();
   }
@@ -64,7 +64,7 @@ export default class UsergroupList extends React.PureComponent {
 
   render() {
     return (
-      <div className={style.sidebar}>
+      <div id="sidebar" className={style.sidebar}>
         <p>Klasy</p>
         <ul>{this.state.usergroups}</ul>
       </div>

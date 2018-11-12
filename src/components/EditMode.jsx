@@ -5,7 +5,7 @@ const EditMode = props => {
   if (props.isOn) {
     return (
       <div>
-        <button className="btn bar" onClick={props.changeMode}>
+        <button className="btn" onClick={props.changeMode}>
           Wyjdź z trybu edycji
         </button>
       </div>
@@ -13,7 +13,7 @@ const EditMode = props => {
   }
   return (
     <div>
-      <button className="btn bar" onClick={props.changeMode}>
+      <button className="btn" onClick={props.changeMode}>
         Włącz tryb edycji
       </button>
     </div>
