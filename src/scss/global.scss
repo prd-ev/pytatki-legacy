@@ -97,6 +97,7 @@ nav {
   }
 }
 
+//Landing page
 .landing-content {
   margin: 33vh auto 0;
   color: $black;
@@ -132,6 +133,7 @@ nav {
     font-size: 24px;
     color: $primary;
     padding: 3px 55px;
+    text-decoration: none;
 
     &:hover {
       text-decoration: none;
@@ -141,6 +143,7 @@ nav {
     }
   }
 }
+
 
 .react-contextmenu-wrapper {
   display: inline-block;
@@ -152,7 +155,7 @@ nav {
   max-width: 400px;
 }
 
-footer a{
+footer a {
   margin: auto;
 }
 
@@ -221,4 +224,51 @@ footer a{
     right: 0;
     z-index: 10;
   }
+}
+
+
+@keyframes move_wave {
+  0% {
+    transform: translateX(0) translateZ(0) scaleY(1)
+  }
+
+  50% {
+    transform: translateX(-25%) translateZ(0) scaleY(0.55)
+  }
+
+  100% {
+    transform: translateX(-50%) translateZ(0) scaleY(1)
+  }
+}
+
+.wave {
+  position: fixed;
+  left: 0;
+  top: 55vh;
+  width: 200%;
+  height: 45vh;
+  background-repeat: repeat no-repeat;
+  background-position: 0 bottom;
+  transform-origin: center bottom;
+}
+
+.waveTop {
+  background-size: 50% 28vh;
+  z-index: 15;
+  opacity: 0.5;
+  animation: move-wave 3s;
+  animation-delay: 1s;
+}
+
+.waveMiddle {
+  background-size: 50% 30vh;
+  z-index: 10;
+  opacity: 0.75;
+  animation: move_wave 10s linear infinite;
+}
+
+.waveBottom {
+  background-size: 50% 29vh;
+  z-index: 5;
+  animation: move_wave 15s linear infinite;
 }
