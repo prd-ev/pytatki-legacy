@@ -1,72 +1,68 @@
 import React from "react";
+import style from "../scss/ListOfUsers.scss";
 
 export default class ListOfUsers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      visible: false,
       id: null,
       users: null,
       link: null
     };
-    this.fetchData();
   }
 
-  fetchData() {
+  fetchData = () => {
     const siteUrl = this.props.siteUrl;
-    return fetch(
-      siteUrl +
-        `/api/?query={getMembers(id_usergroup: ${
-          this.props.usergroup
-        }, access_token:"${this.props.token}")}`
-    )
-      .then(response => response.json())
-      .then(myJson => JSON.parse(myJson.data.getMembers))
-      .then(data =>
-        fetch(
-          siteUrl +
-            `/api/?query={generateInvitationLink(id_usergroup: ${
-              this.props.usergroup
-            }, access_token:"${this.props.token}")}`
-        )
-          .then(response => response.json())
-          .then(myJson => myJson.data.generateInvitationLink)
-          .then(link =>
-            this.setState({ link: link, users: data, id: this.props.usergroup })
+    if (this.state.id == this.props.usergroup) {
+      this.setState({ visible: true });
+    } else {
+      fetch(
+        siteUrl +
+          `/api/?query={getMembers(id_usergroup: ${
+            this.props.usergroup
+          }, access_token:"${this.props.token}")}`
+      )
+        .then(response => response.json())
+        .then(myJson => JSON.parse(myJson.data.getMembers))
+        .then(data =>
+          fetch(
+            siteUrl +
+              `/api/?query={generateInvitationLink(id_usergroup: ${
+                this.props.usergroup
+              }, access_token:"${this.props.token}")}`
           )
-      );
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.link != nextState.link) {
-      return true;
+            .then(response => response.json())
+            .then(myJson => myJson.data.generateInvitationLink)
+            .then(link =>
+              this.setState({
+                link: link,
+                users: data,
+                id: this.props.usergroup,
+                visible: true
+              })
+            )
+        );
     }
-    if (this.props.usergroup != nextProps.usergroup) {
+  };
+
+  shouldComponentUpdate(nextState) {
+    if (this.state.visible != nextState.visible) return true;
+    if (this.state.link != nextState.link) {
       return true;
     }
     return false;
   }
 
-  componentDidUpdate() {
-    if (this.state.id != this.props.usergroup) this.fetchData();
-  }
-
-  render() {
-    if (this.state.users && this.state.link) {
+  modal() {
+    if (this.state.visible) {
       return (
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Lista uzytkowników</h5>
-            <button
-              type="button"
-              className="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+        <div className={style.modal}>
+          <div>
+            <h5>Lista uzytkowników</h5>
           </div>
-          <div className="modal-body">
-            Zaproś nowych uzytkowników
+          <div>
+            Zaproś nowych uzytkowników<br />
             <textarea
               id="link"
               value={this.state.link}
@@ -76,7 +72,7 @@ export default class ListOfUsers extends React.Component {
                 document.getElementById("link").select();
               }}
             />
-            <button
+            <span
               onClick={() => {
                 document.getElementById("link").focus();
                 document.getElementById("link").select();
@@ -84,25 +80,41 @@ export default class ListOfUsers extends React.Component {
               }}
             >
               Copy
-            </button>
+            </span>
             <hr />
-            {this.state.users.map(user => (
-              <p key={user.iduser}>{user.login}</p>
-            ))}
+            <h5>Uzytkownicy</h5>
+            <ul>
+              {this.state.users.map(user => (
+                <li key={user.iduser}>{user.login}</li>
+              ))}
+            </ul>
           </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
+          <span
+            onClick={() => {
+              this.setState({ visible: false });
+            }}
+          >
+            Close
+          </span>
         </div>
       );
-    } else {
-      return "";
     }
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        <button
+          type="button"
+          onClick={() => {
+            if (!this.state.visible) this.fetchData();
+          }}
+          className="btn bar"
+        >
+          Lista uzytkowników
+        </button>
+        {this.modal()}
+      </React.Fragment>
+    );
   }
 }

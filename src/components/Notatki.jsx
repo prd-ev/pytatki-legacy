@@ -361,23 +361,11 @@ class Notatki extends React.Component {
   listOfUsers = () => {
     return (
       <div>
-        <button
-          type="button"
-          className="btn bar"
-          data-toggle="modal"
-          data-target="#listOfUsers"
-        >
-          Lista uzytkowników
-        </button>
-        <div className="modal" tabIndex="-1" role="dialog" id="listOfUsers">
-          <div className="modal-dialog" role="document">
-            <ListOfUsers
-              usergroup={this.state.currentUsergroupId}
-              siteUrl={this.state.siteUrl}
-              token={this.state.token}
-            />
-          </div>
-        </div>
+        <ListOfUsers
+          usergroup={this.state.currentUsergroupId}
+          siteUrl={this.state.siteUrl}
+          token={this.state.token}
+        />
       </div>
     );
   };
