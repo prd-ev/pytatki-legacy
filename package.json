@@ -7,6 +7,7 @@
     "test": "jest",
     "test-watch": "jest --watch",
     "build": "webpack --mode production",
+    "coverage": "jest --coverage",
     "watch": "webpack --mode development --watch",
     "dev": "python3 run.py | npm run watch",
     "setup": "cp examples/config.json .",
