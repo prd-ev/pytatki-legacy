@@ -24,6 +24,10 @@ def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_U
 def add_user_to_usergroup(conn, iduser, idusergroup):
     """Add user to usergroup"""
     c = conn.cursor()
+    c.execute("SELECT 1 FROM user_membership WHERE usergroup_id = %s AND user_id = %s",
+              (pymysql.escape_string(str(idusergroup)), pymysql.escape_string(str(iduser))))
+    if c.fetchone():
+        return "user already a member"
     c.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
               (pymysql.escape_string(str(iduser)), pymysql.escape_string(str(idusergroup))))
     return c.lastrowid
