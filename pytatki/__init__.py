@@ -1,5 +1,5 @@
 name = "pytatki"
-__version__ = "1.1a5"
+__version__ = "1.1a6"
 
 import pytatki.api.graphql
 import pytatki.view_manager
