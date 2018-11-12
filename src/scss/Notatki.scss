@@ -38,7 +38,7 @@
   p {
     pointer-events: none;
     font-size: 18px;
-    margin: 90px 15px 15px;
+    margin: 90px auto 15px;
   }
 }
 
@@ -73,8 +73,7 @@
 }
 
 .actionBar {
-
-  &>div {
+  & > div {
     display: inline-block;
     z-index: 20;
 
@@ -120,7 +119,7 @@
   .fetchedData {
     padding: 45px 20px;
   }
-  .mainContent{
+  .mainContent {
     padding: 20px;
   }
 }
