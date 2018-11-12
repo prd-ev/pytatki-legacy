@@ -3,6 +3,8 @@
 
 .modal {
   position: fixed;
+  max-width: 500px;
+  max-height: 500px;
   top: 10%;
   bottom: 10%;
   left: 10px;
