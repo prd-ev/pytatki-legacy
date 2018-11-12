@@ -1,5 +1,6 @@
 import React from "react";
 import style from "../scss/ListOfUsers.scss";
+import PropTypes from "prop-types";
 
 export default class ListOfUsers extends React.Component {
   constructor(props) {
@@ -62,7 +63,8 @@ export default class ListOfUsers extends React.Component {
             <h5>Lista uzytkowników</h5>
           </div>
           <div>
-            Zaproś nowych uzytkowników<br />
+            Zaproś nowych uzytkowników
+            <br />
             <textarea
               id="link"
               value={this.state.link}
@@ -118,3 +120,9 @@ export default class ListOfUsers extends React.Component {
     );
   }
 }
+
+ListOfUsers.propTypes = {
+  siteUrl: PropTypes.string,
+  token: PropTypes.string,
+  usergroup: PropTypes.string
+};
