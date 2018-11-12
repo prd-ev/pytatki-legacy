@@ -37,6 +37,7 @@
     "babel-core": "^7.0.0-bridge",
     "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.4",
+    "compression-webpack-plugin": "^2.0.0",
     "css-loader": "^1.0.1",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.6.0",

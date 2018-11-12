@@ -1,11 +1,16 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = () => {
   return {
     plugins: [
       new MiniCssExtractPlugin({
         filename: "style.css"
+      }),
+      new CompressionPlugin({
+        algorithm: "gzip",
+        test: /\.js$|\.css$|\.html$/,
       })
     ],
     entry: {
