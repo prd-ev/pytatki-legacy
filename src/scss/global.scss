@@ -149,6 +149,10 @@ nav {
   display: inline-block;
 }
 
+.react-contextmenu {
+  z-index: 30;
+}
+
 .login-row,
 .register-row {
   margin: 100px auto;
