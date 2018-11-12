@@ -4,41 +4,40 @@ export default class ListOfUsers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: null
+      id: null,
+      users: null,
+      link: null
     };
     this.fetchData();
   }
 
   fetchData() {
     const siteUrl = this.props.siteUrl;
-    return fetch(siteUrl + "/api/?query={getToken}")
+    return fetch(
+      siteUrl +
+        `/api/?query={getMembers(id_usergroup: ${
+          this.props.usergroup
+        }, access_token:"${this.props.token}")}`
+    )
       .then(response => response.json())
-      .then(res => res.data.getToken)
-      .then(token =>
+      .then(myJson => JSON.parse(myJson.data.getMembers))
+      .then(data =>
         fetch(
           siteUrl +
-            `/api/?query={getMembers(id_usergroup: ${
+            `/api/?query={generateInvitationLink(id_usergroup: ${
               this.props.usergroup
-            }, access_token:"${token}")}`
+            }, access_token:"${this.props.token}")}`
         )
           .then(response => response.json())
-          .then(myJson => JSON.parse(myJson.data.getMembers))
-          .then(data =>
-            fetch(
-              siteUrl +
-                `/api/?query={generateInvitationLink(id_usergroup: ${
-                  this.props.usergroup
-                }, access_token:"${token}")}`
-            )
-              .then(response => response.json())
-              .then(myJson => myJson.data.generateInvitationLink)
-              .then(link => this.setState({ link: link, users: data }))
+          .then(myJson => myJson.data.generateInvitationLink)
+          .then(link =>
+            this.setState({ link: link, users: data, id: this.props.usergroup })
           )
       );
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (String(this.state.users) != String(nextState.users)) {
+    if (this.state.link != nextState.link) {
       return true;
     }
     if (this.props.usergroup != nextProps.usergroup) {
@@ -48,7 +47,7 @@ export default class ListOfUsers extends React.Component {
   }
 
   componentDidUpdate() {
-    this.fetchData();
+    if (this.state.id != this.props.usergroup) this.fetchData();
   }
 
   render() {

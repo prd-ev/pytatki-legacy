@@ -374,6 +374,7 @@ class Notatki extends React.Component {
             <ListOfUsers
               usergroup={this.state.currentUsergroupId}
               siteUrl={this.state.siteUrl}
+              token={this.state.token}
             />
           </div>
         </div>
