@@ -38,6 +38,8 @@ def get_users_of_usergroup(idusergroup, iduser):
         con.execute("SELECT iduser, login FROM usergroup_membership WHERE idusergroup = %s",
                     pymysql.escape_string(str(idusergroup)))
         users = con.fetchall()
+        con.close()
+        conn.close()
         return json.dumps(users)
     return None
 
