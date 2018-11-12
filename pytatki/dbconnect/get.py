@@ -31,6 +31,19 @@ def get_usergroups_of_user(iduser):
     return json.dumps(usergroups, ensure_ascii=False)
 
 
+def get_users_of_usergroup(idusergroup, iduser):
+    """Get list of users of usergroup"""
+    if has_access_to_usergroup(idusergroup, iduser):
+        con, conn = connection()
+        con.execute("SELECT iduser, login FROM usergroup_membership WHERE idusergroup = %s",
+                    pymysql.escape_string(str(idusergroup)))
+        users = con.fetchall()
+        con.close()
+        conn.close()
+        return json.dumps(users)
+    return None
+
+
 def get_root_id(id_usergroup, id_user):
     """Get if of root directory in usergroup"""
     if has_access_to_usergroup(id_usergroup, id_user):

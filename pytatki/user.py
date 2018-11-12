@@ -14,11 +14,9 @@ from flask_login import login_user, logout_user, current_user
 from pytatki.main import APP, MAIL, CONFIG
 from pytatki.models import User, get_user
 from pytatki.view_manager import login_manager, login_required
-from itsdangerous import URLSafeTimedSerializer
+from pytatki.security import ts
 from pytatki.api.graphql import generate_access_token
 from werkzeug.wrappers import Response
-
-ts = URLSafeTimedSerializer(CONFIG['DEFAULT']['secret_key'])
 
 
 def valid_password(password):

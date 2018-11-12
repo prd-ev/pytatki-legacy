@@ -1,0 +1,23 @@
+@import "_variables.scss";
+@import "global";
+
+.modal {
+  position: fixed;
+  top: 10%;
+  bottom: 10%;
+  left: 10px;
+  right: 10px;
+  margin: auto;
+  border: 3px solid $primary;
+  border-radius: 5px;
+  background-color: $white;
+  padding: 20px;
+  z-index: 999;
+  span {
+    @extend %btn;
+    width: 40%;
+    margin: 5%;
+    text-align: center;
+    display: inline-block;
+  }
+}

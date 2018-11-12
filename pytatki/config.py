@@ -19,6 +19,8 @@ def parse_config(filename, check_email=False, check_uwsgi=False, check_db_config
         print("Run init_db.py to setup database")
         if check_db_configuration:
             return False
+    config.update({"HOST": "{}:{}".format(
+        config["DEFAULT"]["HOST"], config["DEFAULT"]["PORT"])})
     return config
 
 

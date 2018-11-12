@@ -12,10 +12,11 @@ from pytatki import __version__
 from pytatki.dbconnect import (connection, create_note, has_access_to_note,
                                has_access_to_notegroup,
                                note_exists, notegroup_empty, remove_note,
-                               remove_notegroup)
+                               remove_notegroup, add_user_to_usergroup)
 from pytatki.main import APP, CONFIG
 from pytatki.models import get_user
 from pytatki.view_manager import login_manager, nocache
+from pytatki.security import ts
 
 __author__ = 'Patryk Niedzwiedzinski'
 
@@ -378,6 +379,18 @@ def download(identifier):
             return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
+
+
+@APP.route('/join/<group>')
+def join_group(group):
+    group = ts.loads(group, salt=APP.secret_key, max_age=86400)
+    con, conn = connection()
+    conn.begin()
+    add_user_to_usergroup(conn, current_user['iduser'], group)
+    conn.commit()
+    con.close()
+    conn.close()
+    return redirect('/app/')
 
 
 @APP.route('/graphql/')
