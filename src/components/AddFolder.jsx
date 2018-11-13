@@ -30,20 +30,22 @@ const AddFolder = props => {
   };
 
   return (
-    <Modal name="Dodaj folder">
-      <div>
-        <h5>Dodaj folder w aktualnej lokalizacji</h5>
-      </div>
-      <div>
-        <form id="addFolderForm" className={style.form} onSubmit={addFolder}>
-          <label htmlFor="folderTitle">Tytuł folderu</label>
-          <br />
-          <input required name="title" type="text" id="folderTitle" />
-          <br />
-          <input className="btn" type="submit" value="Dodaj" />
-        </form>
-      </div>
-    </Modal>
+    <div>
+      <Modal name="Dodaj folder">
+        <div>
+          <h5>Dodaj folder w aktualnej lokalizacji</h5>
+        </div>
+        <div>
+          <form id="addFolderForm" className={style.form} onSubmit={addFolder}>
+            <label htmlFor="folderTitle">Tytuł folderu</label>
+            <br />
+            <input required name="title" type="text" id="folderTitle" />
+            <br />
+            <input className="btn" type="submit" value="Dodaj" />
+          </form>
+        </div>
+      </Modal>
+    </div>
   );
 };
 

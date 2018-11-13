@@ -58,62 +58,58 @@ export default class ListOfUsers extends React.Component {
     }
   }
 
-  modal() {
-    return (
-      <React.Fragment>
-        <div>
-          <h5>Lista uzytkowników</h5>
-        </div>
-        <div>
-          Zaproś nowych uzytkowników
-          <br />
-          {this.state.link ? (
-            <React.Fragment>
-              <textarea
-                id="link"
-                value={this.state.link}
-                readOnly
-                onClick={() => {
-                  document.getElementById("link").focus();
-                  document.getElementById("link").select();
-                }}
-              />
-              <span
-                onClick={() => {
-                  document.getElementById("link").focus();
-                  document.getElementById("link").select();
-                  document.execCommand("copy");
-                }}
-              >
-                Copy
-              </span>
-            </React.Fragment>
-          ) : (
-            <i className="ld ld-ring ld-cycle" />
-          )}
-          <hr />
-          <h5>Uzytkownicy</h5>
-          <ul>
-            {this.state.users ? (
-              this.state.users.map(user => (
-                <li key={user.iduser}>
-                  <a href={`/user/${user.login}`}>{user.login}</a>
-                </li>
-              ))
-            ) : (
-              <i className="ld ld-ring ld-cycle" />
-            )}
-          </ul>
-        </div>
-      </React.Fragment>
-    );
-  }
-
   render() {
     return (
-      <Modal name="Lista uzytkowników" action={this.fetchData}>
-        {this.modal()}
-      </Modal>
+      <div>
+        <Modal name="Lista uzytkowników" action={this.fetchData}>
+          <React.Fragment>
+            <div>
+              <h5>Lista uzytkowników</h5>
+            </div>
+            <div>
+              Zaproś nowych uzytkowników
+              <br />
+              {this.state.link ? (
+                <React.Fragment>
+                  <textarea
+                    id="link"
+                    value={this.state.link}
+                    readOnly
+                    onClick={() => {
+                      document.getElementById("link").focus();
+                      document.getElementById("link").select();
+                    }}
+                  />
+                  <span
+                    onClick={() => {
+                      document.getElementById("link").focus();
+                      document.getElementById("link").select();
+                      document.execCommand("copy");
+                    }}
+                  >
+                    Copy
+                  </span>
+                </React.Fragment>
+              ) : (
+                <i className="ld ld-ring ld-cycle" />
+              )}
+              <hr />
+              <h5>Uzytkownicy</h5>
+              <ul>
+                {this.state.users ? (
+                  this.state.users.map(user => (
+                    <li key={user.iduser}>
+                      <a href={`/user/${user.login}`}>{user.login}</a>
+                    </li>
+                  ))
+                ) : (
+                  <i className="ld ld-ring ld-cycle" />
+                )}
+              </ul>
+            </div>
+          </React.Fragment>
+        </Modal>
+      </div>
     );
   }
 }
