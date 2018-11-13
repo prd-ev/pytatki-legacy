@@ -5,7 +5,7 @@ export default class Modal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false
+      visible: this.props.no_button ? true : false
     };
     this.close = this.close.bind(this);
   }
@@ -13,26 +13,36 @@ export default class Modal extends React.Component {
   close(e) {
     e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
+    if (this.props.close_action) this.props.close_action();
     this.setState({
       visible: false
     });
   }
 
+  button() {
+    if (this.props.no_button) {
+      return "";
+    }
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          if (!this.state.visible) {
+            if (this.props.action) this.props.action();
+            this.setState({ visible: true });
+          }
+        }}
+        className="btn bar"
+      >
+        {this.props.name}
+      </button>
+    );
+  }
+
   render() {
     return (
       <React.Fragment>
-        <button
-          type="button"
-          onClick={() => {
-            if (!this.state.visible) {
-              if (this.props.action) this.props.action();
-              this.setState({ visible: true });
-            }
-          }}
-          className="btn bar"
-        >
-          {this.props.name}
-        </button>
+        {this.button()}
         {this.state.visible ? (
           <div className={style.modal_view} onClick={this.close}>
             <div

@@ -1,6 +1,7 @@
 import React from "react";
 import config from "../../config.json";
 import style from "../scss/Info.scss";
+import Modal from "./Modal.jsx";
 
 const siteUrl = "http://" + config.DEFAULT.HOST + ":" + config.DEFAULT.PORT;
 
@@ -248,26 +249,40 @@ class InfoNote extends React.Component {
     );
   };
 
+  render_info() {
+    if (this.props.is_note) {
+      return (
+        <React.Fragment>
+          {this.renderNoteHeader()}
+          <h3>Latest actions</h3>
+          {this.renderNoteActions()}
+        </React.Fragment>
+      );
+    } else {
+      return (
+        <React.Fragment>
+          {this.renderGroupHeader()}
+          {this.renderGroupElements()}
+        </React.Fragment>
+      );
+    }
+  }
+
   render() {
+    const isMobile = window.innerWidth <= 500;
     if (this.props.visible) {
-      if (this.props.is_note) {
+      if (isMobile) {
         return (
-          <React.Fragment>
-            <div className={style.info}>
-              <i onClick={() => this.closeInfo()} className="fas fa-times" />
-              {this.renderNoteHeader()}
-              <h3>Latest actions</h3>
-              {this.renderNoteActions()}
-            </div>
-          </React.Fragment>
+          <Modal no_button={true} close_action={this.closeInfo}>
+            {this.render_info()}
+          </Modal>
         );
       } else {
         return (
           <React.Fragment>
             <div className={style.info}>
-              <i onClick={() => this.closeInfo()} className="fas fa-times" />
-              {this.renderGroupHeader()}
-              {this.renderGroupElements()}
+              <i onClick={() => this.closeInfo()} className="fas fa-times" />{" "}
+              {this.render_info()}
             </div>
           </React.Fragment>
         );
