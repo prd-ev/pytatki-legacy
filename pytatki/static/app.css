@@ -154,7 +154,7 @@ nav {
 .btn---33DBP, .deleteConfirmation---i9UGG span {
   background-color: #fd9453;
   border-color: #fd9453;
-  color: #fff;
+  color: #fff !important;
   box-shadow: 1px 1px 4px 0 #1d1d1d;
   cursor: pointer;
   max-width: 200px;
@@ -324,14 +324,25 @@ footer a {
 #deaditor---1f8vM {
   grid-column: 2;
   grid-row: 1;
-  margin-top: 100px; }
+  margin-top: 25px; }
   #deaditor---1f8vM .controls---2NmPk {
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto; }
     #deaditor---1f8vM .controls---2NmPk .styleButton---w7zd9 {
       padding: 10px; }
-  #deaditor---1f8vM .editor---2qY0h {
+  #deaditor---1f8vM .editor---2qY0h,
+  #deaditor---1f8vM .editorhidePlaceholder---1C-kX {
     min-height: 80vh;
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+    position: relative; }
+    #deaditor---1f8vM .editor---2qY0h a,
+    #deaditor---1f8vM .editorhidePlaceholder---1C-kX a {
+      position: absolute;
+      bottom: 10px;
+      right: 10px; }
   #deaditor---1f8vM .DraftEditor-root---3gLt3 {
     padding: 20px; }
 
@@ -386,7 +397,7 @@ nav {
 .btn---2K_Sj, .modal---beey2 span {
   background-color: #fd9453;
   border-color: #fd9453;
-  color: #fff;
+  color: #fff !important;
   box-shadow: 1px 1px 4px 0 #1d1d1d;
   cursor: pointer;
   max-width: 200px;
@@ -556,14 +567,25 @@ footer a {
 #deaditor---2x0OD {
   grid-column: 2;
   grid-row: 1;
-  margin-top: 100px; }
+  margin-top: 25px; }
   #deaditor---2x0OD .controls---1T4dQ {
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto; }
     #deaditor---2x0OD .controls---1T4dQ .styleButton---lI8X- {
       padding: 10px; }
-  #deaditor---2x0OD .editor---2debR {
+  #deaditor---2x0OD .editor---2debR,
+  #deaditor---2x0OD .editorhidePlaceholder---3YRee {
     min-height: 80vh;
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+    position: relative; }
+    #deaditor---2x0OD .editor---2debR a,
+    #deaditor---2x0OD .editorhidePlaceholder---3YRee a {
+      position: absolute;
+      bottom: 10px;
+      right: 10px; }
   #deaditor---2x0OD .DraftEditor-root---3dGDR {
     padding: 20px; }
 
@@ -634,7 +656,7 @@ nav {
 .btn---3y-2T, .addIcon---3LKCu span {
   background-color: #fd9453;
   border-color: #fd9453;
-  color: #fff;
+  color: #fff !important;
   box-shadow: 1px 1px 4px 0 #1d1d1d;
   cursor: pointer;
   max-width: 200px;
@@ -804,14 +826,25 @@ footer a {
 #deaditor---2BGhj {
   grid-column: 2;
   grid-row: 1;
-  margin-top: 100px; }
+  margin-top: 25px; }
   #deaditor---2BGhj .controls---2qMQl {
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto; }
     #deaditor---2BGhj .controls---2qMQl .styleButton---1AhxZ {
       padding: 10px; }
-  #deaditor---2BGhj .editor---1XFfZ {
+  #deaditor---2BGhj .editor---1XFfZ,
+  #deaditor---2BGhj .editorhidePlaceholder---3D-PE {
     min-height: 80vh;
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+    position: relative; }
+    #deaditor---2BGhj .editor---1XFfZ a,
+    #deaditor---2BGhj .editorhidePlaceholder---3D-PE a {
+      position: absolute;
+      bottom: 10px;
+      right: 10px; }
   #deaditor---2BGhj .DraftEditor-root---2Jlgb {
     padding: 20px; }
 
@@ -858,7 +891,7 @@ nav {
 .btn {
   background-color: #fd9453;
   border-color: #fd9453;
-  color: #fff;
+  color: #fff !important;
   box-shadow: 1px 1px 4px 0 #1d1d1d;
   cursor: pointer;
   max-width: 200px;
@@ -1043,14 +1076,25 @@ footer a {
 #deaditor {
   grid-column: 2;
   grid-row: 1;
-  margin-top: 100px; }
+  margin-top: 25px; }
   #deaditor .controls {
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto; }
     #deaditor .controls .styleButton {
       padding: 10px; }
-  #deaditor .editor {
+  #deaditor .editor,
+  #deaditor .editorhidePlaceholder {
     min-height: 80vh;
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+    position: relative; }
+    #deaditor .editor a,
+    #deaditor .editorhidePlaceholder a {
+      position: absolute;
+      bottom: 10px;
+      right: 10px; }
   #deaditor .DraftEditor-root {
     padding: 20px; }
 

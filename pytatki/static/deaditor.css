@@ -26,7 +26,7 @@ nav {
 .btn {
   background-color: #fd9453;
   border-color: #fd9453;
-  color: #fff;
+  color: #fff !important;
   box-shadow: 1px 1px 4px 0 #1d1d1d;
   cursor: pointer;
   max-width: 200px;
@@ -211,14 +211,25 @@ footer a {
 #deaditor {
   grid-column: 2;
   grid-row: 1;
-  margin-top: 100px; }
+  margin-top: 25px; }
   #deaditor .controls {
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto; }
     #deaditor .controls .styleButton {
       padding: 10px; }
-  #deaditor .editor {
+  #deaditor .editor,
+  #deaditor .editorhidePlaceholder {
     min-height: 80vh;
-    border: #444444 solid 1px; }
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+    position: relative; }
+    #deaditor .editor a,
+    #deaditor .editorhidePlaceholder a {
+      position: absolute;
+      bottom: 10px;
+      right: 10px; }
   #deaditor .DraftEditor-root {
     padding: 20px; }
 

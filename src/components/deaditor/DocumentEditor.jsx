@@ -1,5 +1,5 @@
 import React from 'react';
-import { Editor, EditorState, RichUtils } from 'draft-js';
+import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw } from 'draft-js';
 
 export default class DocumentEditor extends React.Component {
     constructor(props) {
@@ -83,6 +83,7 @@ export default class DocumentEditor extends React.Component {
                         ref="editor"
                         spellCheck={true}
                     />
+                    <SaveNote note={JSON.stringify(convertToRaw(contentState))} />
                 </div>
             </div>
         );
@@ -186,5 +187,29 @@ const InlineStyleControls = (props) => {
                 />
             )}
         </div>
+    );
+};
+
+
+const SaveNote = (props) => {
+
+    const uploadNote = () => {
+        let note = props.note;
+        let formData = new FormData();
+        formData.append("note", note);
+        fetch('http://localhost:5000/add/note/', {
+            method: "POST",
+            body: formData
+        }).then(
+            response => response.json() // if the response is a JSON object
+        ).then(
+            success => alert(success.data) // Handle the success response object
+        ).catch(
+            error => console.log(error) // Handle the error response object
+        );
+    }
+
+    return (
+        <a className="btn" onClick={uploadNote}>Zapisz notatkę</a>
     );
 };
