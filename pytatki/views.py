@@ -398,10 +398,21 @@ def graphql_explorer():
     return render_template("graphql.html")
 
 
-@APP.route('/deaditor/')
-def deaditor():
-    return render_template("deaditor.html")
-
+@APP.route('/deaditor/<id>/')
+def deaditor(id):
+    if current_user.is_authenticated:
+        if has_access_to_note(id, current_user['iduser']):
+            con, conn = connection()
+            con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                        escape_string(id))
+            note = con.fetchone()
+            con.close()
+            conn.close()
+            if note['note_type'] == "note":
+                return render_template("deaditor.html", file=note['value'])
+            return redirect("/download/" + id)
+    flash("Musisz byc zalogowany", 'warning')
+    return redirect('/app/')
 
 
 APP.secret_key = CONFIG['DEFAULT']['secret_key']
