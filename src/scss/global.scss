@@ -248,31 +248,32 @@ footer a {
 .wave {
   position: fixed;
   left: 0;
-  top: 55vh;
-  width: 200%;
-  height: 45vh;
+  top: 58vh;
+  width: 400%;
+  height: 50vh;
   background-repeat: repeat no-repeat;
   background-position: 0 bottom;
   transform-origin: center bottom;
 }
 
 .waveTop {
-  background-size: 50% 28vh;
   z-index: 15;
   opacity: 0.5;
-  animation: move-wave 3s;
-  animation-delay: 1s;
+  animation: move_wave 30s linear infinite reverse;
+  background-position: 50%;
+  background-image: url("/static/images/wave.png");
 }
 
 .waveMiddle {
-  background-size: 50% 30vh;
   z-index: 10;
   opacity: 0.75;
-  animation: move_wave 10s linear infinite;
+  background-position: 20%;
+  animation: move_wave 40s linear infinite reverse;
+  background-image: url("/static/images/wave.png");
 }
 
 .waveBottom {
-  background-size: 50% 29vh;
   z-index: 5;
-  animation: move_wave 15s linear infinite;
+  animation: move_wave 60s linear infinite reverse;
+  background-image: url("/static/images/wave.png");
 }
