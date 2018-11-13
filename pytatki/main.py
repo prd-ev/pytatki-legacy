@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask import Flask
+from whitenoise import WhiteNoise
 
 __author__ = 'Patryk Niedzwiedzinski'
 
@@ -36,6 +37,7 @@ APP.config.update(
     MAIL_USERNAME=CONFIG['EMAIL']['EMAIL'],
     MAIL_PASSWORD=CONFIG['EMAIL']['EMAIL_PASSWORD']
 )
+APP.wsgi_app = WhiteNoise(APP.wsgi_app, root='pytatki/static')
 LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login_get'
