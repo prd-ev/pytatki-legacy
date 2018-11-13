@@ -398,4 +398,10 @@ def graphql_explorer():
     return render_template("graphql.html")
 
 
+@APP.route('/deaditor/')
+def deaditor():
+    return render_template("deaditor.html")
+
+
+
 APP.secret_key = CONFIG['DEFAULT']['secret_key']
