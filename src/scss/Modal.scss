@@ -15,6 +15,13 @@
   background-color: $white;
   padding: 20px;
   z-index: 999;
+
+  .close i {
+    font-size: 24px;
+    float: right;
+    margin: 0 0 -1rem auto;
+  }
+
   span {
     @extend %btn;
     width: 40%;
