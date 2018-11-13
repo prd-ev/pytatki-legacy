@@ -1,6 +1,16 @@
 @import "_variables.scss";
 @import "global";
 
+.modal_view {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 21 !important;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 .modal {
   position: fixed;
   max-width: 500px;
@@ -10,11 +20,14 @@
   left: 10px;
   right: 10px;
   margin: auto;
-  border: 3px solid $primary;
+  //border: 3px solid $primary;
   border-radius: 5px;
   background-color: $white;
   padding: 20px;
-  z-index: 999;
+  z-index: 22;
+  -webkit-box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.75);
+  box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.75);
 
   .close i {
     font-size: 24px;
