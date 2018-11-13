@@ -1,0 +1,5 @@
+<IfModule mod_headers.c>
+<filesMatch "*">
+        Header set Cache-Control "max-age=7200, public"
+</filesMatch>
+</IfModule>
