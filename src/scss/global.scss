@@ -277,3 +277,30 @@ footer a {
   animation: move_wave 60s linear infinite reverse;
   background-image: url("/static/images/wave.png");
 }
+
+
+//Deaditor
+.grid-wrapper-deaditor{
+  display: grid;
+  grid-template-columns: 195px auto;
+  grid-column-gap: 30px; 
+}
+
+#deaditor{
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 100px;
+  .controls{
+    border: #444444 solid 1px;
+    .styleButton{
+      padding: 10px;
+    }
+  }
+  .editor{
+    min-height: 80vh;
+    border: #444444 solid 1px;
+  }
+  .DraftEditor-root{
+    padding: 20px;
+  }
+}

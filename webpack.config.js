@@ -6,7 +6,7 @@ module.exports = () => {
   return {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "style.css"
+        filename: "[name].css"
       }),
       new CompressionPlugin({
         algorithm: "gzip",

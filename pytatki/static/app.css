@@ -316,6 +316,25 @@ footer a {
   animation: move_wave---1PoLQ 60s linear infinite reverse;
   background-image: url("/static/images/wave.png"); }
 
+.grid-wrapper-deaditor---1VoYe {
+  display: grid;
+  grid-template-columns: 195px auto;
+  grid-column-gap: 30px; }
+
+#deaditor---1f8vM {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 100px; }
+  #deaditor---1f8vM .controls---2NmPk {
+    border: #444444 solid 1px; }
+    #deaditor---1f8vM .controls---2NmPk .styleButton---w7zd9 {
+      padding: 10px; }
+  #deaditor---1f8vM .editor---2qY0h {
+    min-height: 80vh;
+    border: #444444 solid 1px; }
+  #deaditor---1f8vM .DraftEditor-root---3gLt3 {
+    padding: 20px; }
+
 .deleteConfirmation---i9UGG {
   position: fixed;
   top: 30%;
@@ -528,6 +547,25 @@ footer a {
   z-index: 5;
   animation: move_wave---gjT3Q 60s linear infinite reverse;
   background-image: url("/static/images/wave.png"); }
+
+.grid-wrapper-deaditor---1GMZ- {
+  display: grid;
+  grid-template-columns: 195px auto;
+  grid-column-gap: 30px; }
+
+#deaditor---2x0OD {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 100px; }
+  #deaditor---2x0OD .controls---1T4dQ {
+    border: #444444 solid 1px; }
+    #deaditor---2x0OD .controls---1T4dQ .styleButton---lI8X- {
+      padding: 10px; }
+  #deaditor---2x0OD .editor---2debR {
+    min-height: 80vh;
+    border: #444444 solid 1px; }
+  #deaditor---2x0OD .DraftEditor-root---3dGDR {
+    padding: 20px; }
 
 .modal---beey2 {
   position: fixed;
@@ -758,6 +796,25 @@ footer a {
   animation: move_wave---1XJ4u 60s linear infinite reverse;
   background-image: url("/static/images/wave.png"); }
 
+.grid-wrapper-deaditor---2tKNO {
+  display: grid;
+  grid-template-columns: 195px auto;
+  grid-column-gap: 30px; }
+
+#deaditor---2BGhj {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 100px; }
+  #deaditor---2BGhj .controls---2qMQl {
+    border: #444444 solid 1px; }
+    #deaditor---2BGhj .controls---2qMQl .styleButton---1AhxZ {
+      padding: 10px; }
+  #deaditor---2BGhj .editor---1XFfZ {
+    min-height: 80vh;
+    border: #444444 solid 1px; }
+  #deaditor---2BGhj .DraftEditor-root---2Jlgb {
+    padding: 20px; }
+
 .addIcon---3LKCu {
   position: fixed;
   top: 30%;
@@ -977,6 +1034,25 @@ footer a {
   z-index: 5;
   animation: move_wave 60s linear infinite reverse;
   background-image: url("/static/images/wave.png"); }
+
+.grid-wrapper-deaditor {
+  display: grid;
+  grid-template-columns: 195px auto;
+  grid-column-gap: 30px; }
+
+#deaditor {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 100px; }
+  #deaditor .controls {
+    border: #444444 solid 1px; }
+    #deaditor .controls .styleButton {
+      padding: 10px; }
+  #deaditor .editor {
+    min-height: 80vh;
+    border: #444444 solid 1px; }
+  #deaditor .DraftEditor-root {
+    padding: 20px; }
 
 
 /*# sourceMappingURL=app.css.map*/
