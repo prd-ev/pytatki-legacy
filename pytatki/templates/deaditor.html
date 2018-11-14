@@ -103,7 +103,7 @@
             </div>
             {% endfor %} {% endif %} {% endwith %}
         </div>
-        {{ file }}
+        <script> var file = "{{file|safe}}" </script>
         <div id="deaditor"></div>
     </div>
     <footer>

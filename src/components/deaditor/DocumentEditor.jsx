@@ -4,7 +4,9 @@ import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw } from 'dr
 export default class DocumentEditor extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { editorState: EditorState.createEmpty() };
+        file = file.replace(/\'/g, '"');
+        let content =convertFromRaw(JSON.parse(file))
+        this.state = { editorState: EditorState.createWithContent(content) };
 
         this.focus = () => this.refs.editor.focus();
         this.onChange = (editorState) => this.setState({ editorState });

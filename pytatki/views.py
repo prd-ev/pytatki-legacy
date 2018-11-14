@@ -409,7 +409,9 @@ def deaditor(id):
             con.close()
             conn.close()
             if note['note_type'] == "note":
-                return render_template("deaditor.html", file=note['value'])
+                with open('pytatki/files/' + note['value'], 'r') as file:
+                    data = json.load(file)
+                return render_template("deaditor.html", file=data)
             return redirect("/download/" + id)
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/app/')
