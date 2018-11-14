@@ -6,9 +6,15 @@ const AddNote = props => {
     let createNote = e => {
         e.preventDefault();
         const title = document.getElementById('noteTitle').value;
+        let formData = new FormData();
+        formData.append(
+            "notegroup_id",
+            props.that.state.currentDirId[props.that.state.currentDepth]
+        );
+        formData.append("title", title)
         fetch(props.that.state.siteUrl + "/add_note/", {
             method: "POST",
-            body: title
+            body: formData
         })
             .then(
                 response => response.json() // if the response is a JSON object

@@ -252,7 +252,7 @@ def allowed_file(filename):
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
 def add():
-    """Add new note"""
+    """Add new file"""
     if request.method == 'POST':
         if note_exists(title=request.form['title'], notegroup_id=request.form['notegroup_id']):
             return jsonify({'data': 'name in use'}), 400
@@ -400,6 +400,38 @@ def graphql_explorer():
     return render_template("graphql.html")
 
 
+@APP.route('/add_note/', methods=["GET", "POST"])
+def add_note():
+    """Add new note"""
+    if request.method == 'POST':
+        form = request.form
+        if note_exists(title=form['title'], notegroup_id=form['notegroup_id']):
+            return jsonify({'data': 'name in use'}), 400
+        if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], form['title'], ".json")):
+            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
+                os.makedirs(os.path.join(
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id']))
+            with open(os.path.join(
+                APP.config['UPLOAD_FOLDER'], form['notegroup_id'], form['title'] + ".json"), 'w') as note:
+                note.write('{"blocks":[{"key":"7i6ti","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}')
+        con, conn = connection()
+        conn.begin()
+        added = create_note(
+            conn,
+            str(os.path.join(form['notegroup_id'], form['title'] + '.json')),
+            form['title'],
+            CONFIG['IDENTIFIERS']['note_type_note_id'],
+            current_user['iduser'],
+            form['notegroup_id'],
+            CONFIG['IDENTIFIERS']['status_active_id'])
+        conn.commit()
+        con.close()
+        conn.close()
+        if not added:
+            return jsonify({'data': 'failed'}), 500
+        return jsonify({'data': 'Notatka zostala dodana!'}), 201
+
+
 @APP.route('/deaditor/<id>/', methods=["GET", "POST"])
 def deaditor(id):
     if request.method == "POST":
@@ -414,10 +446,10 @@ def deaditor(id):
         try:
             with open('pytatki/files/' + note['value'], 'wb') as file:
                 file.write(request.data)
-            return jsonify({"data":"Zapisanie powiodło się"})
+            return jsonify({"data": "Zapisanie powiodło się"})
         except Exception as error:
             flash(error)
-            return jsonify({"data":"Nie udało się zapisać"})
+            return jsonify({"data": "Nie udało się zapisać"})
 
     else:
         if current_user.is_authenticated:
