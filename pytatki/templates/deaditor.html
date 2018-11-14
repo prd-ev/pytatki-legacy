@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='deaditor.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
         crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/loading.css" />
@@ -23,7 +23,7 @@
 <body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}">
     <div id="openSwipeArea"></div>
     <div id="closeSwipeArea"></div>
-    <div class="grid-wrapper">
+    <div class="grid-wrapper-deaditor">
         <nav>
             <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
                 <span class="align-middle">Pytatki</span>
@@ -103,71 +103,80 @@
             </div>
             {% endfor %} {% endif %} {% endwith %}
         </div>
-        {% block content %}{% endblock %}
-        <div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true" style="text-align: left;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zarejestruj się</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container">
-                            <form id="form" method=post action="/register/">
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="reg_username" name="username"
-                                        type="text" value="" placeholder="Nazwa użytkownika">
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="email" name="email" type="email"
-                                        value="" placeholder="Adres email">
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="reg_password" name="password"
-                                        type="password" value="" placeholder="Hasło">
-                                    <ul id="pass" class="bg-white m-2 p-2 rounded" style="width: 80%; padding: .375rem .75rem; display: none; position: absolute; z-index: 999; -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);">
-                                        <li id="letter" class="text-danger ml-4">
-                                            <small class="form-text">
-                                                <b>Duże</b> i
-                                                <b>małe</b> litery</small>
-                                        </li>
-                                        <li id="number" class="text-danger ml-4">
-                                            <small class="form-text">
-                                                <b>Cyfry</b>
-                                            </small>
-                                        </li>
-                                        <li id="length" class="text-danger ml-4">
-                                            <small class="form-text">
-                                                <b>8</b> znaków</small>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password"
-                                        value="" placeholder="Powtórz hasło">
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox"
-                                        value="checked">
-                                    <label class="form-check-label" for="accept_tos">
-                                        Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17
-                                        stycznia
-                                        2018r.)
-                                    </label>
-                                </div>
-                                <br>
-                                <input id="submit" class="btn btn-primary" disabled="disabled" type=submit value="Zarejestruj się">
-                            </form>
-                        </div>
+        <script> var file = "{{file|safe}}" </script>
+        <div id="deaditor"></div>
+    </div>
+    <footer>
+        <a class="btn btn-danger btn-block" href="https://gitreports.com/issue/butterfly-pn/pytatki">
+            Zgłoś błąd!
+        </a>
+    </footer>
+    <!-- Attach React components -->
+    <script type="text/javascript" src="{{ url_for('static', filename='vendor.bundle.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='deaditor.bundle.js') }}"></script>
+    <div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+        style="text-align: left;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zarejestruj się</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <form id="form" method=post action="/register/">
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="reg_username" name="username"
+                                    type="text" value="" placeholder="Nazwa użytkownika">
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="email" name="email" type="email"
+                                    value="" placeholder="Adres email">
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="reg_password" name="password"
+                                    type="password" value="" placeholder="Hasło">
+                                <ul id="pass" class="bg-white m-2 p-2 rounded" style="width: 80%; padding: .375rem .75rem; display: none; position: absolute; z-index: 999; -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);">
+                                    <li id="letter" class="text-danger ml-4">
+                                        <small class="form-text">
+                                            <b>Duże</b> i
+                                            <b>małe</b> litery</small>
+                                    </li>
+                                    <li id="number" class="text-danger ml-4">
+                                        <small class="form-text">
+                                            <b>Cyfry</b>
+                                        </small>
+                                    </li>
+                                    <li id="length" class="text-danger ml-4">
+                                        <small class="form-text">
+                                            <b>8</b> znaków</small>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="confirm" name="confirm" type="password"
+                                    value="" placeholder="Powtórz hasło">
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" id="accept_tos" name="accept_tos" type="checkbox" value="checked">
+                                <label class="form-check-label" for="accept_tos">
+                                    Akceptuję Warunki użytkowania i Politykę prywatności (zaktualizowana 17
+                                    stycznia
+                                    2018r.)
+                                </label>
+                            </div>
+                            <br>
+                            <input id="submit" class="btn btn-primary" disabled="disabled" type=submit value="Zarejestruj się">
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            var form = document.getElementById("form");
+    </div>
+    <script>
+        var form = document.getElementById("form");
 
             var register_username = document.getElementById("reg_username");
             var email = document.getElementById("email");
@@ -328,38 +337,38 @@
                 }
             }
         </script>
-        <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-            style="text-align: left;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zaloguj się</h4>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container">
-                            <form method=post action="/login/">
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="username" name="username"
-                                        type="text" value="" placeholder="Login lub email">
-                                </div>
-                                <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="password" name="password"
-                                        type="password" value="" placeholder="Hasło">
-                                </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                    <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
-                                </div>
-                                <input class="btn btn-primary" type=submit value="Zaloguj się">
-                            </form>
-                        </div>
+    <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+        style="text-align: left;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 style="text-align: left;" class="modal-title" id="exampleModalLabele">Zaloguj się</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <form method=post action="/login/">
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="username" name="username" type="text"
+                                    value="" placeholder="Login lub email">
+                            </div>
+                            <div class="form-group">
+                                <input autocapitalize="none" class="form-control" id="password" name="password" type="password"
+                                    value="" placeholder="Hasło">
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
+                            </div>
+                            <input class="btn btn-primary" type=submit value="Zaloguj się">
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </body>
 
 </html>

@@ -3,6 +3,7 @@ import style from '../scss/ChangeIcon.scss';
 
 export default function ChangeIcon(props) {
     let changeIcon = folderId => () => {
+        let form = document.getElementById('icon-form');
         const icon = form[1].files[0];
         var formData = new FormData();
         formData.append("icon", icon);
@@ -27,12 +28,13 @@ export default function ChangeIcon(props) {
             <div className={style.addIcon}>
                 <p>Udostępnij własną ikonę</p>
                 <form
+                    id="icon-form"
                     className={style.form}
                     onSubmit={() => changeIcon(props.that.state.idToChangeIcon)}
                 >
                     <label htmlFor="noteFile">Nowa ikona</label>
                     <br />
-                    <input required type="file" name="file" />
+                    <input required type="file" name="file"/>
                 </form>
                 <span onClick={changeIcon(props.that.state.idToChangeIcon)}>Zmień</span>
                 <span onClick={() => props.that.setState({ idToChangeIcon: null })}>Anuluj</span>

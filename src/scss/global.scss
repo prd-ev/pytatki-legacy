@@ -36,7 +36,7 @@ nav {
 %btn {
   background-color: $primary;
   border-color: $primary;
-  color: $white;
+  color: $white !important;
   box-shadow: 1px 1px 4px 0 $black;
   cursor: pointer;
   max-width: 200px;
@@ -274,4 +274,46 @@ footer a {
   z-index: 5;
   animation: move_wave 60s linear infinite reverse;
   background-image: url("/static/images/wave.png");
+}
+
+
+//Deaditor
+.grid-wrapper-deaditor {
+  display: grid;
+  grid-template-columns: 195px auto;
+  grid-column-gap: 30px;
+}
+
+#deaditor {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 25px;
+
+  .controls {
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+
+    .styleButton {
+      padding: 10px;
+    }
+  }
+
+  .editor,
+  .editorhidePlaceholder {
+    min-height: 80vh;
+    border: #444444 solid 1px;
+    max-width: 70vw;
+    margin: auto;
+    position: relative;
+    a{
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+  }
+
+  .DraftEditor-root {
+    padding: 20px;
+  }
 }
