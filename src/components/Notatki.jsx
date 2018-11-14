@@ -354,7 +354,8 @@ class Notatki extends React.Component {
       currentDirId: [],
       currentPath: [],
       currentUsergroupName: usergroupName,
-      currentUsergroupId: usergroupId
+      currentUsergroupId: usergroupId,
+      note: null
     });
   };
 

@@ -153,6 +153,7 @@ class InfoNote extends React.Component {
 
   //Check if component should update: if visible changes or if noteInfo changes
   shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.note !== nextProps.note) return true;
     if (this.props.visible !== nextProps.visible) {
       return true;
     }
@@ -166,7 +167,10 @@ class InfoNote extends React.Component {
   }
 
   //If component updated fetch new data
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    if (this.props.note != prevProps.note && this.props.note == null) {
+      this.closeInfo();
+    }
     this.fetchData();
   }
 
