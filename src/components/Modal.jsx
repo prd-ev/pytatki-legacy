@@ -8,15 +8,28 @@ export default class Modal extends React.Component {
       visible: this.props.no_button ? true : false
     };
     this.close = this.close.bind(this);
+    this.escDetection = this.escDetection.bind(this);
+  }
+
+  escDetection(e) {
+    if (e.keyCode === 27) {
+      this.close();
+    }
   }
 
   close(e) {
-    e.cancelBubble = true;
-    if (e.stopPropagation) e.stopPropagation();
     if (this.props.close_action) this.props.close_action();
     this.setState({
       visible: false
     });
+  }
+
+  componentDidMount() {
+    document.addEventListener("keydown", this.escDetection, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.escDetection, false);
   }
 
   button() {
@@ -32,7 +45,7 @@ export default class Modal extends React.Component {
             this.setState({ visible: true });
           }
         }}
-        className="btn bar"
+        className="btn"
       >
         {this.props.name}
       </button>
@@ -44,7 +57,14 @@ export default class Modal extends React.Component {
       <React.Fragment>
         {this.button()}
         {this.state.visible ? (
-          <div className={style.modal_view} onClick={this.close}>
+          <div
+            className={style.modal_view}
+            onClick={e => {
+              e.cancelBubble = true;
+              if (e.stopPropagation) e.stopPropagation();
+              this.close(e);
+            }}
+          >
             <div
               className={style.modal}
               onClick={e => {
