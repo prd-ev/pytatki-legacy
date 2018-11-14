@@ -354,7 +354,8 @@ class Notatki extends React.Component {
       currentDirId: [],
       currentPath: [],
       currentUsergroupName: usergroupName,
-      currentUsergroupId: usergroupId
+      currentUsergroupId: usergroupId,
+      note: null
     });
   };
 
@@ -378,6 +379,7 @@ class Notatki extends React.Component {
           siteUrl={this.state.siteUrl}
           token={this.state.token}
         />
+        <AddUsergroup that={this} />
         <div className={style.mainContent}>
           <p className={style.usergroupName}>
             {this.state.currentUsergroupName}

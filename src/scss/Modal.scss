@@ -1,0 +1,49 @@
+@import "_variables.scss";
+@import "global";
+
+.modal_view {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 21 !important;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  position: fixed;
+  max-width: 500px;
+  max-height: 500px;
+  top: 10%;
+  bottom: 10%;
+  left: 10px;
+  right: 10px;
+  margin: auto;
+  //border: 3px solid $primary;
+  border-radius: 5px;
+  background-color: $white;
+  padding: 20px;
+  z-index: 22;
+  -webkit-box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.75);
+  box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.75);
+
+  input input[type="text"] {
+    border: 1px solid #111111;
+  }
+
+  .close i {
+    font-size: 24px;
+    float: right;
+    margin: 0 0 -1rem auto;
+  }
+
+  span {
+    @extend %btn;
+    width: 40%;
+    margin: 5%;
+    text-align: center;
+    display: inline-block;
+  }
+}
