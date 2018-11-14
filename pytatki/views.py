@@ -411,8 +411,14 @@ def deaditor(id):
                 note = con.fetchone()
                 con.close()
                 conn.close()
-        with open('pytatki/files/' + note['value'], 'w') as file:
-            json.dumps(request.data, file)
+        try:
+            with open('pytatki/files/' + note['value'], 'wb') as file:
+                file.write(request.data)
+            return jsonify({"data":"Zapisanie powiodło się"})
+        except Exception as error:
+            flash(error)
+            return jsonify({"data":"Nie udało się zapisać"})
+
     else:
         if current_user.is_authenticated:
             if has_access_to_note(id, current_user['iduser']):
