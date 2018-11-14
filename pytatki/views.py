@@ -412,8 +412,9 @@ def add_note():
                 os.makedirs(os.path.join(
                     APP.config['UPLOAD_FOLDER'], form['notegroup_id']))
             with open(os.path.join(
-                APP.config['UPLOAD_FOLDER'], form['notegroup_id'], form['title'] + ".json"), 'w') as note:
-                note.write('{"blocks":[{"key":"7i6ti","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}')
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id'], form['title'] + ".json"), 'w') as note:
+                note.write(
+                    '{"blocks":[{"key":"7i6ti","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}')
         con, conn = connection()
         conn.begin()
         added = create_note(
@@ -425,11 +426,14 @@ def add_note():
             form['notegroup_id'],
             CONFIG['IDENTIFIERS']['status_active_id'])
         conn.commit()
+        con.execute("SELECT idnote FROM note_view WHERE title = %s",
+                    escape_string(form['title']))
+        note = con.fetchone()
         con.close()
         conn.close()
         if not added:
             return jsonify({'data': 'failed'}), 500
-        return jsonify({'data': 'Notatka zostala dodana!'}), 201
+        return jsonify({'data': 'Notatka numer ' + str(note['idnote']) + ' zostala dodana!'}), 201
 
 
 @APP.route('/deaditor/<id>/', methods=["GET", "POST"])

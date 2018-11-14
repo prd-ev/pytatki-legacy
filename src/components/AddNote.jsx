@@ -20,7 +20,12 @@ const AddNote = props => {
                 response => response.json() // if the response is a JSON object
             )
             .then(
-                success => alert(success.data) // Handle the success response object
+                success => {
+                    alert(success.data);
+                    if (success.data.includes('zostala dodana')) {
+                        window.open("/deaditor/" + success.data.match(/\d+/g))
+                    }
+                } // Handle the success response object
             )
             .catch(
                 error => console.log(error) // Handle the error response object

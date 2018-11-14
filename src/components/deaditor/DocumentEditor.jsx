@@ -197,7 +197,7 @@ const SaveNote = (props) => {
 
     const uploadNote = () => {
         let note = props.note;
-        fetch('http://localhost:5000/deaditor/34/', {
+        fetch(window.location, {
             method: "POST",
             body: note,
             headers: {
