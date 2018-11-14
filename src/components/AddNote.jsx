@@ -46,7 +46,7 @@ const AddNote = props => {
             <br />
             <input required type="file" name="file" id="noteFile" />
             <br />
-            <input type="submit" value="Dodaj" />
+            <input className="btn" type="submit" value="Dodaj" />
           </form>
         </div>
       </Modal>
