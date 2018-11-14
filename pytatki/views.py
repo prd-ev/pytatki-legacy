@@ -376,6 +376,8 @@ def download(identifier):
             conn.close()
             if note['note_type'] == "file":
                 return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
+            if note['note_type'] == "note":
+                return redirect('/deaditor/' + identifier)
             return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
@@ -398,23 +400,35 @@ def graphql_explorer():
     return render_template("graphql.html")
 
 
-@APP.route('/deaditor/<id>/')
+@APP.route('/deaditor/<id>/', methods=["GET", "POST"])
 def deaditor(id):
-    if current_user.is_authenticated:
-        if has_access_to_note(id, current_user['iduser']):
-            con, conn = connection()
-            con.execute("SELECT * FROM note_view WHERE idnote = %s",
-                        escape_string(id))
-            note = con.fetchone()
-            con.close()
-            conn.close()
-            if note['note_type'] == "note":
-                with open('pytatki/files/' + note['value'], 'r') as file:
-                    data = json.load(file)
-                return render_template("deaditor.html", file=data)
-            return redirect("/download/" + id)
-    flash("Musisz byc zalogowany", 'warning')
-    return redirect('/app/')
+    if request.method == "POST":
+        if current_user.is_authenticated:
+            if has_access_to_note(id, current_user['iduser']):
+                con, conn = connection()
+                con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                            escape_string(id))
+                note = con.fetchone()
+                con.close()
+                conn.close()
+        with open('pytatki/files/' + note['value'], 'w') as file:
+            json.dumps(request.data, file)
+    else:
+        if current_user.is_authenticated:
+            if has_access_to_note(id, current_user['iduser']):
+                con, conn = connection()
+                con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                            escape_string(id))
+                note = con.fetchone()
+                con.close()
+                conn.close()
+                if note['note_type'] == "note":
+                    with open('pytatki/files/' + note['value'], 'r') as file:
+                        data = json.load(file)
+                    return render_template("deaditor.html", file=data)
+                return redirect("/download/" + id)
+        flash("Musisz byc zalogowany", 'warning')
+        return redirect('/app/')
 
 
 APP.secret_key = CONFIG['DEFAULT']['secret_key']

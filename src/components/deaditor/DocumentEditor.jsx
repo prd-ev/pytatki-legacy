@@ -5,7 +5,7 @@ export default class DocumentEditor extends React.Component {
     constructor(props) {
         super(props);
         file = file.replace(/\'/g, '"');
-        let content =convertFromRaw(JSON.parse(file))
+        let content = convertFromRaw(JSON.parse(file))
         this.state = { editorState: EditorState.createWithContent(content) };
 
         this.focus = () => this.refs.editor.focus();
@@ -197,11 +197,13 @@ const SaveNote = (props) => {
 
     const uploadNote = () => {
         let note = props.note;
-        let formData = new FormData();
-        formData.append("note", note);
-        fetch('http://localhost:5000/add/note/', {
+        fetch('http://localhost:5000/deaditor/34/', {
             method: "POST",
-            body: formData
+            body: note,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
         }).then(
             response => response.json() // if the response is a JSON object
         ).then(
