@@ -54,7 +54,7 @@ const NoteGroupMenu = props => {
           Właściwości
         </MenuItem>
       )}
-      {trigger && (
+      {/*trigger && (
         <MenuItem
           className={style.contextmenu_item}
           onClick={handleItemClick}
@@ -62,7 +62,7 @@ const NoteGroupMenu = props => {
         >
           Zmień ikonę
         </MenuItem>
-      )}
+      )*/}
       {trigger && (
         <MenuItem
           className={style.contextmenu_item}
