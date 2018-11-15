@@ -6,7 +6,7 @@ module.exports = () => {
   return {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "style.css"
+        filename: "[name].css"
       }),
       new CompressionPlugin({
         algorithm: "gzip",
@@ -15,7 +15,8 @@ module.exports = () => {
     ],
     entry: {
       vendor: ['react', 'react-dom', 'prop-types', 'react-contextmenu'],
-      app: ["./src/components/index.js"]
+      app: ["./src/components/index.js"],
+      deaditor: ["./src/components/deaditor/index.js"]
     },
     output: {
       path: path.resolve(__dirname, "./pytatki/static"),

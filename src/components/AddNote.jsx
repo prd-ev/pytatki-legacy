@@ -3,19 +3,16 @@ import style from "../scss/AddContent.scss";
 import Modal from "./Modal.jsx";
 
 const AddNote = props => {
-  let uploadNote = e => {
+  let createNote = e => {
     e.preventDefault();
-    const form = document.getElementById("form");
-    const file = form[1].files[0];
-    const title = form[0].value;
-    var formData = new FormData();
-    formData.append("file", file);
-    formData.append("title", title);
+    const title = document.getElementById("noteTitle").value;
+    let formData = new FormData();
     formData.append(
       "notegroup_id",
       props.that.state.currentDirId[props.that.state.currentDepth]
     );
-    fetch(props.that.state.siteUrl + "/add/", {
+    formData.append("title", title);
+    fetch(props.that.state.siteUrl + "/add_note/", {
       method: "POST",
       body: formData
     })
@@ -23,7 +20,12 @@ const AddNote = props => {
         response => response.json() // if the response is a JSON object
       )
       .then(
-        success => alert(success.data) // Handle the success response object
+        success => {
+          alert(success.data);
+          if (success.data.includes("zostala dodana")) {
+            window.open("/deaditor/" + success.data.match(/\d+/g));
+          }
+        } // Handle the success response object
       )
       .catch(
         error => console.log(error) // Handle the error response object
@@ -34,19 +36,15 @@ const AddNote = props => {
 
   return (
     <div>
-      <Modal name="Dodaj notatkę">
-        <h5>Dodaj notatkę w aktualnym folderze</h5>
+      <Modal name="Stwórz nową notatkę">
+        <h5>Stwórz nową notatkę w aktualnym folderze</h5>
         <div>
-          <form id="form" className={style.form} onSubmit={uploadNote}>
+          <form id="form" className={style.form} onSubmit={createNote}>
             <label htmlFor="noteTitle">Tytuł notatki</label>
             <br />
             <input required type="text" name="title" id="noteTitle" />
             <br />
-            <label htmlFor="noteFile">Plik notatki</label>
-            <br />
-            <input required type="file" name="file" id="noteFile" />
-            <br />
-            <input className="btn" type="submit" value="Dodaj" />
+            <input type="submit" value="Dodaj" />
           </form>
         </div>
       </Modal>

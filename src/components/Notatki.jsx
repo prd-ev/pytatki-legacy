@@ -1,6 +1,4 @@
 import React from "react";
-import AddNote from "./AddNote.jsx";
-import AddFolder from "./AddFolder.jsx";
 import EditMode from "./EditMode.jsx";
 import UsergroupList from "./UsergroupList.jsx";
 import config from "../../config.json";
@@ -12,6 +10,7 @@ import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import AddUsergroup from "./AddUsergroup.jsx";
 import ChangeIcon from "./ChangeIcon.jsx";
+import AddContent from './AddContent.jsx';
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
@@ -110,9 +109,9 @@ class Notatki extends React.Component {
     const that = this;
     fetch(
       `${
-        this.state.siteUrl
+      this.state.siteUrl
       }/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${
-        this.state.token
+      this.state.token
       }")}`
     )
       .then(response => response.json())
@@ -128,9 +127,9 @@ class Notatki extends React.Component {
   getContent(dir_id) {
     return fetch(
       `${
-        this.state.siteUrl
+      this.state.siteUrl
       }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${
-        this.state.token
+      this.state.token
       }")}`
     )
       .then(response => response.json())
@@ -385,8 +384,7 @@ class Notatki extends React.Component {
             {this.state.currentUsergroupName}
           </p>
           <div className={style.actionBar} key="actionBar">
-            {this.state.currentUsergroupName ? <AddNote that={this} /> : ""}
-            {this.state.currentUsergroupName ? <AddFolder that={this} /> : ""}
+            {this.state.currentUsergroupName ? <AddContent that={this} /> : ""}
             {this.state.currentUsergroupId ? this.listOfUsers() : ""}
             {this.state.currentUsergroupName ? (
               <EditMode
@@ -394,8 +392,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </div>
           <ConfirmDelete that={this} />
           <ChangeIcon that={this} />
@@ -405,8 +403,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
