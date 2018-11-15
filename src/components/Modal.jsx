@@ -9,6 +9,7 @@ export default class Modal extends React.Component {
     };
     this.close = this.close.bind(this);
     this.escDetection = this.escDetection.bind(this);
+    document.addEventListener("keydown", this.escDetection, false);
   }
 
   escDetection(e) {
@@ -22,10 +23,6 @@ export default class Modal extends React.Component {
     this.setState({
       visible: false
     });
-  }
-
-  componentDidMount() {
-    document.addEventListener("keydown", this.escDetection, false);
   }
 
   componentWillUnmount() {
