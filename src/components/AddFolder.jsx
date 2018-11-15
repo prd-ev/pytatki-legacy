@@ -31,7 +31,6 @@ const AddFolder = props => {
 
   return (
     <div>
-      <Modal name="Dodaj folder">
         <div>
           <h5>Dodaj folder w aktualnej lokalizacji</h5>
         </div>
@@ -44,7 +43,6 @@ const AddFolder = props => {
             <input className="btn" type="submit" value="Dodaj" />
           </form>
         </div>
-      </Modal>
     </div>
   );
 };

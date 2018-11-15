@@ -5,7 +5,7 @@ import Modal from "./Modal.jsx";
 const AddFile = props => {
   let uploadFile = e => {
     e.preventDefault();
-    const form = document.getElementById("form");
+    const form = document.getElementById("fileForm");
     const file = form[1].files[0];
     const title = form[0].value;
     var formData = new FormData();
@@ -34,22 +34,20 @@ const AddFile = props => {
 
   return (
     <div>
-      <Modal name="Dodaj notatkę">
         <h5>Dodaj notatkę w aktualnym folderze</h5>
         <div>
-          <form id="form" className={style.form} onSubmit={uploadFile}>
+          <form id="fileForm" className={style.form} onSubmit={uploadFile}>
             <label htmlFor="fileTitle">Tytuł notatki</label>
             <br />
             <input required type="text" name="title" id="fileTitle" />
             <br />
             <label htmlFor="noteFile">Plik notatki</label>
             <br />
-            <input required type="file" name="file" id="noteFile" />
+            <input required className="btn" className={style.chooseFile} type="file" name="file" id="noteFile" />
             <br />
-            <input type="submit" value="Dodaj" />
+            <input type="submit" className="btn" value="Dodaj" />
           </form>
         </div>
-      </Modal>
     </div>
   );
 };

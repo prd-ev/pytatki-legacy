@@ -46,7 +46,7 @@ const AddUsergroup = props => {
             <br />
             <input required name="title" type="text" id="description" />
             <br />
-            <input type="submit" value="Dodaj" />
+            <input type="submit" className="btn" value="Dodaj" />
           </form>
         </div>
       </Modal>

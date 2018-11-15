@@ -36,7 +36,6 @@ const AddNote = props => {
 
   return (
     <div>
-      <Modal name="Stwórz nową notatkę">
         <h5>Stwórz nową notatkę w aktualnym folderze</h5>
         <div>
           <form id="form" className={style.form} onSubmit={createNote}>
@@ -44,10 +43,9 @@ const AddNote = props => {
             <br />
             <input required type="text" name="title" id="noteTitle" />
             <br />
-            <input type="submit" value="Dodaj" />
+            <input type="submit" className="btn" value="Dodaj" />
           </form>
         </div>
-      </Modal>
     </div>
   );
 };
