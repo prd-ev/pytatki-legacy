@@ -1,0 +1,8 @@
+version: "3"
+services:
+  pytatki:
+    build: .
+    ports:
+      - "5000:80"
+    volumes:
+      - ../apache:/etc/apache2
