@@ -445,15 +445,26 @@ def deaditor(id):
                 con.execute("SELECT * FROM note_view WHERE idnote = %s",
                             escape_string(id))
                 note = con.fetchone()
+                con.execute("SELECT creator_id FROM note_view WHERE idnote = %s",
+                            escape_string(id))
+                creator = con.fetchone()
                 con.close()
                 conn.close()
-        try:
-            with open('pytatki/files/' + note['value'], 'wb') as file:
-                file.write(request.data)
-            return jsonify({"data": "Zapisanie powiodło się"})
-        except Exception as error:
-            flash(error)
-            return jsonify({"data": "Nie udało się zapisać"})
+                if creator['creator_id']==current_user['iduser']:
+                    try:
+                        with open('pytatki/files/' + note['value'], 'wb') as file:
+                            file.write(request.data)
+                        return jsonify({"data": "Zapisanie powiodło się"})
+                    except Exception as error:
+                        flash(error)
+                        return jsonify({"data": "Nie udało się zapisać"})
+                else:
+                    return jsonify({"data": "Tylko właściciel może zapisywać notatkę"})
+            else:
+                return jsonify({"data": "Nie masz dostępu do notatki"})
+        else:
+            return jsonify({"data": "Musisz być zalogowany"})
+
 
     else:
         if current_user.is_authenticated:
@@ -462,12 +473,20 @@ def deaditor(id):
                 con.execute("SELECT * FROM note_view WHERE idnote = %s",
                             escape_string(id))
                 note = con.fetchone()
+                con.execute("SELECT creator_id FROM note_view WHERE idnote = %s",
+                            escape_string(id))
+                creator = con.fetchone()
                 con.close()
                 conn.close()
+                if creator['creator_id']==current_user['iduser']:
+                    is_author = True
+                else:
+                    is_author = False
                 if note['note_type'] == "note":
                     with open('pytatki/files/' + note['value'], 'r') as file:
                         data = json.load(file)
-                    return render_template("deaditor.html", file=data)
+                    
+                    return render_template("deaditor.html", file=data, is_author=is_author)
                 return redirect("/download/" + id)
         flash("Musisz byc zalogowany", 'warning')
         return redirect('/app/')

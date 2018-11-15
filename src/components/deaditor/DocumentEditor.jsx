@@ -65,14 +65,14 @@ export default class DocumentEditor extends React.Component {
 
         return (
             <div className="root">
-                <BlockStyleControls
+                {isAuthor == "True" ? <BlockStyleControls
                     editorState={editorState}
                     onToggle={this.toggleBlockType}
-                />
-                <InlineStyleControls
+                /> : ""}
+                {isAuthor == "True" ? <InlineStyleControls
                     editorState={editorState}
                     onToggle={this.toggleInlineStyle}
-                />
+                /> : ""}
                 <div className={className} onClick={this.focus}>
                     <Editor
                         blockStyleFn={getBlockStyle}
@@ -84,8 +84,11 @@ export default class DocumentEditor extends React.Component {
                         placeholder="Zacznij pisać notatkę..."
                         ref="editor"
                         spellCheck={true}
+                        readOnly={isAuthor == "True" ? false : true}
                     />
-                    <SaveNote note={JSON.stringify(convertToRaw(contentState))} />
+                    {isAuthor == "True" ? <SaveNote
+                        note={JSON.stringify(convertToRaw(contentState))}
+                    /> : ""}
                 </div>
             </div>
         );
