@@ -273,24 +273,12 @@ class InfoNote extends React.Component {
   }
 
   render() {
-    const isMobile = window.innerWidth <= 500;
     if (this.props.visible) {
-      if (isMobile) {
-        return (
-          <Modal no_button={true} close_action={this.closeInfo}>
-            {this.render_info()}
-          </Modal>
-        );
-      } else {
-        return (
-          <React.Fragment>
-            <div className={style.info}>
-              <i onClick={() => this.closeInfo()} className="fas fa-times" />{" "}
-              {this.render_info()}
-            </div>
-          </React.Fragment>
-        );
-      }
+      return (
+        <Modal no_button={true} close_action={this.closeInfo}>
+          {this.render_info()}
+        </Modal>
+      );
     } else {
       return <React.Fragment />;
     }
