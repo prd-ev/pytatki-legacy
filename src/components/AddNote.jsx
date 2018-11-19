@@ -1,6 +1,5 @@
 import React from "react";
 import style from "../scss/AddContent.scss";
-import Modal from "./Modal.jsx";
 
 const AddNote = props => {
   let createNote = e => {
@@ -27,25 +26,25 @@ const AddNote = props => {
           }
         } // Handle the success response object
       )
+      .then(r => props.that.updateContent())
       .catch(
         error => console.log(error) // Handle the error response object
       );
-    props.that.updateContent();
     e.target.querySelector("input").value = null;
   };
 
   return (
     <div>
-        <h5>Stwórz nową notatkę w aktualnym folderze</h5>
-        <div>
-          <form id="form" className={style.form} onSubmit={createNote}>
-            <label htmlFor="noteTitle">Tytuł notatki</label>
-            <br />
-            <input required type="text" name="title" id="noteTitle" />
-            <br />
-            <input type="submit" className="btn" value="Dodaj" />
-          </form>
-        </div>
+      <h5>Stwórz nową notatkę w aktualnym folderze</h5>
+      <div>
+        <form id="form" className={style.form} onSubmit={createNote}>
+          <label htmlFor="noteTitle">Tytuł notatki</label>
+          <br />
+          <input required type="text" name="title" id="noteTitle" />
+          <br />
+          <input type="submit" className="btn" value="Dodaj" />
+        </form>
+      </div>
     </div>
   );
 };

@@ -34,6 +34,10 @@ def create_action(conn, content, iduser, idnote):
 def create_notegroup(conn, name, idusergroup, parent_id=0):
     """Insert new notegroup into the database in given usergroup using given connection and returns its id"""
     c = conn.cursor()
+    c.execute("SELECT 1 FROM notegroup WHERE name = %s AND parent_id = %s",
+              (pymysql.escape_string(name), pymysql.escape_string(str(parent_id))))
+    if c.fetchone():
+        return "notegroup exists"
     c.execute("INSERT INTO notegroup (name, parent_id) VALUES (%s, %s)",
               (pymysql.escape_string(name), pymysql.escape_string(str(parent_id))))
     idnotegroup = c.lastrowid

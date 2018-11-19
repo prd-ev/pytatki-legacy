@@ -144,17 +144,17 @@ def delete_user(identifier):
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
-    con, conn = connection()
-    if notegroup_empty(identifier):
-        conn.begin()
-        remove_notegroup(conn, identifier)
-        conn.commit()
-        con.close()
-        conn.close()
-        return jsonify({'data': 'success'})
-    con.close()
-    conn.close()
-    return jsonify({'data': 'notegroup not empty'})
+    if has_access_to_notegroup(identifier, current_user['iduser']):
+        if notegroup_empty(identifier):
+            con, conn = connection()
+            conn.begin()
+            remove_notegroup(conn, identifier)
+            conn.commit()
+            con.close()
+            conn.close()
+            return jsonify({'data': 'success'})
+        return jsonify({'data': 'notegroup not empty'})
+    return jsonify({"data": 'access denied'}), 403
 
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])

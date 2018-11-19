@@ -1,48 +1,53 @@
 import React from "react";
 import style from "../scss/AddContent.scss";
-import Modal from "./Modal.jsx";
 
 const AddFolder = props => {
   let addFolder = e => {
     e.preventDefault();
-    var formData = new FormData();
-    formData.append("title", document.getElementById("addFolderForm")[0].value);
-    formData.append(
-      "parent_id",
-      props.that.state.currentDirId[props.that.state.currentDepth]
-    );
-    formData.append("class", "1"); //dodać dynamicznie
-    fetch(props.that.state.siteUrl + "/admin/add/", {
-      method: "POST",
-      body: formData
-    })
+    fetch(
+      props.that.state.siteUrl +
+        `/api/?query=mutation{createNotegroup(name:"${
+          document.getElementById("addFolderForm")[0].value
+        }", id_usergroup: ${props.that.state.currentUsergroupId}, parent_id: ${
+          props.that.state.currentDirId[props.that.state.currentDepth]
+        }, access_token: "${props.that.state.token}")}`,
+      {
+        method: "POST"
+      }
+    )
       .then(
         response => response.json() // if the response is a JSON object
       )
       .then(
-        success => alert(success.data) // Handle the success response object
+        success => success.data.createNotegroup // Handle the success response object
+      )
+      .then(s => JSON.parse(s))
+      .then(json =>
+        typeof json.data === "string" || json.data instanceof String
+          ? alert(json.data)
+          : alert("dodano folder")
       )
       .catch(
         error => console.log(error) // Handle the error response object
-      );
-    props.that.updateContent();
+      )
+      .then(r => props.that.updateContent());
     e.target.querySelector("input").value = null;
   };
 
   return (
     <div>
-        <div>
-          <h5>Dodaj folder w aktualnej lokalizacji</h5>
-        </div>
-        <div>
-          <form id="addFolderForm" className={style.form} onSubmit={addFolder}>
-            <label htmlFor="folderTitle">Tytuł folderu</label>
-            <br />
-            <input required name="title" type="text" id="folderTitle" />
-            <br />
-            <input className="btn" type="submit" value="Dodaj" />
-          </form>
-        </div>
+      <div>
+        <h5>Dodaj folder w aktualnej lokalizacji</h5>
+      </div>
+      <div>
+        <form id="addFolderForm" className={style.form} onSubmit={addFolder}>
+          <label htmlFor="folderTitle">Tytuł folderu</label>
+          <br />
+          <input required name="title" type="text" id="folderTitle" />
+          <br />
+          <input className="btn" type="submit" value="Dodaj" />
+        </form>
+      </div>
     </div>
   );
 };

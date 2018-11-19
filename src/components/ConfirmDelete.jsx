@@ -14,10 +14,10 @@ export default function ConfirmDelete(props) {
       .catch(
         error => console.log(error) // Handle the error response object
       );
+    props.that.updateContent();
     props.that.setState({
       noteToDelete: null
     });
-    props.that.updateContent();
   };
 
   let deleteFolder = folderId => () => {
@@ -31,10 +31,10 @@ export default function ConfirmDelete(props) {
       .catch(
         error => console.log(error) // Handle the error response object
       );
+    props.that.updateContent();
     props.that.setState({
       folderToDelete: null
     });
-    props.that.updateContent();
   };
 
   const isMobile = window.innerWidth <= 500;

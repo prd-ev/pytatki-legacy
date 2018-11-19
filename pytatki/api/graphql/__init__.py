@@ -1,6 +1,6 @@
 from flask_graphql import GraphQLView
 from pytatki.main import APP, CONFIG
-from pytatki.api.graphql.functions import api_create_usergroup
+from pytatki.api.graphql.functions import api_create_usergroup, api_create_notegroup
 from pytatki.security import ts
 from pytatki.dbconnect import connection, has_access_to_usergroup, get_note, get_last_note_actions, get_notegroup, get_root_id,  get_usergroups_of_user, get_users_of_usergroup
 import gc
@@ -198,6 +198,17 @@ MutationRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, name, description, access_token: api_create_usergroup(
                 name, description, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'createNotegroup': GraphQLField(
+            type=GraphQLString,
+            args={
+                'name': GraphQLArgument(GraphQLString),
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'parent_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, name, id_usergroup, parent_id, access_token: api_create_notegroup(
+                name, id_usergroup, parent_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         )
     }
 )
