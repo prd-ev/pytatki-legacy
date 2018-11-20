@@ -46,24 +46,24 @@ Create `config.json` file in root directory of repository. You can find an examp
 
 ```json
 {
-  "DEFAULT": {
+  "default": {
     "secret_key": "change_it",
-    "DEBUG": true,
-    "HOST": "127.0.0.1",
-    "PORT": 5000
+    "debug": true,
+    "host": "127.0.0.1",
+    "port": 5000
   },
-  "EMAIL": {
-    "MAIL_SERVER": "smtp.gmail.com",
-    "MAIL_PORT": 465,
-    "MAIL_USE_SSL": true,
-    "EMAIL": "your_mail@gmail.com",
-    "EMAIL_PASSWORD": "your_password"
+  "email": {
+    "mail_server": "smtp.gmail.com",
+    "mail_port": 465,
+    "mail_use_ssl": true,
+    "email": "your_mail@gmail.com",
+    "email_password": "your_password"
   },
-  "DATABASE": {
-    "DB_HOST": "127.0.0.1",
-    "DB_USER": "pytatki",
-    "DB_PASSWORD": "pytatki",
-    "DB_NAME": "pytatki"
+  "database": {
+    "db_host": "127.0.0.1",
+    "db_user": "pytatki",
+    "db_password": "pytatki",
+    "db_name": "pytatki"
   }
 }
 ```

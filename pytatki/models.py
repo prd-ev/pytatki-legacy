@@ -28,7 +28,7 @@ def get_user(id_user=None, login=None, email=None):
     if not user_dict:
         return None
     con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                (escape_string(str(user_dict['iduser'])), escape_string(str(Config['IDENTIFIERS']['admingroup_id']))))
+                (escape_string(str(user_dict['iduser'])), escape_string(str(Config['database']['admingroup_id']))))
     admin = con.fetchone()
     user = User(is_admin=bool(admin))
     user.update(user_dict)

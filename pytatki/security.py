@@ -5,4 +5,4 @@ from pytatki.main import CONFIG
 __author__ = "Patryk Niedźwiedziński"
 
 
-ts = URLSafeTimedSerializer(CONFIG['DEFAULT']['secret_key'])
+ts = URLSafeTimedSerializer(CONFIG['default']['secret_key'])

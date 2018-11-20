@@ -206,7 +206,7 @@ def give_admin(identifier):
     if current_user.is_admin and user and user['iduser'] != current_user:
         try:
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
-                        (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['admingroup_id']))
+                        (escape_string(user['iduser']), CONFIG['database']['admingroup_id']))
             conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 user['login']), 'success')
@@ -219,7 +219,7 @@ def give_admin(identifier):
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if int(identifier) != int(CONFIG['IDENTIFIERS']['admin_id']):
+    if int(identifier) != int(CONFIG['database']['admin_id']):
         con, conn = connection()
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
@@ -227,7 +227,7 @@ def take_admin(identifier):
         if current_user.is_admin and query:
             try:
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                            (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['admingroup_id']))))
+                            (escape_string(identifier), escape_string(int(CONFIG['database']['admingroup_id']))))
                 conn.commit()
                 flash('Odebrano uprawnienia administratora uzytkownikowi ' +
                       user['login'], 'success')
@@ -281,10 +281,10 @@ def add():
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
-            CONFIG['IDENTIFIERS']['note_type_file_id'],
+            CONFIG['database']['note_type_file_id'],
             current_user['iduser'],
             form['notegroup_id'],
-            CONFIG['IDENTIFIERS']['status_active_id'])
+            CONFIG['database']['status_active_id'])
         conn.commit()
         con.close()
         conn.close()
@@ -421,10 +421,10 @@ def add_note():
             conn,
             str(os.path.join(form['notegroup_id'], form['title'] + '.json')),
             form['title'],
-            CONFIG['IDENTIFIERS']['note_type_note_id'],
+            CONFIG['database']['note_type_note_id'],
             current_user['iduser'],
             form['notegroup_id'],
-            CONFIG['IDENTIFIERS']['status_active_id'])
+            CONFIG['database']['status_active_id'])
         conn.commit()
         con.execute("SELECT idnote FROM note_view WHERE title = %s",
                     escape_string(form['title']))
@@ -491,4 +491,4 @@ def deaditor(idnote):
         return redirect('/app/')
 
 
-APP.secret_key = CONFIG['DEFAULT']['secret_key']
+APP.secret_key = CONFIG['default']['secret_key']

@@ -8,8 +8,8 @@ __author__ = "Patryk Niedźwiedziński"
 CONFIG = parse_config('config.json', check_db_configuration=False)
 
 
-def connection(host=CONFIG['DATABASE']['DB_HOST'], user=CONFIG['DATABASE']['DB_USER'],
-               password=CONFIG['DATABASE']['DB_PASSWORD'], db=CONFIG['DATABASE']['DB_NAME'],
+def connection(host=CONFIG['database']['db_host'], user=CONFIG['database']['db_user'],
+               password=CONFIG['database']['db_password'], db=CONFIG['database']['db_name'],
                charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor):
     conn = pymysql.connect(host=host,
                            user=user,
