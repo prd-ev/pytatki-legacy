@@ -27,27 +27,34 @@ const AddFile = props => {
       )
       .catch(
         error => console.log(error) // Handle the error response object
-      );
-    props.that.updateContent();
+      )
+      .then(r => props.that.updateContent());
     e.target.querySelector("input").value = null;
   };
 
   return (
     <div>
-        <h5>Dodaj notatkę w aktualnym folderze</h5>
-        <div>
-          <form id="fileForm" className={style.form} onSubmit={uploadFile}>
-            <label htmlFor="fileTitle">Tytuł notatki</label>
-            <br />
-            <input required type="text" name="title" id="fileTitle" />
-            <br />
-            <label htmlFor="noteFile">Plik notatki</label>
-            <br />
-            <input required className="btn" className={style.chooseFile} type="file" name="file" id="noteFile" />
-            <br />
-            <input type="submit" className="btn" value="Dodaj" />
-          </form>
-        </div>
+      <h5>Dodaj notatkę w aktualnym folderze</h5>
+      <div>
+        <form id="fileForm" className={style.form} onSubmit={uploadFile}>
+          <label htmlFor="fileTitle">Tytuł notatki</label>
+          <br />
+          <input required type="text" name="title" id="fileTitle" />
+          <br />
+          <label htmlFor="noteFile">Plik notatki</label>
+          <br />
+          <input
+            required
+            className="btn"
+            className={style.chooseFile}
+            type="file"
+            name="file"
+            id="noteFile"
+          />
+          <br />
+          <input type="submit" className="btn" value="Dodaj" />
+        </form>
+      </div>
     </div>
   );
 };
