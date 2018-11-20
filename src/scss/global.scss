@@ -211,7 +211,6 @@ footer a {
   background-image: url("/static/images/wave.png");
 }
 
-
 //Deaditor
 .grid-wrapper-deaditor {
   display: grid;
@@ -254,8 +253,15 @@ footer a {
   }
 }
 
-@media only screen and (max-width: 575px) {
+.menu-toggler {
+  display: none;
+}
 
+.fa-bars {
+  font-size: 45px;
+}
+
+@media only screen and (max-width: 575px) {
   //Landing page
   .landing-content {
     .brand {
@@ -305,12 +311,12 @@ footer a {
     left: 0;
   }
 
-  #openSwipeArea {
+  /*#openSwipeArea {
     height: 100vh;
     width: 30vw;
     position: absolute;
     z-index: 10;
-  }
+  }*/
 
   #closeSwipeArea {
     height: 100vh;
@@ -318,6 +324,10 @@ footer a {
     position: absolute;
     right: 0;
     z-index: 10;
+  }
+
+  .menu-toggler {
+    display: inline;
   }
 
   //Deaditor

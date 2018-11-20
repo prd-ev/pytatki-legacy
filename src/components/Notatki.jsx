@@ -10,7 +10,7 @@ import { ContextMenuTrigger } from "react-contextmenu";
 import { ConnectedMenu, ConnectedGroupMenu } from "./ContextMenu.jsx";
 import AddUsergroup from "./AddUsergroup.jsx";
 import ChangeIcon from "./ChangeIcon.jsx";
-import AddContent from './AddContent.jsx';
+import AddContent from "./AddContent.jsx";
 class Notatki extends React.Component {
   constructor(props) {
     super(props);
@@ -109,9 +109,9 @@ class Notatki extends React.Component {
     const that = this;
     fetch(
       `${
-      this.state.siteUrl
+        this.state.siteUrl
       }/api/?query={getRootId(id_usergroup:${usergroupId},access_token:"${
-      this.state.token
+        this.state.token
       }")}`
     )
       .then(response => response.json())
@@ -127,9 +127,9 @@ class Notatki extends React.Component {
   getContent(dir_id) {
     return fetch(
       `${
-      this.state.siteUrl
+        this.state.siteUrl
       }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${
-      this.state.token
+        this.state.token
       }")}`
     )
       .then(response => response.json())
@@ -378,6 +378,29 @@ class Notatki extends React.Component {
           siteUrl={this.state.siteUrl}
           token={this.state.token}
         />
+        <button
+          className="menu-toggler"
+          onClick={() => {
+            if (
+              !document.getElementById("sidebar").classList.contains("navOpen")
+            ) {
+              document
+                .getElementById("sidebar")
+                .animate([{ left: "-70vw" }, { left: "0" }], {
+                  duration: 300
+                });
+              document
+                .querySelector("nav")
+                .animate([{ left: "-70vw" }, { left: "0" }], {
+                  duration: 300
+                });
+              document.getElementById("sidebar").classList.add("navOpen");
+              document.querySelector("nav").classList.add("navOpen");
+            }
+          }}
+        >
+          <i className="fas fa-bars" />
+        </button>
         <AddUsergroup that={this} />
         <div className={style.mainContent}>
           <p className={style.usergroupName}>
@@ -392,8 +415,8 @@ class Notatki extends React.Component {
                 isOn={this.state.editModeOn}
               />
             ) : (
-                ""
-              )}
+              ""
+            )}
           </div>
           <ConfirmDelete that={this} />
           <ChangeIcon that={this} />
@@ -403,8 +426,8 @@ class Notatki extends React.Component {
               {this.showCurrentPath()}
             </div>
           ) : (
-              ""
-            )}
+            ""
+          )}
           <div className={style.fetchedData} key="fetchedData">
             {this.packContent()}
           </div>
