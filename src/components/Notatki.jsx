@@ -134,7 +134,7 @@ class Notatki extends React.Component {
     )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getContent))
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   }
 
   openNote = e => {

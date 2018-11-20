@@ -28,7 +28,7 @@ const AddFolder = props => {
           : alert("dodano folder")
       )
       .catch(
-        error => console.log(error) // Handle the error response object
+        error => console.error(error) // Handle the error response object
       )
       .then(r => props.that.updateContent());
     e.target.querySelector("input").value = null;

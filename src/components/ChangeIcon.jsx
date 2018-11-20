@@ -18,7 +18,7 @@ export default function ChangeIcon(props) {
         success => alert(success.data) // Handle the success response object
       )
       .catch(
-        error => console.log(error) // Handle the error response object
+        error => console.error(error) // Handle the error response object
       );
     props.that.setState({
       idToChangeIcon: null

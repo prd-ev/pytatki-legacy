@@ -28,7 +28,7 @@ const AddNote = props => {
       )
       .then(r => props.that.updateContent())
       .catch(
-        error => console.log(error) // Handle the error response object
+        error => console.error(error) // Handle the error response object
       );
     e.target.querySelector("input").value = null;
   };

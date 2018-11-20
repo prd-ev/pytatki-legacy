@@ -24,7 +24,7 @@ const AddUsergroup = props => {
         } // Handle the success response object
       )
       .catch(
-        error => console.log(error) // Handle the error response object
+        error => console.error(error) // Handle the error response object
       );
   };
 
