@@ -18,7 +18,7 @@ def remove_note(conn, idnote, iduser):
         conn.cursor().execute(
             "UPDATE note SET status_id = %s WHERE idnote = %s",
             (pymysql.escape_string(str(
-                CONFIG['database']['status_removed_id'])), pymysql.escape_string(str(idnote)))
+                CONFIG['identifiers']['status_removed_id'])), pymysql.escape_string(str(idnote)))
         )
         create_action(conn, 'removes a note \'{}\''.format(
             str(idnote)), iduser, idnote)

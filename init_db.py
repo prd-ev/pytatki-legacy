@@ -42,13 +42,13 @@ def save_to_config(config_dict):
     """
     with open('config.json', 'r') as fp:
         config = json.load(fp)
-    config['database']['admingroup_id'] = config_dict['admingroup_id']
-    config['database']['admin_id'] = config_dict['admin_id']
-    config['database']['status_active_id'] = config_dict['active_id']
-    config['database']['status_removed_id'] = config_dict['removed_id']
-    config['database']['note_type_file_id'] = config_dict['file_id']
-    config['database']['note_type_text_id'] = config_dict['text_id']
-    config['database']['note_type_url_id'] = config_dict['url_id']
+    config['identifiers']['admingroup_id'] = config_dict['admingroup_id']
+    config['identifiers']['admin_id'] = config_dict['admin_id']
+    config['identifiers']['status_active_id'] = config_dict['active_id']
+    config['identifiers']['status_removed_id'] = config_dict['removed_id']
+    config['identifiers']['note_type_file_id'] = config_dict['file_id']
+    config['identifiers']['note_type_text_id'] = config_dict['text_id']
+    config['identifiers']['note_type_url_id'] = config_dict['url_id']
     with open('config.json', 'w') as configfile:
         configfile.truncate(0)
         json.dump(config, configfile)
