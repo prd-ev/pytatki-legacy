@@ -5,7 +5,7 @@ export default class DocumentEditor extends React.Component {
     constructor(props) {
         super(props);
         file = file.replace(/\'/g, '"');
-        let content = convertFromRaw(JSON.parse(file))
+        let content = convertFromRaw(JSON.parse(file));
         this.state = { editorState: EditorState.createWithContent(content) };
 
         this.focus = () => this.refs.editor.focus();
@@ -56,7 +56,7 @@ export default class DocumentEditor extends React.Component {
         // If the user changes block type before entering any text, we can
         // either style the placeholder or hide it. Let's just hide it now.
         let className = 'editor';
-        var contentState = editorState.getCurrentContent();
+        let contentState = editorState.getCurrentContent();
         if (!contentState.hasText()) {
             if (contentState.getBlockMap().first().getType() !== 'unstyled') {
                 className += 'hidePlaceholder';
@@ -83,7 +83,7 @@ export default class DocumentEditor extends React.Component {
                         onTab={this.onTab}
                         placeholder="Zacznij pisać notatkę..."
                         ref="editor"
-                        spellCheck={true}
+                        spellCheck
                         readOnly={isAuthor == "True" ? false : true}
                     />
                     {isAuthor == "True" ? <SaveNote
@@ -171,7 +171,7 @@ const BlockStyleControls = (props) => {
     );
 };
 
-var INLINE_STYLES = [
+let INLINE_STYLES = [
     { label: 'Pogrubienie', style: 'BOLD' },
     { label: 'Kursywa', style: 'ITALIC' },
     { label: 'Podkreślenie', style: 'UNDERLINE' },
@@ -179,7 +179,7 @@ var INLINE_STYLES = [
 ];
 
 const InlineStyleControls = (props) => {
-    var currentStyle = props.editorState.getCurrentInlineStyle();
+    let currentStyle = props.editorState.getCurrentInlineStyle();
     return (
         <div className="controls">
             {INLINE_STYLES.map(type =>
@@ -214,7 +214,7 @@ const SaveNote = (props) => {
         ).catch(
             error => console.error(error) // Handle the error response object
         );
-    }
+    };
 
     return (
         <a className="btn" onClick={uploadNote}>Zapisz notatkę</a>

@@ -43,7 +43,7 @@ export default function ConfirmDelete(props) {
     if (isMobile) {
       return (
         <Modal
-          no_button={true}
+          no_button
           close_action={() => props.that.setState({ noteToDelete: null })}
         >
           <p>Jesteś pewien, że chcesz usunąć tą notatkę?</p>
@@ -78,7 +78,7 @@ export default function ConfirmDelete(props) {
     if (isMobile) {
       return (
         <Modal
-          no_button={true}
+          no_button
           close_action={() => props.that.setState({ folderToDelete: null })}
         >
           <p>Jesteś pewien, że chcesz usunąć ten folder?</p>
