@@ -12,8 +12,7 @@ from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
 from pytatki.main import APP, MAIL, CONFIG
-from email.message import EmailMessage
-from pytatki.models import User, get_user
+from pytatki.models import get_user
 from pytatki.view_manager import login_manager, login_required
 from pytatki.security import ts
 from pytatki.api.graphql import generate_access_token

@@ -116,7 +116,7 @@ def test_create_note(insert_user):
 
 def test_remove_note(insert_note):
     _, conn = connection()
-    success = remove_note(conn, 1, 1)
+    remove_note(conn, 1, 1)
     conn.commit()
     if note_exists(idnote=1) is not False:
         raise AssertionError()

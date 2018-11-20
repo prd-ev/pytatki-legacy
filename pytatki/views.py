@@ -436,17 +436,17 @@ def add_note():
         return jsonify({'data': 'Notatka numer ' + str(note['idnote']) + ' zostala dodana!'}), 201
 
 
-@APP.route('/deaditor/<id>/', methods=["GET", "POST"])
-def deaditor(id):
+@APP.route('/deaditor/<idnote>/', methods=["GET", "POST"])
+def deaditor(idnote):
     if request.method == "POST":
         if current_user.is_authenticated:
-            if has_access_to_note(id, current_user['iduser']):
+            if has_access_to_note(idnote, current_user['iduser']):
                 con, conn = connection()
                 con.execute("SELECT * FROM note_view WHERE idnote = %s",
-                            escape_string(id))
+                            escape_string(idnote))
                 note = con.fetchone()
                 con.execute("SELECT creator_id FROM note_view WHERE idnote = %s",
-                            escape_string(id))
+                            escape_string(idnote))
                 creator = con.fetchone()
                 con.close()
                 conn.close()
@@ -468,13 +468,13 @@ def deaditor(id):
 
     else:
         if current_user.is_authenticated:
-            if has_access_to_note(id, current_user['iduser']):
+            if has_access_to_note(idnote, current_user['iduser']):
                 con, conn = connection()
                 con.execute("SELECT * FROM note_view WHERE idnote = %s",
-                            escape_string(id))
+                            escape_string(idnote))
                 note = con.fetchone()
                 con.execute("SELECT creator_id FROM note_view WHERE idnote = %s",
-                            escape_string(id))
+                            escape_string(idnote))
                 creator = con.fetchone()
                 con.close()
                 conn.close()
@@ -485,9 +485,8 @@ def deaditor(id):
                 if note['note_type'] == "note":
                     with open('pytatki/files/' + note['value'], 'r') as file:
                         data = json.load(file)
-                    
                     return render_template("deaditor.html", file=data, is_author=is_author)
-                return redirect("/download/" + id)
+                return redirect("/download/" + idnote)
         flash("Musisz byc zalogowany", 'warning')
         return redirect('/app/')
 

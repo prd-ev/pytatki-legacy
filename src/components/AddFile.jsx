@@ -8,7 +8,7 @@ const AddFile = props => {
     const form = document.getElementById("fileForm");
     const file = form[1].files[0];
     const title = form[0].value;
-    var formData = new FormData();
+    let formData = new FormData();
     formData.append("file", file);
     formData.append("title", title);
     formData.append(

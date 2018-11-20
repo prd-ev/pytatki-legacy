@@ -1,6 +1,5 @@
 """Create functions"""
 import pymysql
-import json
 from passlib.hash import sha256_crypt
 from pytatki.config import parse_config
 from pytatki.dbconnect.checks import note_exists
