@@ -15,9 +15,9 @@ class Notatki extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      siteUrl: config.DEFAULT.HTTPS
-        ? `https://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`
-        : `http://${config.DEFAULT.HOST}:${config.DEFAULT.PORT}`,
+      siteUrl: config.default.HTTPS
+        ? `https://${config.default.host}:${config.default.port}`
+        : `http://${config.default.host}:${config.default.port}`,
       currentDepth: 0,
       data: [],
       currentPath: [],

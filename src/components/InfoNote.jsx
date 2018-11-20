@@ -3,7 +3,7 @@ import config from "../../config.json";
 import style from "../scss/Info.scss";
 import Modal from "./Modal.jsx";
 
-const siteUrl = "http://" + config.DEFAULT.HOST + ":" + config.DEFAULT.PORT;
+const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
 class InfoNote extends React.Component {
   constructor(props) {
