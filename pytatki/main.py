@@ -33,10 +33,13 @@ APP = create_app()
 APP.config.update(
     MAIL_SERVER=CONFIG['EMAIL']['MAIL_SERVER'],
     MAIL_PORT=CONFIG['EMAIL']['MAIL_PORT'],
-    MAIL_USE_SSL=CONFIG['EMAIL']['MAIL_USE_SSL'],
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
     MAIL_USERNAME=CONFIG['EMAIL']['EMAIL'],
-    MAIL_PASSWORD=CONFIG['EMAIL']['EMAIL_PASSWORD']
+    MAIL_PASSWORD=CONFIG['EMAIL']['EMAIL_PASSWORD'],
+    MAIL_DEFAULT_SENDER=CONFIG['EMAIL']['EMAIL']
 )
+
 APP.wsgi_app = WhiteNoise(APP.wsgi_app, root='pytatki/static')
 LM = LoginManager()
 LM.init_app(APP)

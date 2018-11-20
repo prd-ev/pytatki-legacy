@@ -12,6 +12,7 @@ from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
 from pytatki.main import APP, MAIL, CONFIG
+from email.message import EmailMessage
 from pytatki.models import User, get_user
 from pytatki.view_manager import login_manager, login_required
 from pytatki.security import ts
@@ -52,8 +53,10 @@ def user_info(username):
 
 def send_confirmation_email(email):
     token = ts.dumps(email, salt=APP.secret_key)
-    msg = Message("Pytatki - Potwierdź swój adres email",
-                  sender=CONFIG['EMAIL']['EMAIL'], recipients=[email])
+    print(email)
+    print(APP.config.get('MAIL_USERNAME'))
+    msg = Message('Pytatki - Potwierdź adres email', sender=APP.config.get('MAIL_USERNAME'),
+                  recipients=[email])
     msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
@@ -69,7 +72,7 @@ def send_confirmation_view():
 @APP.route('/user/confirm/<token>')
 def confirm_email(token):
     try:
-        email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+        email = ts.loads(token, salt=APP.secret_key, max_age=86400)
         con, conn = connection()
         con.execute(
             "UPDATE user SET email_confirm = 1 WHERE email = (%s)", escape_string(email))
@@ -197,8 +200,8 @@ def login_get():
 def logout():
     """Logout"""
     next_url = request.args.get('next') if 'next' in request.args else None
-    #status = request.args.get('status') if 'status' in request.args else None
-    #client_id = request.args.get('client_id') if 'client_id' in request.args else None
+    # status = request.args.get('status') if 'status' in request.args else None
+    # client_id = request.args.get('client_id') if 'client_id' in request.args else None
     logout_user()
     return redirect(next_url if next_url else '/')
 
