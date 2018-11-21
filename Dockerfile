@@ -1,6 +1,8 @@
 FROM ubuntu:18.04
 RUN apt-get update
-RUN apt-get install -y python3 python3-dev python3-pip apache2 apache2-dev libapache2-mod-wsgi-py3
+RUN apt-get install -y --no-install-recommends python3 python3-dev python3-pip apache2 apache2-dev libapache2-mod-wsgi-py3 \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 RUN pip3 install mod_wsgi
 COPY . /pytatki
 WORKDIR /pytatki
