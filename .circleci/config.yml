@@ -35,17 +35,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Update npm 
-          command: 'sudo npm install -g npm@latest'
+          name: Update npm
+          command: "sudo npm install -g npm@latest"
       - run:
           name: Install Node dependencies
-          command: 'npm install --dev'
+          command: "npm install --dev"
       - run:
           name: Copy default config
           command: cp examples/config.json ./
       - run:
           name: Run react tests
-          command: 'npm test'
+          command: "npm test"
 workflows:
   version: 2
   pytest_and_jest:

@@ -8,10 +8,9 @@ from pytatki.dbconnect import (connection, create_action, create_note,
                                create_status, create_user, create_usergroup,
                                has_access_to_note, note_exists,
                                notegroup_empty, remove_note, remove_notegroup,
-                               create_action, get_note, create_note,
-                               get_notegroup, has_access_to_notegroup,
-                               get_type_id, get_usergroups_of_user,
-                               has_access_to_usergroup)
+                               get_note, get_notegroup,
+                               has_access_to_notegroup, get_type_id,
+                               get_usergroups_of_user, has_access_to_usergroup)
 
 
 class Mock:
@@ -125,7 +124,7 @@ def test_remove_note(insert_note):
 
 
 def test_has_access_to_notegroup(insert_notegroup):
-    if has_access_to_notegroup(1, 1) != True:
+    if has_access_to_notegroup(1, 1) is False:
         raise AssertionError()
 
 

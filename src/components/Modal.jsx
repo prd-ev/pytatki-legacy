@@ -12,6 +12,10 @@ export default class Modal extends React.Component {
     document.addEventListener("keydown", this.escDetection, false);
   }
 
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.escDetection, false);
+  }
+
   escDetection(e) {
     if (e.keyCode === 27) {
       this.close();
@@ -23,10 +27,6 @@ export default class Modal extends React.Component {
     this.setState({
       visible: false
     });
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.escDetection, false);
   }
 
   button() {

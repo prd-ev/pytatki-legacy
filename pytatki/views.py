@@ -478,10 +478,7 @@ def deaditor(idnote):
                 creator = con.fetchone()
                 con.close()
                 conn.close()
-                if creator['creator_id']==current_user['iduser']:
-                    is_author = True
-                else:
-                    is_author = False
+                is_author = creator['creator_id']==current_user['iduser']
                 if note['note_type'] == "note":
                     with open('pytatki/files/' + note['value'], 'r') as file:
                         data = json.load(file)
