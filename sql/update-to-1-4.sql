@@ -1,4 +1,4 @@
-USE pytatki_backup;
+USE pytatki;
 
 ALTER VIEW note_view AS
 SELECT a.idnote, a.value, a.title, a.status_id, b.name AS 'note_type', a.user_id AS 'creator_id', d.login AS 'creator_login', a.notegroup_id, c.folder_name AS 'notegroup_name'
