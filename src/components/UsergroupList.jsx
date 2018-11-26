@@ -22,9 +22,7 @@ export default class UsergroupList extends React.PureComponent {
         alert(res.data.getToken);
       })
       .then(token =>
-        fetch(
-          siteUrl + '/api/?query={getUsergroups(access_token:"' + token + '")}'
-        )
+        fetch(`${siteUrl}/api/?query={getUsergroups(access_token:"${token}")}'`)
       )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getUsergroups))

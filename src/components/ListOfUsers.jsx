@@ -14,8 +14,7 @@ export default class ListOfUsers extends React.Component {
 
   fetchData = () => {
     const siteUrl = this.props.siteUrl;
-    if (this.state.id == this.props.usergroup) {
-    } else {
+    if (!this.state.id === this.props.usergroup) {
       fetch(
         siteUrl +
           `/api/?query={getMembers(id_usergroup: ${
@@ -45,15 +44,17 @@ export default class ListOfUsers extends React.Component {
   };
 
   shouldComponentUpdate(nextState, nextProps) {
-    if (this.props.usergroup != nextProps.usergroup) return true;
-    if (this.props.usergroup != nextState.id) {
+    if (this.props.usergroup !== nextProps.usergroup) {
+      return true;
+    }
+    if (this.props.usergroup !== nextState.id) {
       return true;
     }
     return false;
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.usergroup != prevProps.usergroup) {
+    if (this.props.usergroup !== prevProps.usergroup) {
       this.setState({ link: null, users: null, id: null });
     }
   }

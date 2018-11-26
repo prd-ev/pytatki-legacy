@@ -63,7 +63,7 @@ class Notatki extends React.Component {
       for (const notegroup of innerJson) {
         let object = {};
         if (notegroup.idnote) {
-          if (notegroup.status_id != 2) {
+          if (notegroup.status_id !== 2) {
             object["title"] = notegroup.name;
             object["key"] = "note" + notegroup.idnote;
             object["is_note"] = true;

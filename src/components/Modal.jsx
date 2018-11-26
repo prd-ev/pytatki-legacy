@@ -23,7 +23,9 @@ export default class Modal extends React.Component {
   }
 
   close(e) {
-    if (this.props.close_action) this.props.close_action();
+    if (this.props.close_action) {
+      this.props.close_action();
+    }
     this.setState({
       visible: false
     });
@@ -38,7 +40,9 @@ export default class Modal extends React.Component {
         type="button"
         onClick={() => {
           if (!this.state.visible) {
-            if (this.props.action) this.props.action();
+            if (this.props.action) {
+              this.props.action();
+            }
             this.setState({ visible: true });
           }
         }}
@@ -58,7 +62,9 @@ export default class Modal extends React.Component {
             className={style.modal_view}
             onClick={e => {
               e.cancelBubble = true;
-              if (e.stopPropagation) e.stopPropagation();
+              if (e.stopPropagation) {
+                e.stopPropagation();
+              }
               this.close(e);
             }}
           >

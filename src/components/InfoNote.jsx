@@ -168,7 +168,7 @@ class InfoNote extends React.Component {
 
   //If component updated fetch new data
   componentDidUpdate(prevProps) {
-    if (this.props.note != prevProps.note && this.props.note == null) {
+    if (this.props.note !== prevProps.note && this.props.note == null) {
       this.closeInfo();
     }
     this.fetchData();
@@ -253,7 +253,7 @@ class InfoNote extends React.Component {
     );
   };
 
-  render_info() {
+  renderInfo() {
     if (this.props.is_note) {
       return (
         <React.Fragment>
@@ -276,7 +276,7 @@ class InfoNote extends React.Component {
     if (this.props.visible) {
       return (
         <Modal no_button={true} close_action={this.closeInfo}>
-          {this.render_info()}
+          {this.renderInfo()}
         </Modal>
       );
     } else {
