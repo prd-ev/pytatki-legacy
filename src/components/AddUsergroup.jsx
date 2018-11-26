@@ -3,7 +3,7 @@ import ComponentStyle from "../scss/AddContent.scss";
 import Modal from "./Modal.jsx";
 
 const AddUsergroup = props => {
-  let addUsergroup = e => {
+  const addUsergroup = e => {
     e.preventDefault();
     fetch(
       props.that.state.siteUrl +
