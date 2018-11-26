@@ -5,14 +5,13 @@ export default class UsergroupList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      usergroups: <i className="ld ld-ring ld-cycle" />
+      usergroups: []
     };
     this.getUsergroups();
   }
 
   getUsergroups = () => {
     const siteUrl = this.props.siteUrl;
-    const that = this;
     return fetch(siteUrl + "/api/?query={getToken}")
       .then(response => response.json())
       .then(res => {
@@ -22,38 +21,24 @@ export default class UsergroupList extends React.PureComponent {
         alert(res.data.getToken);
       })
       .then(token =>
-        fetch(`${siteUrl}/api/?query={getUsergroups(access_token:"${token}")}'`)
+        fetch(`${siteUrl}/api/?query={getUsergroups(access_token:"${token}")}`)
       )
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getUsergroups))
-      .then(function(innerJson) {
+      .then(innerJson => {
         let usergroups = [];
-        for (const usergroup of innerJson) {
-          let object = {};
+        innerJson.map(usergroup => {
+          let object = {}; // new usergroup object
           object["key"] = usergroup.idusergroup;
           object["name"] = usergroup.name;
           object["color"] = usergroup.color;
           object["imagePath"] = usergroup.image_path;
           usergroups.push(object);
-        }
-        return usergroups;
+        });
+        return usergroups; // array of all usergroups
       })
-      .then(plainGroups => {
-        let groups = [];
-        for (const group of plainGroups) {
-          groups.push(
-            <li key={group.key}>
-              <button
-                className="btn"
-                onClick={this.props.updateUsergroup}
-                id={group.key}
-              >
-                {group.name}
-              </button>
-            </li>
-          );
-        }
-        that.setState({
+      .then(groups => {
+        this.setState({
           usergroups: groups
         });
       })
@@ -64,7 +49,25 @@ export default class UsergroupList extends React.PureComponent {
     return (
       <div id="sidebar" className={style.sidebar}>
         <p>Klasy</p>
-        <ul>{this.state.usergroups}</ul>
+        <ul>
+          {this.state.usergroups ? (
+            this.state.usergroups.map(group => {
+              return (
+                <li key={group.key}>
+                  <button
+                    className="btn"
+                    onClick={this.props.updateUsergroup}
+                    id={group.key}
+                  >
+                    {group.name}
+                  </button>
+                </li>
+              );
+            })
+          ) : (
+            <i className="ld ld-ring ld-cycle" />
+          )}
+        </ul>
       </div>
     );
   }

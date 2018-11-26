@@ -5,7 +5,7 @@ export default class Modal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: this.props.no_button ? true : false
+      visible: !!this.props.no_button
     };
     this.close = this.close.bind(this);
     this.escDetection = this.escDetection.bind(this);

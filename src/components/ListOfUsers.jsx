@@ -10,11 +10,12 @@ export default class ListOfUsers extends React.Component {
       users: null,
       link: null
     };
+    this.linkArea = React.createRef();
   }
 
   fetchData = () => {
     const siteUrl = this.props.siteUrl;
-    if (!this.state.id === this.props.usergroup) {
+    if (!(this.state.id === this.props.usergroup)) {
       fetch(
         siteUrl +
           `/api/?query={getMembers(id_usergroup: ${
@@ -59,6 +60,11 @@ export default class ListOfUsers extends React.Component {
     }
   }
 
+  focusOnLink() {
+    this.linkArea.current.focus();
+    this.linkArea.current.select();
+  }
+
   render() {
     return (
       <div>
@@ -76,15 +82,14 @@ export default class ListOfUsers extends React.Component {
                     id="link"
                     value={this.state.link}
                     readOnly
+                    ref={this.linkArea}
                     onClick={() => {
-                      document.getElementById("link").focus();
-                      document.getElementById("link").select();
+                      this.focusOnLink();
                     }}
                   />
                   <span
                     onClick={() => {
-                      document.getElementById("link").focus();
-                      document.getElementById("link").select();
+                      this.focusOnLink();
                       document.execCommand("copy");
                     }}
                   >
