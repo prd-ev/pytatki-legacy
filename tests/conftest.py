@@ -4,8 +4,8 @@ import pytest
 from init_db import parse_sql
 from pytatki.dbconnect import (add_user_to_usergroup, connection, create_note,
                                create_note_type, create_notegroup,
-                               create_status, create_user, create_usergroup)
-from pytatki.views import has_access_to_usergroup
+                               create_status, create_user, create_usergroup,
+                               has_access_to_usergroup)
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -19,10 +19,12 @@ def create_db():
         raise Warning("Database exists")
     for query in parse_sql('sql/create-database.sql'):
         cursor.execute(query)
-    cursor.execute("SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
+    cursor.execute(
+        "SELECT User FROM mysql.user WHERE User=\"pytatki\" AND Host=\"127.0.0.1\"")
     user_exists = cursor.fetchone()
     if not user_exists:
-        cursor.execute("CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
+        cursor.execute(
+            "CREATE USER \'pytatki\'@\'127.0.0.1\' IDENTIFIED BY \'pytatki\';")
     cursor.execute("GRANT ALL ON pytatki.* TO \'pytatki\'@\'127.0.0.1\'")
     conn.close()
 

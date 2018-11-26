@@ -20,16 +20,16 @@
                         {% if a['login']==current_user['login'] %}
                         <span class="ml-3 badge badge-secondary" style="display: inline-block">TO TY!</span>
                         {% endif %}
-                        {% if a.is_admin() %}
+                        {% if a.is_admin %}
                         <span class="ml-3 badge badge-primary" style="display: inline-block">ADMIN</span>
                         {% endif %}
                     </h5>
                 </a>
-                {% if not a.is_admin()%}
+                {% if not a.is_admin%}
                 <a class="float-right btn btn-danger m-1" href="/admin/delete/user/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Usuń</a>
                 {% endif %}
-                {% if current_user.is_admin() %}
-                {% if not a.is_admin()%}
+                {% if current_user.is_admin %}
+                {% if not a.is_admin%}
                 <a class="float-right btn btn-info m-1" href="/admin/give-admin/{{a['iduser']}}/?next=%2Fadmin%2Fuser-list%2F">Daj
                     admina</a>
                 {%else%}

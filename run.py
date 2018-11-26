@@ -5,4 +5,5 @@ from pytatki.main import APP, CONFIG
 
 
 if __name__ == '__main__':
-    APP.run(debug=CONFIG['DEFAULT']['DEBUG'], host=CONFIG['DEFAULT']['HOST'], port=CONFIG['DEFAULT']['PORT'])
+    APP.run(debug=CONFIG['default']['debug'], host=CONFIG['default']
+            ['host'], port=CONFIG['default']['port'])

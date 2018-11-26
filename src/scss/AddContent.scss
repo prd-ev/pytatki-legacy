@@ -1,12 +1,15 @@
 .form {
-    label {
-        font: 12px;
-    }
+  label {
+    font: 12px;
+  }
 
-    input[type=submit] {
-        background: none;
-    }
+  input[type="file"] {
+  
+  }
+}
 
-    input[type=file] {
-    }
+
+.addContainer{
+  display: flex;
+  text-align: center;
 }

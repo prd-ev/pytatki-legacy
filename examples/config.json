@@ -1,0 +1,32 @@
+{
+  "default": {
+    "secret_key": "change_it",
+    "debug": true,
+    "host": "127.0.0.1",
+    "port": 5000,
+    "https": false
+  },
+  "email": {
+    "mail_server": "smtp.gmail.com",
+    "mail_port": 465,
+    "mail_use_ssl": true,
+    "email": "your_mail@gmail.com",
+    "email_password": "your_password"
+  },
+  "database": {
+    "db_host": "127.0.0.1",
+    "db_user": "pytatki",
+    "db_password": "pytatki",
+    "db_name": "pytatki"
+  },
+  "identifiers": {
+    "admingroup_id": 1,
+    "admin_id": 1,
+    "status_active_id": 1,
+    "status_removed_id": 2,
+    "note_type_file_id": 1,
+    "note_type_text_id": 2,
+    "note_type_url_id": 3,
+    "note_type_deadnote_id": 4
+  }
+}
