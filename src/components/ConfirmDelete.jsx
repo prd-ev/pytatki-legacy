@@ -3,7 +3,7 @@ import style from "../scss/ConfirmDelete.scss";
 import Modal from "./Modal.jsx";
 
 export default function ConfirmDelete(props) {
-  let deleteNote = noteId => () => {
+  const deleteNote = noteId => () => {
     fetch(props.that.state.siteUrl + "/admin/delete/note/" + noteId, {})
       .then(
         response => response.json() // if the response is a JSON object
