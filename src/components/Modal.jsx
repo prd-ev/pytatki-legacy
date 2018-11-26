@@ -72,7 +72,9 @@ export default class Modal extends React.Component {
               className={style.modal}
               onClick={e => {
                 e.cancelBubble = true;
-                if (e.stopPropagation) e.stopPropagation();
+                if (e.stopPropagation) {
+                  e.stopPropagation();
+                }
               }}
             >
               <a className={style.close} onClick={this.close}>

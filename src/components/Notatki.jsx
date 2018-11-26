@@ -55,10 +55,10 @@ class Notatki extends React.Component {
 
   changeCurrentDirectory = e => {
     //Increase depth, set state of data[depth] to downloaded array of folder/note object
-    let selected_dir_id = e.target.id;
-    let selected_dir_name = e.target.innerText;
+    let selectedDirId = e.target.id;
+    let selectedDirName = e.target.innerText;
     const that = this;
-    this.getContent(selected_dir_id).then(innerJson => {
+    this.getContent(selectedDirId).then(innerJson => {
       const folderContent = innerJson.map(notegroup => {
         if (notegroup.idnote) {
           return {
@@ -77,9 +77,9 @@ class Notatki extends React.Component {
       let updatedData = that.state.data;
       updatedData[that.state.currentDepth + 1] = folderContent;
       let updatedPath = that.state.currentPath;
-      updatedPath[that.state.currentDepth] = selected_dir_name;
+      updatedPath[that.state.currentDepth] = selectedDirName;
       let updatedDirId = that.state.currentDirId;
-      updatedDirId[that.state.currentDepth + 1] = Number(selected_dir_id);
+      updatedDirId[that.state.currentDepth + 1] = Number(selectedDirId);
       that.setState(prevState => ({
         data: updatedData,
         currentDepth: prevState.currentDepth + 1,
@@ -122,11 +122,11 @@ class Notatki extends React.Component {
       });
   };
 
-  getContent(dir_id) {
+  getContent(dirId) {
     return fetch(
       `${
         this.state.siteUrl
-      }/api/?query={getContent(id_notegroup:${dir_id},access_token:"${
+      }/api/?query={getContent(id_notegroup:${dirId},access_token:"${
         this.state.token
       }")}`
     )
