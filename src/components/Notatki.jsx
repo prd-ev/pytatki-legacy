@@ -433,6 +433,7 @@ class Notatki extends React.Component {
             visible={this.state.infoVisible}
             closeInfoNotatki={this.closeInfo}
             token={this.state.token}
+            props={this.state.siteUrl}
           />
           <ConnectedMenu />
           <ConnectedGroupMenu />
