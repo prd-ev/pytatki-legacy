@@ -30,14 +30,11 @@ class InfoNote extends React.Component {
 
   //Fetch from /api/?query={getNoteById} of note id in props an token passed as argument
   getNote = token => {
-    if (this.props.note != null)
+    if (this.props.note != null) {
       return fetch(
-        siteUrl +
-          "/api/?query={getNoteById(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        `${siteUrl}/api/?query={getNoteById(id_note:${
+          this.props.note
+        },access_token:"${token}")}'`
       )
         .then(response => {
           //Convert response to json
@@ -47,6 +44,7 @@ class InfoNote extends React.Component {
           //Filter data
           return JSON.parse(response.data.getNoteById);
         });
+    }
   };
 
   //Fetch from /api/?query={getNoteLastActions} of note id in props and token passed as argument
