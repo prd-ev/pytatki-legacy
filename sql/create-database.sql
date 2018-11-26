@@ -307,9 +307,9 @@ USE `pytatki`;
 CREATE  OR REPLACE VIEW `note_tags` AS
 SELECT b.idnote, a.tag_id, c.name AS 'tag_name' FROM tagging a, note b, tag c WHERE a.note_id = b.idnote AND a.tag_id = c.idtag;
 
-DROP USER IF EXISTS 'pytatki'@'127.0.0.1';
-CREATE USER 'pytatki'@'127.0.0.1' IDENTIFIED BY 'pytatki';
-GRANT ALL ON `pytatki`.* TO 'pytatki'@'127.0.0.1';
+DROP USER IF EXISTS 'pytatki'@'%';
+CREATE USER 'pytatki'@'%' IDENTIFIED BY 'pytatki';
+GRANT ALL ON `pytatki`.* TO 'pytatki'@'%';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

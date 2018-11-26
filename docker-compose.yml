@@ -1,8 +1,14 @@
 version: "3"
 services:
+  db:
+    image: mariadb/server
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    ports:
+      - "3306:3306"
   pytatki:
-    build: .
+    image: pytatki
     ports:
       - "5000:80"
-    volumes:
-      - ../apache:/etc/apache2
+    depends_on:
+      - db

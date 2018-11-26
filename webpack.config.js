@@ -1,6 +1,6 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CompressionPlugin = require('compression-webpack-plugin');
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = () => {
   return {
@@ -10,11 +10,11 @@ module.exports = () => {
       }),
       new CompressionPlugin({
         algorithm: "gzip",
-        test: /\.js$|\.css$|\.html$/,
+        test: /\.js$|\.css$|\.html$/
       })
     ],
     entry: {
-      vendor: ['react', 'react-dom', 'prop-types', 'react-contextmenu'],
+      vendor: ["react", "react-dom", "prop-types", "react-contextmenu"],
       app: ["./src/components/index.js"],
       deaditor: ["./src/components/deaditor/index.js"]
     },
@@ -24,12 +24,13 @@ module.exports = () => {
     },
     optimization: {
       splitChunks: {
-        chunks: 'async'
+        chunks: "async"
       }
     },
     devtool: "source-map",
     module: {
-      rules: [{
+      rules: [
+        {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
           loader: "babel-loader",

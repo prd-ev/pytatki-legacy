@@ -3,6 +3,9 @@
 
 .modal_view {
   position: fixed;
+  padding-top: 5vh;
+  padding-right: 15px;
+  padding-left: 15px;
   top: 0;
   right: 0;
   bottom: 0;
@@ -12,7 +15,7 @@
 }
 
 .modal {
-  position: fixed;
+  overflow-y: auto;
   max-width: 1000px;
   max-height: 500px;
   top: 10%;

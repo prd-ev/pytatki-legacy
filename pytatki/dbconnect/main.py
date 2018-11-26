@@ -12,6 +12,7 @@ def connection(host=CONFIG['database']['db_host'], user=CONFIG['database']['db_u
                password=CONFIG['database']['db_password'], db=CONFIG['database']['db_name'],
                charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor):
     conn = pymysql.connect(host=host,
+                           port=3306,
                            user=user,
                            password=password,
                            db=db,
