@@ -2,7 +2,7 @@ import React from "react";
 import style from "../scss/AddContent.scss";
 
 const AddNote = props => {
-  let createNote = e => {
+  const createNote = e => {
     e.preventDefault();
     const title = document.getElementById("noteTitle").value;
     let formData = new FormData();
