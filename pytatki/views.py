@@ -479,7 +479,7 @@ def deaditor(idnote):
                 con.close()
                 conn.close()
                 is_author = creator['creator_id']==current_user['iduser']
-                if note['note_type'] == "note":
+                if note['note_type'] == "deadnote":
                     with open('pytatki/files/' + note['value'], 'r') as file:
                         data = json.load(file)
                     return render_template("deaditor.html", file=data, is_author=is_author)
