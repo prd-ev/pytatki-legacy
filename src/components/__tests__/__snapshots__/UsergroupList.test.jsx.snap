@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UsergroupList snapshot renders as expected 1`] = `
+<div
+  className="sidebar"
+  id="sidebar"
+>
+  <p>
+    Klasy
+  </p>
+  <ul>
+    <li
+      key="1"
+    >
+      <button
+        className="btn"
+        id={1}
+      >
+        grupa
+      </button>
+    </li>
+    <li
+      key="2"
+    >
+      <button
+        className="btn"
+        id={2}
+      >
+        grupa42
+      </button>
+    </li>
+  </ul>
+</div>
+`;

@@ -2,45 +2,26 @@
 import json
 import os
 
-from flask import (flash, g, redirect, render_template, request, send_file,
-                   jsonify)
+from flask import (flash, g, jsonify, redirect, render_template, request,
+                   send_file)
 from flask_login import current_user
 from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
 from pytatki import __version__
-from pytatki.dbconnect import (connection, note_exists, notegroup_empty,
-                               remove_note, remove_notegroup, create_note,
-                               has_access_to_note, has_access_to_notegroup)
+from pytatki.dbconnect import (connection, create_note, has_access_to_note,
+                               has_access_to_notegroup,
+                               note_exists, notegroup_empty, remove_note,
+                               remove_notegroup, add_user_to_usergroup)
 from pytatki.main import APP, CONFIG
-from pytatki.models import User
+from pytatki.models import get_user
 from pytatki.view_manager import login_manager, nocache
+from pytatki.security import ts
 
 __author__ = 'Patryk Niedzwiedzinski'
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt',
                       'rtf', 'cpp'}
-
-
-def type_id(type_name):
-    con, conn = connection()
-    con.execute("SELECT idnote_type FROM note_type WHERE name = %s",
-                escape_string(type_name))
-    file_type = con.fetchone()
-    con.close()
-    conn.close()
-    return file_type['idnote_type']
-
-
-def has_access_to_usergroup(id_usergroup, id_user):
-    """Returns true if user has access to usergroup, else false"""
-    con, conn = connection()
-    con.execute("SELECT user_id FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-    return_value = con.fetchone()
-    con.close()
-    conn.close()
-    return True if return_value else False
 
 
 def find_notegroup_children(id_notegroup, id_user):
@@ -67,22 +48,6 @@ def find_notegroup_children(id_notegroup, id_user):
             for note in notes:
                 children.append(note)
     return json.dumps(children, ensure_ascii=False)
-
-
-def get_root_id(id_usergroup, id_user):
-    """Get if of root directory in usergroup"""
-    if has_access_to_usergroup(id_usergroup, id_user):
-        con, conn = connection()
-        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s AND parent_id = 0",
-                    (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-        root_id = con.fetchone()
-        if not root_id:
-            return "No root folder" + str(id_user)
-        root_id = root_id['idnotegroup']
-        con.close()
-        conn.close()
-        return root_id
-    return "Access denied"
 
 
 def add_tag_to_note(tag, id_note, id_user):
@@ -140,17 +105,6 @@ def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user
     return note
 
 
-def get_usergroups_of_user(iduser):
-    """Get list of usergroups"""
-    con, conn = connection()
-    con.execute("SELECT idusergroup, name, color, description, image_path FROM usergroup_membership WHERE iduser = %s",
-                escape_string(str(iduser)))
-    usergroups = con.fetchall()
-    con.close()
-    conn.close()
-    return json.dumps(usergroups, ensure_ascii=False)
-
-
 @APP.route('/')
 def homepage():
     if current_user.is_authenticated:
@@ -174,7 +128,7 @@ def about():
 @login_manager
 def admin():
     """Admin"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         return render_template('admin.html')
     flash("Nie mozesz tego zrobic", 'warning')
     return redirect('/')
@@ -190,26 +144,26 @@ def delete_user(identifier):
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
 def delete_notegroup(identifier):
-    con, conn = connection()
-    if notegroup_empty(conn, identifier):
-        conn.begin()
-        remove_notegroup(conn, identifier)
-        conn.commit()
-        con.close()
-        conn.close()
-        return jsonify({'data': 'success'})
-    con.close()
-    conn.close()
-    return jsonify({'data': 'notegroup not empty'})
+    if has_access_to_notegroup(identifier, current_user['iduser']):
+        if notegroup_empty(identifier):
+            con, conn = connection()
+            conn.begin()
+            remove_notegroup(conn, identifier)
+            conn.commit()
+            con.close()
+            conn.close()
+            return jsonify({'data': 'success'})
+        return jsonify({'data': 'notegroup not empty'})
+    return jsonify({"data": 'access denied'}), 403
 
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
 @login_manager
 def delete_note(identifier):
     """Delete note"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
-        if note_exists(conn, identifier):
+        if note_exists(idnote=identifier):
             conn.begin()
             remove_note(conn, identifier, current_user['iduser'])
             conn.commit()
@@ -226,7 +180,7 @@ def delete_note(identifier):
 @login_manager
 def user_list():
     """wyswietla liste uzytkownikow"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         con.execute("SELECT * FROM user")
         users_raw = con.fetchall()
@@ -234,8 +188,7 @@ def user_list():
         conn.close()
         users = []
         for user_dict in users_raw:
-            user = User()
-            user.update(user_dict)
+            user = get_user(id_user=user_dict['iduser'])
             users.append(user)
         return render_template('user_list.html', users=users)
     flash('Nie mozesz tego zrobic!', 'warning')
@@ -250,10 +203,10 @@ def give_admin(identifier):
     con.execute("SELECT * FROM user WHERE iduser = %s",
                 escape_string(identifier))
     user = con.fetchone()
-    if current_user.is_admin() and user and user['iduser'] != current_user:
+    if current_user.is_admin and user and user['iduser'] != current_user:
         try:
             con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)",
-                        (escape_string(user['iduser']), CONFIG['IDENTIFIERS']['admingroup_id']))
+                        (escape_string(user['iduser']), CONFIG['identifiers']['admingroup_id']))
             conn.commit()
             flash('Przekazano uprawnienia administratora uzytkownikowi ' + str(
                 user['login']), 'success')
@@ -266,15 +219,15 @@ def give_admin(identifier):
 @login_manager
 def take_admin(identifier):
     """take admin"""
-    if int(identifier) != int(CONFIG['IDENTIFIERS']['admin_id']):
+    if int(identifier) != int(CONFIG['identifiers']['admin_id']):
         con, conn = connection()
         query = con.execute(
             "SELECT iduser, login FROM user WHERE iduser = %s", escape_string(identifier))
         user = con.fetchone()
-        if current_user.is_admin() and query:
+        if current_user.is_admin and query:
             try:
                 con.execute("DELETE FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
-                            (escape_string(identifier), escape_string(int(CONFIG['IDENTIFIERS']['admingroup_id']))))
+                            (escape_string(identifier), escape_string(int(CONFIG['identifiers']['admingroup_id']))))
                 conn.commit()
                 flash('Odebrano uprawnienia administratora uzytkownikowi ' +
                       user['login'], 'success')
@@ -299,8 +252,10 @@ def allowed_file(filename):
 @APP.route('/add/', methods=["GET", "POST"])
 @login_manager
 def add():
-    """Add new note"""
+    """Add new file"""
     if request.method == 'POST':
+        if note_exists(title=request.form['title'], notegroup_id=request.form['notegroup_id']):
+            return jsonify({'data': 'name in use'}), 400
         form = request.form
         if 'file' not in request.files:
             return jsonify({'data': 'No file part'})
@@ -312,7 +267,6 @@ def add():
                 filename = secure_filename(request_file.filename)
             else:
                 return jsonify({'data': "File unsecure"})
-            print(filename)
             if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename)):
                 if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
                     os.makedirs(os.path.join(
@@ -320,21 +274,23 @@ def add():
                 request_file.save(os.path.join(
                     APP.config['UPLOAD_FOLDER'], form['notegroup_id'], filename))
         else:
-            return jsonify({'data': 'Nieobslugiwane rozszerzenie'})
+            return jsonify({'data': 'Nieobslugiwane rozszerzenie'}), 501
         con, conn = connection()
         conn.begin()
-        create_note(
+        added = create_note(
             conn,
             str(os.path.join(form['notegroup_id'], filename)),
             form['title'],
-            CONFIG['IDENTIFIERS']['note_type_file_id'],
+            CONFIG['identifiers']['note_type_file_id'],
             current_user['iduser'],
             form['notegroup_id'],
-            CONFIG['IDENTIFIERS']['status_active_id'])
+            CONFIG['identifiers']['status_active_id'])
         conn.commit()
         con.close()
         conn.close()
-        return jsonify({'data': 'Notatka zostala dodana!'})
+        if not added:
+            return jsonify({'data': 'failed'}), 500
+        return jsonify({'data': 'Notatka zostala dodana!'}), 201
     else:
         con, conn = connection()
         con.execute(
@@ -350,7 +306,7 @@ def add():
 @login_manager
 def admin_add_post():
     """Admin add"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         con.execute("SELECT idnotegroup FROM notegroup_view WHERE lower(folder_name) = lower(%s) AND idusergroup = %s AND parent_id = %s",
                     (escape_string(request.form['title']),
@@ -390,7 +346,7 @@ def admin_add_post():
 @login_manager
 def admin_add_get():
     """Admin add"""
-    if current_user.is_admin():
+    if current_user.is_admin:
         con, conn = connection()
         con.execute("SELECT idnotegroup, folder_name, parent_id FROM notegroup_view WHERE iduser = %s",
                     escape_string(str(current_user['iduser'])))
@@ -420,9 +376,23 @@ def download(identifier):
             conn.close()
             if note['note_type'] == "file":
                 return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
+            if note['note_type'] == "note":
+                return redirect('/deaditor/' + identifier)
             return note['value']
     flash("Musisz byc zalogowany", 'warning')
     return redirect('/')
+
+
+@APP.route('/join/<group>')
+def join_group(group):
+    group = ts.loads(group, salt=APP.secret_key, max_age=86400)
+    con, conn = connection()
+    conn.begin()
+    add_user_to_usergroup(conn, current_user['iduser'], group)
+    conn.commit()
+    con.close()
+    conn.close()
+    return redirect('/app/')
 
 
 @APP.route('/graphql/')
@@ -430,4 +400,92 @@ def graphql_explorer():
     return render_template("graphql.html")
 
 
-APP.secret_key = CONFIG['DEFAULT']['secret_key']
+@APP.route('/add_note/', methods=["GET", "POST"])
+def add_note():
+    """Add new note"""
+    if request.method == 'POST':
+        form = request.form
+        if note_exists(title=form['title'], notegroup_id=form['notegroup_id']):
+            return jsonify({'data': 'name in use'}), 400
+        if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'], form['title'], ".json")):
+            if not os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], form['notegroup_id'])):
+                os.makedirs(os.path.join(
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id']))
+            with open(os.path.join(
+                    APP.config['UPLOAD_FOLDER'], form['notegroup_id'], form['title'] + ".json"), 'w') as note:
+                note.write(
+                    '{"blocks":[{"key":"7i6ti","text":"","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}')
+        con, conn = connection()
+        conn.begin()
+        added = create_note(
+            conn,
+            str(os.path.join(form['notegroup_id'], form['title'] + '.json')),
+            form['title'],
+            CONFIG['identifiers']['note_type_note_id'],
+            current_user['iduser'],
+            form['notegroup_id'],
+            CONFIG['identifiers']['status_active_id'])
+        conn.commit()
+        con.execute("SELECT idnote FROM note_view WHERE title = %s",
+                    escape_string(form['title']))
+        note = con.fetchone()
+        con.close()
+        conn.close()
+        if not added:
+            return jsonify({'data': 'failed'}), 500
+        return jsonify({'data': 'Notatka numer ' + str(note['idnote']) + ' zostala dodana!'}), 201
+
+
+@APP.route('/deaditor/<idnote>/', methods=["GET", "POST"])
+def deaditor(idnote):
+    if request.method == "POST":
+        if current_user.is_authenticated:
+            if has_access_to_note(idnote, current_user['iduser']):
+                con, conn = connection()
+                con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                            escape_string(idnote))
+                note = con.fetchone()
+                con.execute("SELECT creator_id FROM note_view WHERE idnote = %s",
+                            escape_string(idnote))
+                creator = con.fetchone()
+                con.close()
+                conn.close()
+                if creator['creator_id']==current_user['iduser']:
+                    try:
+                        with open('pytatki/files/' + note['value'], 'wb') as file:
+                            file.write(request.data)
+                        return jsonify({"data": "Zapisanie powiodło się"})
+                    except Exception as error:
+                        flash(error)
+                        return jsonify({"data": "Nie udało się zapisać"})
+                else:
+                    return jsonify({"data": "Tylko właściciel może zapisywać notatkę"})
+            else:
+                return jsonify({"data": "Nie masz dostępu do notatki"})
+        else:
+            return jsonify({"data": "Musisz być zalogowany"})
+
+
+    else:
+        if current_user.is_authenticated:
+            if has_access_to_note(idnote, current_user['iduser']):
+                con, conn = connection()
+                con.execute("SELECT * FROM note_view WHERE idnote = %s",
+                            escape_string(idnote))
+                note = con.fetchone()
+                con.execute("SELECT creator_id FROM note_view WHERE idnote = %s",
+                            escape_string(idnote))
+                creator = con.fetchone()
+                con.close()
+                conn.close()
+                is_author = creator['creator_id']==current_user['iduser']
+                if note['note_type'] == "note":
+                    with open('pytatki/files/' + note['value'], 'r') as file:
+                        data = json.load(file)
+                    return render_template("deaditor.html", file=data, is_author=is_author)
+                return redirect("/download/" + idnote)
+        flash("Musisz byc zalogowany", 'warning')
+        return redirect('/app/')
+
+
+APP.secret_key = CONFIG['default']['secret_key']

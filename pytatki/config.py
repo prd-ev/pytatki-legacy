@@ -5,20 +5,25 @@ import json
 def parse_config(filename, check_email=False, check_uwsgi=False, check_db_configuration=True):
     with open(filename) as fp:
         config = json.load(fp)
-    if 'DEFAULT' not in config:
-        print("No DEFAULT section")
+    if 'default' not in config:
+        print("No default section")
         return False
-    if 'DATABASE' not in config:
+    if 'database' not in config:
         print("Database configuration not found")
         return False
-    if 'EMAIL' not in config:
+    if 'email' not in config:
         print("Email configuration not found")
         if check_email:
             return False
-    if 'IDENTIFIERS' not in config:
+    if 'database' not in config:
         print("Run init_db.py to setup database")
         if check_db_configuration:
             return False
+    if config["default"]["port"] == "80":
+        config.update({"host": config["default"]["host"]})
+    else:
+        config.update({"host": "{}:{}".format(
+            config["default"]["host"], config["default"]["port"])})
     return config
 
 

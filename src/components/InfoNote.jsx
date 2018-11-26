@@ -1,6 +1,7 @@
 import React from "react";
 import config from "../../config.json";
-import ComponentStyle from "../scss/Info.scss";
+import style from "../scss/Info.scss";
+import Modal from "./Modal.jsx";
 
 const siteUrl = "http://" + config.default.host + ":" + config.default.port;
 
@@ -119,21 +120,16 @@ class InfoNote extends React.Component {
         this.state.noteActions == null &&
         this.props.note != null
       ) {
-        fetch(siteUrl + "/api/?query={getToken}")
-          .then(response => response.json())
-          .then(res => res.data.getToken)
-          .then(token => {
-            if (this.getNote(token))
-              this.getNote(token).then(info => {
-                if (this.getNoteLastActions(token))
-                  this.getNoteLastActions(token).then(actions => {
-                    this.setState({
-                      noteInfo: info,
-                      noteActions: actions
-                    });
-                  });
-              });
-          });
+        this.getNote(this.props.token).then(info => {
+          if (info)
+            this.getNoteLastActions(this.props.token).then(actions => {
+              if (actions)
+                this.setState({
+                  noteInfo: info,
+                  noteActions: actions
+                });
+            });
+        });
       }
     } else {
       if (
@@ -141,25 +137,23 @@ class InfoNote extends React.Component {
         this.state.groupContent == null &&
         this.props.note != null
       ) {
-        fetch(siteUrl + "/api/?query={getToken}")
-          .then(response => response.json())
-          .then(res => res.data.getToken)
-          .then(token => {
-            this.getContent(token).then(content => {
-              this.getNotegroup(token).then(info => {
+        this.getContent(this.props.token).then(content => {
+          if (content)
+            this.getNotegroup(this.props.token).then(info => {
+              if (info)
                 this.setState({
                   groupInfo: info,
                   groupContent: content
                 });
-              });
             });
-          });
+        });
       }
     }
   };
 
   //Check if component should update: if visible changes or if noteInfo changes
   shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.note !== nextProps.note) return true;
     if (this.props.visible !== nextProps.visible) {
       return true;
     }
@@ -173,7 +167,10 @@ class InfoNote extends React.Component {
   }
 
   //If component updated fetch new data
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    if (this.props.note !== prevProps.note && this.props.note == null) {
+      this.closeInfo();
+    }
     this.fetchData();
   }
 
@@ -204,7 +201,7 @@ class InfoNote extends React.Component {
     if (this.state.groupContent != null) {
       return (
         <React.Fragment>
-          <h2>{this.state.groupContent.length} notes</h2>
+          <h2>{this.state.groupContent.length} elements</h2>
         </React.Fragment>
       );
     }
@@ -256,30 +253,32 @@ class InfoNote extends React.Component {
     );
   };
 
+  renderInfo() {
+    if (this.props.is_note) {
+      return (
+        <React.Fragment>
+          {this.renderNoteHeader()}
+          <h3>Latest actions</h3>
+          {this.renderNoteActions()}
+        </React.Fragment>
+      );
+    } else {
+      return (
+        <React.Fragment>
+          {this.renderGroupHeader()}
+          {this.renderGroupElements()}
+        </React.Fragment>
+      );
+    }
+  }
+
   render() {
     if (this.props.visible) {
-      if (this.props.is_note) {
-        return (
-          <React.Fragment>
-            <div className={ComponentStyle.info}>
-              <i onClick={() => this.closeInfo()} className="fas fa-times" />
-              {this.renderNoteHeader()}
-              <h3>Latest actions</h3>
-              {this.renderNoteActions()}
-            </div>
-          </React.Fragment>
-        );
-      } else {
-        return (
-          <React.Fragment>
-            <div className={ComponentStyle.info}>
-              <i onClick={() => this.closeInfo()} className="fas fa-times" />
-              {this.renderGroupHeader()}
-              {this.renderGroupElements()}
-            </div>
-          </React.Fragment>
-        );
-      }
+      return (
+        <Modal no_button={true} close_action={this.closeInfo}>
+          {this.renderInfo()}
+        </Modal>
+      );
     } else {
       return <React.Fragment />;
     }

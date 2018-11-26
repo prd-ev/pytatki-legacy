@@ -2,26 +2,29 @@
 <html lang='pl'>
 
 <head>
-
-    <meta charset=utf-8>
+    <title>Pytatki aplikacja e-learningowa</title>
+    <meta name="Description" content="Dynamic pytatki page.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
         crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/loading.css" />
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous" async></script>
+    <script src="{{url_for('static', filename='hammer.min.js')}}" async></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous" async></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-</head>
+        crossorigin="anonymous" async></script>
+    </head>
 
 <body class="{% if page_id == 'homepage'%}normal{%else%}form{%endif%}">
+    <div id="openSwipeArea"></div>
+    <div id="closeSwipeArea"></div>
     <div class="grid-wrapper">
-        <nav class="mb-2">
+        <nav>
             <a class="navbar-brand" href="{% if current_user.is_authenticated %}/app/{% else %}/{% endif %}" style="height: 45px">
                 <span class="align-middle">Pytatki</span>
                 <span class="badge">beta</span>
@@ -55,7 +58,7 @@
                         O aplikacji
                     </a>
                 </li>
-                {% if current_user.is_authenticated %} {% if current_user.is_admin()%}
+                {% if current_user.is_authenticated %} {% if current_user.is_admin%}
                 <hr>
                 <li class="nav-item  md-m-0 mx-1 {% if page_id == 'admin' %} active{% endif %}">
                     <a class="btn btn-warning btn-block" href="/admin">Funkcje administratora</a>
@@ -67,7 +70,7 @@
                 <hr>
                 <li class="nav-item">
                     <div class="dropdown" role="group">
-                        {% if current_user.is_admin() %}
+                        {% if current_user.is_admin %}
                         <button id="btnGroupDrop1" type="button" class="btn btn-block btn-primary dropdown-toggle"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Dodaj
@@ -101,7 +104,6 @@
             {% endfor %} {% endif %} {% endwith %}
         </div>
         {% block content %}{% endblock %}
-        {% if page_id != 'register' %}
         <div class="modal fade" id="register" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true" style="text-align: left;">
             <div class="modal-dialog">
@@ -116,7 +118,7 @@
                         <div class="container">
                             <form id="form" method=post action="/register/">
                                 <div class="form-group">
-                                    <input autocapitalize="none" class="form-control" id="username" name="username"
+                                    <input autocapitalize="none" class="form-control" id="reg_username" name="username"
                                         type="text" value="" placeholder="Nazwa użytkownika">
                                 </div>
                                 <div class="form-group">
@@ -167,7 +169,7 @@
         <script>
             var form = document.getElementById("form");
 
-            var username = document.getElementById("username");
+            var register_username = document.getElementById("reg_username");
             var email = document.getElementById("email");
             var password = document.getElementById("reg_password");
             var confirm = document.getElementById("confirm");
@@ -314,12 +316,11 @@
                 } else {
                     email_status = false;
                 }
-                if (username.value != "") {
+                if (register_username != "") {
                     username_status = true;
                 } else {
                     username_status = false;
                 }
-                console.log(pass_status, pass_confirm, username_status, email_status);
                 if (pass_status && pass_confirm && username_status && email_status) {
                     document.getElementById("submit").disabled = "";
                 } else {
@@ -327,7 +328,6 @@
                 }
             }
         </script>
-        {%endif%} {% if page_id != 'login' %}
         <div class="modal fade" id="login" tabindex="-4" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
             style="text-align: left;">
             <div class="modal-dialog">
@@ -360,7 +360,6 @@
                 </div>
             </div>
         </div>
-        {%endif%}
 </body>
 
 </html>

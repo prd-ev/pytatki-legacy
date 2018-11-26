@@ -1,10 +1,11 @@
 from flask_graphql import GraphQLView
-from pytatki.main import APP
-
-from pytatki.dbconnect import connection, get_note, get_last_note_actions, get_notegroup
+from pytatki.main import APP, CONFIG
+from pytatki.api.graphql.functions import api_create_usergroup, api_create_notegroup
+from pytatki.security import ts
+from pytatki.dbconnect import connection, has_access_to_usergroup, get_note, get_last_note_actions, get_notegroup, get_root_id,  get_usergroups_of_user, get_users_of_usergroup
 import gc
 from flask_login import current_user
-from pytatki.views import find_notegroup_children, get_root_id, post_note, add_tag_to_note, get_usergroups_of_user
+from pytatki.views import find_notegroup_children, post_note, add_tag_to_note
 from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLObjectType
 from graphql.type.scalars import GraphQLString, GraphQLInt
 from graphql.type.schema import GraphQLSchema
@@ -26,6 +27,13 @@ def verify_auth_token(token):
     except BadSignature:
         return None
     return data
+
+
+def invite(iduser, idusergroup):
+    if has_access_to_usergroup(idusergroup, iduser):
+        token = ts.dumps(idusergroup, salt=APP.secret_key)
+        return "{}/join/{}".format(CONFIG['host'], token)
+    return "perimission denied"
 
 
 def auth(func, token):
@@ -120,6 +128,24 @@ QueryRootType = GraphQLObjectType(
             resolver=lambda obj, info, access_token: get_usergroups_of_user(verify_auth_token(
                 access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
+        'generateInvitationLink': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_usergroup, access_token: invite(
+                verify_auth_token(access_token)['id'], id_usergroup) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'getMembers': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_usergroup, access_token: get_users_of_usergroup(
+                id_usergroup, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
         'getToken': GraphQLField(
             type=GraphQLString,
             resolver=lambda obj, info: generate_access_token(current_user['iduser']).decode(
@@ -162,6 +188,27 @@ MutationRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, tag, note_id, access_token: add_tag_to_note(
                 tag, note_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'createUsergroup': GraphQLField(
+            type=GraphQLString,
+            args={
+                'name': GraphQLArgument(GraphQLString),
+                'description': GraphQLArgument(GraphQLString),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, name, description, access_token: api_create_usergroup(
+                name, description, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'createNotegroup': GraphQLField(
+            type=GraphQLString,
+            args={
+                'name': GraphQLArgument(GraphQLString),
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'parent_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, name, id_usergroup, parent_id, access_token: api_create_notegroup(
+                name, id_usergroup, parent_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         )
     }
 )

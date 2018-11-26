@@ -8,8 +8,8 @@
     <li class="nav-item">
         <a class="nav-link" href="/logout">Wyloguj się</a>
     </li>
-    {% else %}
-    <li class="nav-item{% if page_id == 'register' %} active{% endif %}">
+    {% elif page_id == 'register' %}
+    <li class="nav-item">
         <a role="presentation" class="nav-link" data-toggle="modal" data-target="#register" href="#">
             Zarejestruj się
         </a>
@@ -31,7 +31,7 @@
             Zgłoś błąd!
         </a>
     </li>
-    {% if current_user.is_authenticated %} {% if current_user.is_admin()%}
+    {% if current_user.is_authenticated %} {% if current_user.is_admin%}
     <hr>
     <li class="nav-item  md-m-0 mx-1 {% if page_id == 'admin' %} active{% endif %}">
         <a class="btn btn-warning btn-block" href="/admin">Funkcje administratora</a>
@@ -43,7 +43,7 @@
     <hr>
     <li class="nav-item">
         <div class="dropdown" role="group">
-            {% if current_user.is_admin() %}
+            {% if current_user.is_admin %}
             <button id="btnGroupDrop1" type="button" class="btn btn-block btn-primary dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 Dodaj
