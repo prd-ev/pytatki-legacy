@@ -421,7 +421,7 @@ def add_note():
             conn,
             str(os.path.join(form['notegroup_id'], form['title'] + '.json')),
             form['title'],
-            CONFIG['identifiers']['note_type_note_id'],
+            CONFIG['identifiers']['note_type_deadnote_id'],
             current_user['iduser'],
             form['notegroup_id'],
             CONFIG['identifiers']['status_active_id'])
