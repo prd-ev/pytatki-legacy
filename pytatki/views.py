@@ -384,6 +384,7 @@ def download(identifier):
 
 
 @APP.route('/join/<group>')
+@login_manager
 def join_group(group):
     group = ts.loads(group, salt=APP.secret_key, max_age=86400)
     con, conn = connection()
