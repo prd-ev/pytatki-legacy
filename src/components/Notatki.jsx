@@ -76,17 +76,17 @@ class Notatki extends React.Component {
           folderContent.push(object);
         }
       }
-      let updated_data = that.state.data;
-      updated_data[that.state.currentDepth + 1] = folderContent;
-      let updated_path = that.state.currentPath;
-      updated_path[that.state.currentDepth] = selected_dir_name;
-      let updated_dir_id = that.state.currentDirId;
-      updated_dir_id[that.state.currentDepth + 1] = Number(selected_dir_id);
+      let updatedData = that.state.data;
+      updatedData[that.state.currentDepth + 1] = folderContent;
+      let updatedPath = that.state.currentPath;
+      updatedPath[that.state.currentDepth] = selected_dir_name;
+      let updatedDirId = that.state.currentDirId;
+      updatedDirId[that.state.currentDepth + 1] = Number(selected_dir_id);
       that.setState(prevState => ({
-        data: updated_data,
+        data: updatedData,
         currentDepth: prevState.currentDepth + 1,
-        currentPath: updated_path,
-        currentDirId: updated_dir_id
+        currentPath: updatedPath,
+        currentDirId: updatedDirId
       }));
     });
   };
@@ -321,7 +321,7 @@ class Notatki extends React.Component {
           for (const notegroup of innerJson) {
             let object = {};
             if (notegroup.idnote) {
-              if (notegroup.status_id != 2) {
+              if (notegroup.status_id !== 2) {
                 object["title"] = notegroup.name;
                 object["key"] = "note" + notegroup.idnote;
                 object["is_note"] = true;
@@ -334,10 +334,10 @@ class Notatki extends React.Component {
               folderContent.push(object);
             }
           }
-          let updated_data = that.state.data;
-          updated_data[that.state.currentDepth] = folderContent;
+          let updatedData = that.state.data;
+          updatedData[that.state.currentDepth] = folderContent;
           that.setState({
-            data: updated_data
+            data: updatedData
           });
         }
       );

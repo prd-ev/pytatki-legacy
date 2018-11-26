@@ -15,15 +15,19 @@ const AddNote = props => {
       method: "POST",
       body: formData
     })
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        return response;
+      })
       .then(
         response => response.json() // if the response is a JSON object
       )
       .then(
         success => {
           alert(success.data);
-          if (success.data.includes("zostala dodana")) {
-            window.open("/deaditor/" + success.data.match(/\d+/g));
-          }
+          window.open("/deaditor/" + success.data.match(/\d+/g));
         } // Handle the success response object
       )
       .then(r => props.that.updateContent())

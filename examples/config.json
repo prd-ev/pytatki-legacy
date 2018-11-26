@@ -26,6 +26,7 @@
     "status_removed_id": 2,
     "note_type_file_id": 1,
     "note_type_text_id": 2,
-    "note_type_url_id": 3
+    "note_type_url_id": 3,
+    "note_type_deadnote_id": 4
   }
 }

@@ -26,16 +26,12 @@ export default class UsergroupList extends React.PureComponent {
       .then(response => response.json())
       .then(myJson => JSON.parse(myJson.data.getUsergroups))
       .then(innerJson => {
-        let usergroups = [];
-        innerJson.map(usergroup => {
-          let object = {}; // new usergroup object
-          object["key"] = usergroup.idusergroup;
-          object["name"] = usergroup.name;
-          object["color"] = usergroup.color;
-          object["imagePath"] = usergroup.image_path;
-          usergroups.push(object);
-        });
-        return usergroups; // array of all usergroups
+        return innerJson.map(usergroup => ({
+          key: usergroup.idusergroup,
+          name: usergroup.name,
+          color: usergroup.color,
+          imagePath: usergroup.image_path
+        }));
       })
       .then(groups => {
         this.setState({

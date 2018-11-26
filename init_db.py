@@ -49,6 +49,7 @@ def save_to_config(config_dict):
     config['identifiers']['note_type_file_id'] = config_dict['file_id']
     config['identifiers']['note_type_text_id'] = config_dict['text_id']
     config['identifiers']['note_type_url_id'] = config_dict['url_id']
+    config['identifiers']['note_type_deadnote_id'] = config_dict['deadnote_id']
     with open('config.json', 'w') as configfile:
         configfile.truncate(0)
         json.dump(config, configfile)
@@ -81,6 +82,7 @@ def db_init(host=None, user=None, password=None):
         conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
     text_id = create_note_type(conn, "text", "Just plain non-formated text")
     url_id = create_note_type(conn, "url", "An URL link to another resource")
+    deadnote_id = create_note_type(conn, "deadnote", "Note made with Pytatki")
     username = input("Insert your admin login: [admin]")
     username = 'admin' if username == '' else username
     email = input("Insert your admin email: ")
@@ -98,7 +100,8 @@ def db_init(host=None, user=None, password=None):
         'removed_id': removed_id,
         'file_id': file_id,
         'text_id': text_id,
-        'url_id': url_id
+        'url_id': url_id,
+        'deadnote_id': deadnote_id
     })
 
 
