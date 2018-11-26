@@ -32,7 +32,7 @@ class InfoNote extends React.Component {
       return fetch(
         `${this.props.siteUrl}/api/?query={getNoteById(id_note:${
           this.props.note
-        },access_token:"${token}")}'`
+        },access_token:"${token}")}`
       )
         .then(response => {
           //Convert response to json
