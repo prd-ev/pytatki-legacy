@@ -20,7 +20,7 @@ export default function ConfirmDelete(props) {
     });
   };
 
-  let deleteFolder = folderId => () => {
+  const deleteFolder = folderId => () => {
     fetch(props.that.state.siteUrl + "/notegroup/" + folderId + "/delete/", {})
       .then(
         response => response.json() // if the response is a JSON object
