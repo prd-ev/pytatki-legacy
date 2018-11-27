@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
-"""Database tables models"""
+"""This module contains models for all objects in the app."""
+
+import gc
+
 from flask_login._compat import unicode
 from passlib.hash import sha256_crypt
-from pytatki.main import LM
-from pytatki.dbconnect import connection
 from pymysql import escape_string
-import gc
+
+from pytatki import __version__ as version
+from pytatki.dbconnect import connection
 from pytatki.main import CONFIG as Config
+from pytatki.main import LM
+
+__author__ = u"Patryk Niedźwiedziński"
+__copyright__ = "Copyright 2018, Pytatki"
+__credits__ = []
+__license__ = "MIT"
+__version__ = version
+__maintainer__ = u"Patryk Niedźwiedziński"
+__email__ = "pniedzwiedzinski19@gmail.com"
+__status__ = "Production"
 
 
 def get_user(id_user=None, login=None, email=None):
-    """Returns user by given data"""
+    """Generates user object with data fetched from database."""
     sql = "SELECT * FROM user WHERE {} = %s"
     user_data = ()
     if id_user:
@@ -25,7 +38,10 @@ def get_user(id_user=None, login=None, email=None):
     con, conn = connection()
     con.execute(sql, user_data)
     user_dict = con.fetchone()
-    if not user_dict:
+    if user_dict is None:
+        con.close()
+        conn.close()
+        gc.collect()
         return None
     con.execute("SELECT * FROM user_membership WHERE user_id = %s AND usergroup_id = %s",
                 (escape_string(str(user_dict['iduser'])), escape_string(str(Config['identifiers']['admingroup_id']))))

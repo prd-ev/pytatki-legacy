@@ -1,14 +1,23 @@
-"""Plik glowny aplikacji"""
+"""This module creates the flask app instance and configure all services."""
 
 import os
-from pytatki.config import parse_config
-from flask_login import LoginManager
-from flask_bcrypt import Bcrypt
-from flask_mail import Mail
+
 from flask import Flask
+from flask_login import LoginManager
+from flask_mail import Mail
 from whitenoise import WhiteNoise
 
-__author__ = 'Patryk Niedzwiedzinski'
+from pytatki import __version__ as version
+from pytatki.config import parse_config
+
+__author__ = u"Patryk Niedźwiedziński"
+__copyright__ = "Copyright 2018, Pytatki"
+__credits__ = []
+__license__ = "MIT"
+__version__ = version
+__maintainer__ = u"Patryk Niedźwiedziński"
+__email__ = "pniedzwiedzinski19@gmail.com"
+__status__ = "Production"
 
 
 def create_app(test_config=None):
@@ -26,15 +35,14 @@ def create_app(test_config=None):
 
 CONFIG = parse_config('config.json')
 if CONFIG is None:
-    print("An error occurred while parsing config file")
-    exit("Error")
+    raise Exception("An error occurred while parsing config file")
 
 APP = create_app()
 APP.config.update(
     MAIL_SERVER=CONFIG['email']['mail_server'],
     MAIL_PORT=CONFIG['email']['mail_port'],
-    MAIL_USE_TLS=True,
-    MAIL_USE_SSL=False,
+    MAIL_USE_TLS=CONFIG['email']['mail_use_tls'],
+    MAIL_USE_SSL=CONFIG['email']['mail_use_ssl'],
     MAIL_USERNAME=CONFIG['email']['email'],
     MAIL_PASSWORD=CONFIG['email']['email_password'],
     MAIL_DEFAULT_SENDER=CONFIG['email']['email']
@@ -44,7 +52,6 @@ APP.wsgi_app = WhiteNoise(APP.wsgi_app, root='pytatki/static')
 LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login_get'
-BCRYPT = Bcrypt()
 MAIL = Mail(APP)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'files')

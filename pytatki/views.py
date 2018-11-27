@@ -1,4 +1,5 @@
-"""Widoki aplikacji"""
+"""This module contains views of app"""
+
 import json
 import os
 
@@ -8,34 +9,46 @@ from flask_login import current_user
 from pymysql import escape_string
 from werkzeug.utils import secure_filename
 
-from pytatki import __version__
+from pytatki import __version__ as version
 from pytatki.dbconnect import (connection, create_note, has_access_to_note,
                                has_access_to_notegroup,
                                note_exists, notegroup_empty, remove_note,
                                remove_notegroup, add_user_to_usergroup)
 from pytatki.main import APP, CONFIG
 from pytatki.models import get_user
-from pytatki.view_manager import authentication_required, nocache
+from pytatki.view_manager import (authentication_required, nocache,
+                                  admin_required)
 from pytatki.security import ts
 
-__author__ = 'Patryk Niedzwiedzinski'
+__author__ = u"Patryk Niedźwiedziński"
+__copyright__ = "Copyright 2018, Pytatki"
+__credits__ = []
+__license__ = "MIT"
+__version__ = version
+__maintainer__ = u"Patryk Niedźwiedziński"
+__email__ = "pniedzwiedzinski19@gmail.com"
+__status__ = "Production"
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc', 'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt',
-                      'rtf', 'cpp'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'doc',
+                      'docx', 'ppt', 'pptx', 'xslx', 'xsl', 'odt', 'rtf',
+                      'cpp'}
 
 
 def find_notegroup_children(id_notegroup, id_user):
     """Generate dict with recurent children of usergroup"""
-    if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
+    if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or \
+    not int(id_user):
         return "ID must be a valid positive integer"
     children = []
     if has_access_to_notegroup(id_notegroup, id_user):
         con, conn = connection()
-        con.execute("SELECT idnotegroup, folder_name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (
+        con.execute("SELECT idnotegroup, folder_name FROM notegroup_view "
+            "WHERE iduser = %s AND parent_id = %s", (
             escape_string(str(id_user)), escape_string(str(id_notegroup))))
         usergroups = con.fetchall()
         con.execute(
-            "SELECT idnote, value, note_type, creator_login, notegroup_id, notegroup_name, title AS 'name' FROM "
+            "SELECT idnote, value, note_type, creator_login, notegroup_id, "
+            "notegroup_name, title AS 'name' FROM "
             "note_view WHERE notegroup_id = %s AND status_id = 1",
             escape_string(str(id_notegroup)))
         notes = con.fetchall()
@@ -76,15 +89,19 @@ def add_tag_to_note(tag, id_note, id_user):
         return note
 
 
-def post_note(title="xxd", type_name="text", value="xd", id_notegroup=1, id_user=1):
+def post_note(title="xxd",
+              type_name="text",
+              value="xd",
+              id_notegroup=1,
+              id_user=1):
     """Post a note to database"""
     if not has_access_to_notegroup(id_notegroup, id_user):
         return "Access denied"
     if type_name == "file":
         return "File type is not supported via GraphQL"
     con, conn = connection()
-    con.execute("SELECT idnote FROM note WHERE title = %s AND notegroup_id = %s", (
-        escape_string(title), escape_string(str(id_notegroup))))
+    con.execute("SELECT idnote FROM note WHERE title = %s AND notegroup_id "
+        "= %s", (escape_string(title), escape_string(str(id_notegroup))))
     used_name = con.fetchone()
     if used_name:
         con.close()
@@ -113,6 +130,7 @@ def homepage():
 
 
 @APP.route('/app/')
+@authentication_required
 def app_view():
     return render_template('react.html')
 
@@ -120,18 +138,15 @@ def app_view():
 @APP.route('/about/')
 def about():
     """About"""
-    g.version = __version__
+    g.version = version
     return render_template('about.html')
 
 
 @APP.route("/admin/")
-@authentication_required
+@admin_required
 def admin():
     """Admin"""
-    if current_user.is_admin:
-        return render_template('admin.html')
-    flash("Nie mozesz tego zrobic", 'warning')
-    return redirect('/')
+    return render_template('admin.html')
 
 
 @APP.route('/admin/delete/user/<int:identifier>/', methods=["GET"])
@@ -139,7 +154,7 @@ def admin():
 def delete_user(identifier):
     """Delete user"""
     # TODO: delete user
-    return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(__version__))})
+    return jsonify({'data': "This function is not avaliable in this version: \'{}\'".format(str(version))})
 
 
 @APP.route('/notegroup/<int:identifier>/delete/', methods=['GET'])
