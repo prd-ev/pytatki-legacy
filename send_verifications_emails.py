@@ -2,6 +2,7 @@ import flask_mail
 from pytatki.user import send_confirmation_email
 from pymysql import escape_string
 from pytatki.dbconnect import connection
+from pytatki.main import APP
 
 con, conn = connection()
 con.execute("SELECT email FROM user WHERE email_confirm = 0")
