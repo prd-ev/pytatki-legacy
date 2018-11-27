@@ -128,8 +128,8 @@ def register_post():
         else:
             wrong_password = True
         accept = form['accept_tos'] if 'accept_tos' in form else None
-        con.execute("SELECT * FROM user WHERE login = (%s)",
-                    (escape_string(form['username'])))
+        con.execute("SELECT * FROM user WHERE login = (%s) OR email = %s",
+                    (escape_string(form['username']), escape_string(form['email'])))
         used_username = con.fetchone()
         if accept != 'checked' or used_username or '@' not in form['email'] \
                 or wrong_password or valid_username(form['username']):
