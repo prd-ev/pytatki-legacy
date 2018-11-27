@@ -8,8 +8,9 @@
   },
   "email": {
     "mail_server": "smtp.gmail.com",
-    "mail_port": 465,
-    "mail_use_ssl": true,
+    "mail_port": 587,
+    "mail_use_tls": true,
+    "mail_use_ssl": false,
     "email": "your_mail@gmail.com",
     "email_password": "your_password"
   },

@@ -3,8 +3,6 @@ import config from "../../config.json";
 import style from "../scss/Info.scss";
 import Modal from "./Modal.jsx";
 
-const siteUrl = "http://" + config.default.host + ":" + config.default.port;
-
 class InfoNote extends React.Component {
   constructor(props) {
     super(props);
@@ -30,14 +28,11 @@ class InfoNote extends React.Component {
 
   //Fetch from /api/?query={getNoteById} of note id in props an token passed as argument
   getNote = token => {
-    if (this.props.note != null)
+    if (this.props.note != null) {
       return fetch(
-        siteUrl +
-          "/api/?query={getNoteById(id_note:" +
-          this.props.note +
-          ',access_token:"' +
-          token +
-          '")}'
+        `${this.props.siteUrl}/api/?query={getNoteById(id_note:${
+          this.props.note
+        },access_token:"${token}")}`
       )
         .then(response => {
           //Convert response to json
@@ -47,13 +42,14 @@ class InfoNote extends React.Component {
           //Filter data
           return JSON.parse(response.data.getNoteById);
         });
+    }
   };
 
   //Fetch from /api/?query={getNoteLastActions} of note id in props and token passed as argument
   getNoteLastActions = token => {
     if (this.props.note != null)
       return fetch(
-        siteUrl +
+        this.props.siteUrl +
           "/api/?query={getNoteLastActions(id_note:" +
           this.props.note +
           ',access_token:"' +
@@ -74,7 +70,7 @@ class InfoNote extends React.Component {
   getNotegroup = token => {
     if (this.props.note != null)
       return fetch(
-        siteUrl +
+        this.props.siteUrl +
           "/api/?query={getNotegroupById(notegroup_id:" +
           this.props.note +
           ',access_token:"' +
@@ -95,7 +91,7 @@ class InfoNote extends React.Component {
   getContent = token => {
     if (this.props.note != null)
       return fetch(
-        siteUrl +
+        this.props.siteUrl +
           "/api/?query={getContent(id_notegroup:" +
           this.props.note +
           ',access_token:"' +
@@ -176,7 +172,7 @@ class InfoNote extends React.Component {
 
   //Opens note in new window
   openNote = e => () => {
-    window.open(siteUrl + `/download/${e}`);
+    window.open(this.props.siteUrl + `/download/${e}`);
   };
 
   //Renders info about notegroup

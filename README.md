@@ -54,8 +54,9 @@ Create `config.json` file in root directory of repository. You can find an examp
   },
   "email": {
     "mail_server": "smtp.gmail.com",
-    "mail_port": 465,
-    "mail_use_ssl": true,
+    "mail_port": 587,
+    "mail_use_ssl": false,
+    "mail_use_tls": true,
     "email": "your_mail@gmail.com",
     "email_password": "your_password"
   },
