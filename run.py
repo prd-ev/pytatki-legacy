@@ -7,4 +7,5 @@ from pytatki.tasks.tasks import run_jobs, remove_bin
 
 if __name__ == '__main__':
     run_jobs.delay()
-    APP.run(debug=CONFIG['DEFAULT']['DEBUG'], host=CONFIG['DEFAULT']['HOST'], port=CONFIG['DEFAULT']['PORT'])
+    APP.run(debug=CONFIG['default']['debug'], host=CONFIG['default']
+            ['host'], port=CONFIG['default']['port'])

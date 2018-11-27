@@ -4,8 +4,7 @@
 <div class="row mt-3">
     <div class="col-xl-3">
         <a class="btn btn-warning btn-block" href="/admin">
-            < Funkcje administratora</a>
-                <hr>
+            < Funkcje administratora</a> <hr>
     </div>
     <div class="col-xl-9 mb-3">
         <div class="list-group">
@@ -29,14 +28,16 @@
                 {% if not a.is_admin%}
                 <a class="float-right btn btn-danger m-1" href="/admin/delete/user/{{a.id}}/?next=%2Fadmin%2Fuser-list%2F">Usuń</a>
                 {% endif %}
-                {% if current_user.is_admin %} 
-                    {% if not a.is_admin%}
-                    <a class="float-right btn btn-info m-1" href="/admin/give-admin/{{a['iduser']}}/?next=%2Fadmin%2Fuser-list%2F">Daj admina</a>
-                    {%else%}
-                        {%if not a['login']==current_user['login']%}
-                        <a class="float-right btn btn-info m-1" href="/admin/take-admin/{{a['iduser']}}/?next=%2Fadmin%2Fuser-list%2F">Odbierz admina</a>
-                        {% endif %}
-                    {% endif %} 
+                {% if current_user.is_admin %}
+                {% if not a.is_admin%}
+                <a class="float-right btn btn-info m-1" href="/admin/give-admin/{{a['iduser']}}/?next=%2Fadmin%2Fuser-list%2F">Daj
+                    admina</a>
+                {%else%}
+                {%if not a['login']==current_user['login']%}
+                <a class="float-right btn btn-info m-1" href="/admin/take-admin/{{a['iduser']}}/?next=%2Fadmin%2Fuser-list%2F">Odbierz
+                    admina</a>
+                {% endif %}
+                {% endif %}
                 {% endif %}
             </li>
             {% endfor %}

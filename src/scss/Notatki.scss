@@ -1,0 +1,125 @@
+@import "_variables";
+
+.no_group_chosen {
+  font-size: 24px;
+  text-align: center;
+}
+
+.note {
+  background-image: url("/static/images/note.svg");
+  background-size: cover;
+  display: inline-block;
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  vertical-align: top;
+  cursor: pointer;
+
+  p {
+    margin: 110px 20px 20px 27px;
+    pointer-events: none;
+    font-size: 18px;
+  }
+}
+
+.folder {
+  background-image: url("/static/images/folder.png");
+  background-size: cover;
+  background-position: center;
+  display: inline-block;
+  width: 110px;
+  height: 90px;
+  margin-top: 10px;
+  margin-left: 0;
+  margin-right: 0;
+  vertical-align: top;
+  cursor: pointer;
+
+  p {
+    pointer-events: none;
+    font-size: 18px;
+    margin: 90px auto 15px;
+  }
+}
+
+.delete {
+  position: absolute;
+  top: -5px;
+  right: 0;
+  cursor: pointer;
+
+  i {
+    padding: 5px;
+  }
+}
+
+.elementWrapper {
+  width: 135px;
+  height: 150px;
+  text-align: center;
+}
+
+.noteWrapper,
+.folderWrapper {
+  margin-bottom: 50px;
+  position: relative;
+  display: inline-block;
+  z-index: 20;
+}
+
+.mainContent {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.actionBar {
+  & > div {
+    display: inline-block;
+    z-index: 20;
+
+    button {
+      margin-right: 15px;
+    }
+  }
+}
+
+.back {
+  margin-top: 10px;
+  font-size: 30px;
+  position: absolute;
+  z-index: 20;
+
+  span {
+    cursor: default;
+  }
+
+  i {
+    cursor: pointer;
+  }
+}
+
+.fetchedData {
+  padding-top: 45px;
+}
+
+.usergroupName {
+  margin-top: 30px;
+  font-size: 30px;
+}
+
+.create_new_usergroup {
+  margin: 0 auto;
+  text-align: center;
+  padding: 5px;
+  border: solid 1px black;
+  border-radius: 5px;
+}
+
+@media only screen and (max-width: 575px) {
+  .fetchedData {
+    padding: 45px 20px;
+  }
+  .mainContent {
+    padding: 20px;
+  }
+}

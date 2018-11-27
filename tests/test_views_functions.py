@@ -26,3 +26,6 @@ def test_remove_user(insert_user_new):
         raise AssertionError()
     con.close()
     conn.close()
+
+
+# TODO: test pytatki.dbconnect.remove_user

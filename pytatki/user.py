@@ -12,19 +12,17 @@ from flask_mail import Message
 from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
 from pytatki.main import APP, MAIL, CONFIG
-from pytatki.models import User
+from pytatki.models import get_user
 from pytatki.view_manager import login_manager, login_required
-from itsdangerous import URLSafeTimedSerializer
+from pytatki.security import ts
 from pytatki.api.graphql import generate_access_token
 from werkzeug.wrappers import Response
-
-ts = URLSafeTimedSerializer(CONFIG['DEFAULT']['secret_key'])
 
 
 def valid_password(password):
     """Validation of password"""
     return re.search('[0-9]', password) and re.search('[A-Z]', password) \
-           and re.search('[a-z]', password)
+        and re.search('[a-z]', password)
 
 
 def valid_username(username):
@@ -36,11 +34,7 @@ def valid_username(username):
 @login_manager
 def user_info(username):
     """User info"""
-    con, conn = connection()
-    con.execute("SELECT iduser, login FROM user WHERE login = %s", escape_string(username))
-    user = con.fetchone()
-    con.close()
-    conn.close()
+    user = get_user(login=username)
     if user:
         con, conn = connection()
         con.execute("SELECT idnote, title, note_type FROM note_view WHERE creator_id = %s", escape_string(
@@ -57,8 +51,11 @@ def user_info(username):
 
 
 def send_confirmation_email(email):
-    token = ts.dumps(email, salt='email-confirm-key')
-    msg = Message("Pytatki - Potwierdź swój adres email", sender=CONFIG['EMAIL']['EMAIL'], recipients=[email])
+    token = ts.dumps(email, salt=APP.secret_key)
+    print(email)
+    print(APP.config.get('MAIL_USERNAME'))
+    msg = Message('Pytatki - Potwierdź adres email', sender=APP.config.get('MAIL_USERNAME'),
+                  recipients=[email])
     msg.html = render_template('verify_email.html', token=token)
     MAIL.send(msg)
 
@@ -74,7 +71,7 @@ def send_confirmation_view():
 @APP.route('/user/confirm/<token>')
 def confirm_email(token):
     try:
-        email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+        email = ts.loads(token, salt=APP.secret_key, max_age=86400)
         con, conn = connection()
         con.execute(
             "UPDATE user SET email_confirm = 1 WHERE email = (%s)", escape_string(email))
@@ -178,30 +175,17 @@ def register_get():
 
 @APP.route('/login/', methods=["POST"])
 def login_post():
-    try:
-        if current_user.is_authenticated:
-            flash('Już jesteś zalogowany!', 'warning')
-            if request.args.get('next'):
-                return redirect(request.args.get('next'))
-            return redirect('/')
-        con, conn = connection()
-        con.execute("SELECT * FROM user WHERE email = %s OR login = %s",
-                    (escape_string(request.form['username']), escape_string(request.form['username'])))
-        user_dict = con.fetchone()
-        user = User()
-        if user_dict is not None:
-            user.update(user_dict)
-        con.close()
-        conn.close()
-        gc.collect()
-        if user and sha256_crypt.verify(request.form['password'], user['password']):
-            remember_me = request.form['remember'] if 'remember' in request.form else False
-            login_user(user, remember=remember_me)
-            return redirect(request.args.get('next') if 'next' in request.args else '/app/')
-        return render_template('login.html', wrong=True)
-    except Exception as error:
-        flash('Błąd: ' + str(error), 'danger')
+    if current_user.is_authenticated:
+        flash('Już jesteś zalogowany!', 'warning')
+        if request.args.get('next'):
+            return redirect(request.args.get('next'))
         return redirect('/')
+    user = get_user(login=request.form['username'])
+    if user and sha256_crypt.verify(request.form['password'], user['password']):
+        remember_me = request.form['remember'] if 'remember' in request.form else False
+        login_user(user, remember=remember_me)
+        return redirect(request.args.get('next') if 'next' in request.args else '/app/')
+    return render_template('login.html', wrong=True)
 
 
 @APP.route('/login/', methods=["GET"])
@@ -215,8 +199,8 @@ def login_get():
 def logout():
     """Logout"""
     next_url = request.args.get('next') if 'next' in request.args else None
-    status = request.args.get('status') if 'status' in request.args else None
-    client_id = request.args.get('client_id') if 'client_id' in request.args else None
+    # status = request.args.get('status') if 'status' in request.args else None
+    # client_id = request.args.get('client_id') if 'client_id' in request.args else None
     logout_user()
     return redirect(next_url if next_url else '/')
 
@@ -250,7 +234,8 @@ def get_token_post():
     gc.collect()
     if app:
         response = Response()
-        response.headers = {'auth_status': 'success', 'access_token': generate_access_token(current_user['iduser'])}
+        response.headers = {'auth_status': 'success',
+                            'access_token': generate_access_token(current_user['iduser'])}
         return redirect(next_url + '?state=' + state, 302)
     flash("Wrong client_id", "warning")
     return redirect("/")

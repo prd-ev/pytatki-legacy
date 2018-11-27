@@ -1,9 +1,10 @@
 __author__ = "Patryk Niedźwiedziński"
 """Skrypt tworzenia bazy danych"""
 
-import configparser
 from pymysql import escape_string, connect
 from pytatki.dbconnect import connection, create_usergroup, create_status, create_note_type, create_user
+import json
+
 
 def parse_sql(filename):
     data = open(filename, 'r').readlines()
@@ -34,26 +35,28 @@ def parse_sql(filename):
             stmts.append(line.strip())
     return stmts
 
+
 def save_to_config(config_dict):
     """
     Save data to config.ini
     """
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    config.sections()
-    config.add_section('IDENTIFIERS')
-    config['IDENTIFIERS']['ADMINGROUP_ID'] = str(config_dict['admingroup_id'])
-    config['IDENTIFIERS']['ADMIN_ID'] = str(config_dict['admin_id'])
-    config['IDENTIFIERS']['STATUS_ACTIVE_ID'] = str(config_dict['active_id'])
-    config['IDENTIFIERS']['STATUS_REMOVED_ID'] = str(config_dict['removed_id'])
-    config['IDENTIFIERS']['NOTE_TYPE_FILE_ID'] = str(config_dict['file_id'])
-    config['IDENTIFIERS']['NOTE_TYPE_TEXT_ID'] = str(config_dict['text_id'])
-    config['IDENTIFIERS']['NOTE_TYPE_URL_ID'] = str(config_dict['url_id'])
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
+    with open('config.json', 'r') as fp:
+        config = json.load(fp)
+    config['identifiers']['admingroup_id'] = config_dict['admingroup_id']
+    config['identifiers']['admin_id'] = config_dict['admin_id']
+    config['identifiers']['status_active_id'] = config_dict['active_id']
+    config['identifiers']['status_removed_id'] = config_dict['removed_id']
+    config['identifiers']['note_type_file_id'] = config_dict['file_id']
+    config['identifiers']['note_type_text_id'] = config_dict['text_id']
+    config['identifiers']['note_type_url_id'] = config_dict['url_id']
+    config['identifiers']['note_type_deadnote_id'] = config_dict['deadnote_id']
+    with open('config.json', 'w') as configfile:
+        configfile.truncate(0)
+        json.dump(config, configfile)
+
 
 def db_init(host=None, user=None, password=None):
-    """""Create database from sql/create-database"""
+    """Create database from sql/create-database"""
     host = input("DB host: [127.0.0.1]") if not host else host
     host = '127.0.0.1' if host == '' else host
     user = input("DB user: [root] ") if not user else user
@@ -69,19 +72,22 @@ def db_init(host=None, user=None, password=None):
         conn.cursor().execute(query)
     conn.commit()
     conn.close()
-    con, conn = connection(host='127.0.0.1', user='pytatki', password='pytatki', db='pytatki')
+    con, conn = connection(host='127.0.0.1', user='pytatki',
+                           password='pytatki', db='pytatki')
     conn.begin()
     admin_group_id = create_usergroup(conn, 'admins', 'Group of admins')
     active_id = create_status(conn, 'active', 'Record is active')
     removed_id = create_status(conn, 'removed', 'Record is removed')
-    file_id = create_note_type(conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
+    file_id = create_note_type(
+        conn, "file", "A file in format of txt, pdf, png, jpg, jpeg, gif, doc, docx, ppt, pptx, xslx, xsl, odt, rtf, cpp")
     text_id = create_note_type(conn, "text", "Just plain non-formated text")
     url_id = create_note_type(conn, "url", "An URL link to another resource")
+    deadnote_id = create_note_type(conn, "deadnote", "Note made with Pytatki")
     username = input("Insert your admin login: [admin]")
     username = 'admin' if username == '' else username
     email = input("Insert your admin email: ")
     password = input("Insert your admin password: ")
-    admin_id = create_user(conn, username, email, password, active_id)
+    admin_id = create_user(conn, username, password, email, active_id)
     con.execute("INSERT INTO user_membership (user_id, usergroup_id) VALUES (%s, %s)", (
         escape_string(str(admin_id)), escape_string(str(admin_group_id))))
     conn.commit()
@@ -94,8 +100,9 @@ def db_init(host=None, user=None, password=None):
         'removed_id': removed_id,
         'file_id': file_id,
         'text_id': text_id,
-        'url_id': url_id
-        })
+        'url_id': url_id,
+        'deadnote_id': deadnote_id
+    })
 
 
 if __name__ == '__main__':

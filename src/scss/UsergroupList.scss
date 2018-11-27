@@ -1,0 +1,39 @@
+@import "_variables";
+
+.sidebar {
+    grid-column: 1;
+    grid-row: 2;
+
+    p {
+        margin-left: 20px;
+    }
+
+    ul {
+        list-style: none;
+        margin-right: 20px;
+
+        button {
+            text-transform: uppercase;
+            margin: 5px 0;
+            padding: 5px;
+            text-align: center;
+            width: 100%;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 575px) {
+    .sidebar {
+        width: 70vw;
+        background-color: lightblue;
+        position: fixed;
+        top: 50vh;
+        height: 50vh;
+        left: -70vw;
+        z-index: 999;
+    }
+}

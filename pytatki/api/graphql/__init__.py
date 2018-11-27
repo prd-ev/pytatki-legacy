@@ -6,7 +6,7 @@ from pytatki.dbconnect.get import get_notegroup_content, get_trash
 from pytatki.dbconnect import connection, has_access_to_usergroup, get_note, get_last_note_actions, get_notegroup, get_root_id,  get_usergroups_of_user, get_users_of_usergroup
 import gc
 from flask_login import current_user
-from pytatki.views import post_note, add_tag_to_note
+from pytatki.views import find_notegroup_children, post_note, add_tag_to_note
 from graphql.type.definition import GraphQLArgument, GraphQLField, GraphQLObjectType
 from graphql.type.scalars import GraphQLString, GraphQLInt
 from graphql.type.schema import GraphQLSchema
@@ -21,14 +21,22 @@ def generate_access_token(id_user, expiration=3600):
 
 
 def verify_auth_token(token):
-        s = TimedJSONWebSignatureSerializer(APP.secret_key)
-        try:
-            data = s.loads(token)
-        except SignatureExpired:
-            return None
-        except BadSignature:
-            return None
-        return data
+    s = TimedJSONWebSignatureSerializer(APP.secret_key)
+    try:
+        data = s.loads(token)
+    except SignatureExpired:
+        return None
+    except BadSignature:
+        return None
+    return data
+
+
+def invite(iduser, idusergroup):
+    if has_access_to_usergroup(idusergroup, iduser):
+        token = ts.dumps(idusergroup, salt=APP.secret_key)
+        return "{}/join/{}".format(CONFIG['host'], token)
+    return "perimission denied"
+
 
 
 def auth(func, token):
@@ -70,6 +78,15 @@ QueryRootType = GraphQLObjectType(
             resolver=lambda obj, info, parent_id: executeSQL(
                 "SELECT title FROM note_view WHERE parent_id = %s", escape_string(str(parent_id)))
         ),
+        'getNotegroupById': GraphQLField(
+            type=GraphQLString,
+            args={
+                'notegroup_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, notegroup_id, access_token: get_notegroup(
+                notegroup_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
         'getContent': GraphQLField(
             type=GraphQLString,
             args={
@@ -86,6 +103,15 @@ QueryRootType = GraphQLObjectType(
                 'access_token': GraphQLArgument(GraphQLString)
             },
             resolver=lambda obj, info, id_note, access_token: get_note(
+                id_note, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'getNoteLastActions': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_note': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_note, access_token: get_last_note_actions(
                 id_note, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getRootId': GraphQLField(
@@ -122,6 +148,23 @@ QueryRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, id_notegroup, access_token: get_trash(
                 id_notegroup, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        'generateInvitationLink': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_usergroup, access_token: invite(
+                verify_auth_token(access_token)['id'], id_usergroup) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'getMembers': GraphQLField(
+            type=GraphQLString,
+            args={
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, id_usergroup, access_token: get_users_of_usergroup(
+                id_usergroup, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         ),
         'getToken': GraphQLField(
             type=GraphQLString,
@@ -175,13 +218,40 @@ MutationRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, tag, note_id, access_token: add_tag_to_note(
                 tag, note_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'createUsergroup': GraphQLField(
+            type=GraphQLString,
+            args={
+                'name': GraphQLArgument(GraphQLString),
+                'description': GraphQLArgument(GraphQLString),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, name, description, access_token: api_create_usergroup(
+                name, description, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
+        'createNotegroup': GraphQLField(
+            type=GraphQLString,
+            args={
+                'name': GraphQLArgument(GraphQLString),
+                'id_usergroup': GraphQLArgument(GraphQLInt),
+                'parent_id': GraphQLArgument(GraphQLInt),
+                'access_token': GraphQLArgument(GraphQLString)
+            },
+            resolver=lambda obj, info, name, id_usergroup, parent_id, access_token: api_create_notegroup(
+                name, id_usergroup, parent_id, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
         )
     }
 )
 
 schema=GraphQLSchema(QueryRootType, MutationRootType)
 
+<<<<<<< HEAD
 APP.add_url_rule(
     '/api/', view_func = GraphQLView.as_view('api', schema=schema))
 APP.add_url_rule(
     '/graphiql/', view_func = GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
+=======
+APP.add_url_rule('/api/', view_func=GraphQLView.as_view('api', schema=schema))
+APP.add_url_rule(
+    '/graphiql/', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
+>>>>>>> master

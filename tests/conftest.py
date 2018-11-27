@@ -1,11 +1,11 @@
-from pytatki.main import create_app
-import pytest
 import pymysql
-from pytatki.dbconnect import connection, create_user, create_status, create_usergroup, add_user_to_usergroup, create_notegroup, create_note_type, create_note, remove_notegroup
-from pytatki.views import type_id, has_access_to_usergroup
+import pytest
+
 from init_db import parse_sql
-from shutil import copy
-from pytatki.config import parse_config
+from pytatki.dbconnect import (add_user_to_usergroup, connection, create_note,
+                               create_note_type, create_notegroup,
+                               create_status, create_user, create_usergroup,
+                               has_access_to_usergroup)
 
 
 @pytest.fixture(scope='session', autouse=True)

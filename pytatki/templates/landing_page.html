@@ -1,51 +1,35 @@
-{% extends "_base.html" %} {% set page_id = "landing_page" %} {% block content %}
-<div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-lg-8">
-        <div style="height: 200px">
-            <div class="rounded alert-danger" style="padding: 20px; margin-top:50px; margin-bottom:50px">
-                <h3 class="text-center">Musisz być zalogowany!</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-2"></div>
-</div>
-<div class="row login-row">
-    <div class="col-lg-4">
-    </div>
-    <div class="col-lg-4 bg-white rounded m-2" style="padding:15px;">
-        <h3>Logowanie</h3>
-        <form method=post action="{% if request.args.get('next') %}{{request.path + " ?next=" + request.args.get('next')}}{%else%}/login/{%endif%}">
-            <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="username" name="username" type="text" value="{% if form %}{{form['username']}}{%elif request.args.get('username')%}{{request.args.get('username')}}{%else%}{%endif%}"
-                    {%if not request.args.get( 'username')%}autofocus{%endif%} placeholder="Login">
-            </div>
-            <div class="form-group">
-                <input autocapitalize="none" class="form-control" id="password" name="password" type="password" value="" placeholder="Hasło"
-                    {%if request.args.get( 'username')%}autofocus{%endif%}> {% if wrong %}
-                <small class="form-text text-danger">
-                    Niepoprawny login lub hasło!
-                </small>
-                {% endif %}
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                <label class="form-check-label" for="remember">Zapamiętaj mnie</label>
-            </div>
-            <input class="btn btn-primary" type=submit value="Zaloguj się">
-        </form>
-        {% if error %}
-        <p class="error">
-            <strong>Error:</strong>{{error}}</p>
-        {% endif %}
-    </div>
-    <div class="col-lg-4">
-    </div>
-</div>
-<center>
-    <p>Nie masz konta?
-        <a href="{{url_for('register_get', next=request.args.get('next'))}}" style="text-decoration: none">Zarejestruj się</a>
-    </p>
-</center>
+<!doctype html>
+<html lang='pl'>
 
-{% endblock %}
+<head>
+    <title>Pytatki ucz się z nami</title>
+    <meta name="Description" content="Landing page.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+        crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="landing-content">
+        <div class="brand" href="/">
+            <span>Pytatki</span>
+            <span class="badge">beta</span>
+        </div>
+        <div class="motivation">
+            <span>Note Learn Pass</span>
+        </div>
+        <a class="empty-button" href="/login">Start</a>
+    </div>
+    <div class="wave waveTop">
+    </div>
+    <div class="wave waveMiddle">
+    </div>
+    <div class="wave waveBottom">
+    </div>
+
+</body>
+
+</html>

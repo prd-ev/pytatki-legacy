@@ -1,3 +1,15 @@
-.form{
-    background-color: aquamarine;
+.form {
+  label {
+    font: 12px;
+  }
+
+  input[type="file"] {
+  
+  }
+}
+
+
+.addContainer{
+  display: flex;
+  text-align: center;
 }
