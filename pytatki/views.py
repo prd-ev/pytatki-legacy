@@ -376,7 +376,7 @@ def download(identifier):
             conn.close()
             if note['note_type'] == "file":
                 return send_file(os.path.join(APP.config['UPLOAD_FOLDER'], note['value']))
-            if note['note_type'] == "note":
+            if note['note_type'] == "deadnote":
                 return redirect('/deaditor/' + identifier)
             return note['value']
     flash("Musisz byc zalogowany", 'warning')
