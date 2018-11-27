@@ -6,9 +6,9 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/888414de92604fbbbd46b42c04e96e81)](https://www.codacy.com/app/pniedzwiedzinski19/pytatki?utm_source=github.com&utm_medium=referral&utm_content=butterfly-pn/pytatki&utm_campaign=Badge_Grade)
 [![CircleCI](https://circleci.com/gh/PRD-ev/pytatki/tree/master.svg?style=svg)](https://circleci.com/gh/PRD-ev/pytatki/tree/master)
 [![Issues](https://img.shields.io/github/issues/PRD-ev/pytatki.svg)](https://github.com/PRD-ev/pytatki/issues)
-![Snakes](https://img.shields.io/badge/w%C4%99%C5%BCe%20s%C4%85-jadowite-blue.svg)
+![Snakes](https://img.shields.io/badge/version-v1.1.2-blue.svg)
 
-Notes hosting
+Pytatki is an open source web app for storing notes and learning resources. The purpose of this app is to make organizing them easier and faster.
 
 ## Getting Started
 
@@ -84,6 +84,7 @@ jest
 
 - [Bootstrap](https://www.getbootstrap.com/)
 - [Flask](http://flask.pocoo.org/)
+- [React](https://reactjs.org)
 
 ## Contributing 🎉
 
