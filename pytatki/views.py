@@ -56,48 +56,6 @@ def has_access_to_usergroup(id_usergroup, id_user):
     return True if return_value else False
 
 
-def find_notegroup_children(id_notegroup, id_user):
-    """Generate dict with recurent children of usergroup"""
-    if id_notegroup == 0 or not int(id_notegroup) or id_user == 0 or not int(id_user):
-        return "ID must be a valid positive integer"
-    children = []
-    if has_access_to_notegroup(id_notegroup, id_user):
-        con, conn = connection()
-        con.execute("SELECT idnotegroup, folder_name FROM notegroup_view WHERE iduser = %s AND parent_id = %s", (
-            escape_string(str(id_user)), escape_string(str(id_notegroup))))
-        usergroups = con.fetchall()
-        con.execute(
-            "SELECT idnote, value, note_type, creator_login, notegroup_id, notegroup_name, title AS 'name' FROM "
-            "note_view WHERE notegroup_id = %s",
-            escape_string(str(id_notegroup)))
-        notes = con.fetchall()
-        con.close()
-        conn.close()
-        if usergroups:
-            for usergroup in usergroups:
-                children.append(usergroup)
-        if notes:
-            for note in notes:
-                children.append(note)
-    return json.dumps(children, ensure_ascii=False)
-
-
-def get_root_id(id_usergroup, id_user):
-    """Get if of root directory in usergroup"""
-    if has_access_to_usergroup(id_usergroup, id_user):
-        con, conn = connection()
-        con.execute("SELECT idnotegroup FROM notegroup_view WHERE iduser = %s AND idusergroup = %s AND parent_id = 0",
-                    (escape_string(str(id_user)), escape_string(str(id_usergroup))))
-        root_id = con.fetchone()
-        if not root_id:
-            return "No root folder" + str(id_user)
-        root_id = root_id['idnotegroup']
-        con.close()
-        conn.close()
-        return root_id
-    return "Access denied"
-
-
 def add_tag_to_note(tag, id_note, id_user):
     """Add tag to note, if tag doesn't exist create new"""
     if has_access_to_note(id_note, id_user):
