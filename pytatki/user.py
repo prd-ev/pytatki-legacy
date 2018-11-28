@@ -13,7 +13,7 @@ from flask import render_template, redirect, flash, request, url_for
 from flask_login import login_user, logout_user, current_user
 from pytatki.main import APP, MAIL, CONFIG
 from pytatki.models import get_user
-from pytatki.view_manager import login_manager, login_required
+from pytatki.view_manager import authentication_required, login_required
 from pytatki.security import ts
 from pytatki.api.graphql import generate_access_token
 from werkzeug.wrappers import Response
@@ -31,7 +31,7 @@ def valid_username(username):
 
 
 @APP.route('/user/<username>/')
-@login_manager
+@authentication_required
 def user_info(username):
     """User info"""
     user = get_user(login=username)
@@ -102,7 +102,7 @@ def update_email():
 
 
 @APP.route('/user/update-password/', methods=['POST'])
-@login_manager
+@authentication_required
 def update_password():
     if current_user.check_password(request.form['password']):
         con, conn = connection()
@@ -128,8 +128,8 @@ def register_post():
         else:
             wrong_password = True
         accept = form['accept_tos'] if 'accept_tos' in form else None
-        con.execute("SELECT * FROM user WHERE login = (%s)",
-                    (escape_string(form['username'])))
+        con.execute("SELECT * FROM user WHERE login = (%s) OR email = %s",
+                    (escape_string(form['username']), escape_string(form['email'])))
         used_username = con.fetchone()
         if accept != 'checked' or used_username or '@' not in form['email'] \
                 or wrong_password or valid_username(form['username']):
