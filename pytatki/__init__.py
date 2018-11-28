@@ -1,11 +1,12 @@
 name = "pytatki"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
-import pytatki.views
-import pytatki.user
-import pytatki.models
-import pytatki.main
-import pytatki.dbconnect
-import pytatki.config
-import pytatki.view_manager
+import pytatki.admin
 import pytatki.api.graphql
+import pytatki.view_manager
+import pytatki.config
+import pytatki.dbconnect
+import pytatki.main
+import pytatki.models
+import pytatki.user
+import pytatki.views
