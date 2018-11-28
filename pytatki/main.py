@@ -57,13 +57,11 @@ APP.config.update(
     MAIL_PASSWORD=CONFIG['email']['email_password'],
     MAIL_DEFAULT_SENDER=CONFIG['email']['email']
 )
-<< << << < HEAD
+
 APP.config['CELERY_RESULT_BACKEND'] = 'rpc://'
 APP.config['CELERY_BROKER_URL'] = 'amqp://localhost'
-== == == =
 
 APP.wsgi_app = WhiteNoise(APP.wsgi_app, root='pytatki/static')
->>>>>> > master
 LM = LoginManager()
 LM.init_app(APP)
 LM.login_view = 'login_get'

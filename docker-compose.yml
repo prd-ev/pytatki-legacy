@@ -6,9 +6,12 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=true
     ports:
       - "3306:3306"
+  rabbit:
+    image: rabbitmq:3.7-management
   pytatki:
     image: pytatki
     ports:
       - "5000:80"
     depends_on:
       - db
+      - rabbit

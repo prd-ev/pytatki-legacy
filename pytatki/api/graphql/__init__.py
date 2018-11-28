@@ -38,7 +38,6 @@ def invite(iduser, idusergroup):
     return "perimission denied"
 
 
-
 def auth(func, token):
     def some_func(*args, **kwargs):
         return func(*args, **kwargs) if verify_auth_token(token) else "Invalid or expired access_token"
@@ -148,6 +147,7 @@ QueryRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, id_notegroup, access_token: get_trash(
                 id_notegroup, verify_auth_token(access_token)['id']) if verify_auth_token(access_token) else "invalid or expired access_token"
+        ),
         'generateInvitationLink': GraphQLField(
             type=GraphQLString,
             args={
@@ -207,7 +207,6 @@ MutationRootType = GraphQLObjectType(
             },
             resolver=lambda obj, info, notegroup_id, access_token: remove_bin(
                 verify_auth_token(access_token)['id'], notegroup=notegroup_id) if verify_auth_token(access_token) else "invalid or expired access_token"
-            )
         ),
         'addTagToNote': GraphQLField(
             type=GraphQLString,
@@ -245,13 +244,7 @@ MutationRootType = GraphQLObjectType(
 
 schema=GraphQLSchema(QueryRootType, MutationRootType)
 
-<<<<<<< HEAD
 APP.add_url_rule(
     '/api/', view_func = GraphQLView.as_view('api', schema=schema))
 APP.add_url_rule(
     '/graphiql/', view_func = GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
-=======
-APP.add_url_rule('/api/', view_func=GraphQLView.as_view('api', schema=schema))
-APP.add_url_rule(
-    '/graphiql/', view_func=GraphQLView.as_view('graphiql', schema=schema, graphiql=True))
->>>>>>> master
