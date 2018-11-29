@@ -194,6 +194,55 @@ def login_get():
     return render_template('login.html')
 
 
+@APP.route('/resetpassword/', methods=["GET"])
+def reset_password():
+    """Reset password"""
+    return render_template('password_reset.html')
+
+
+@APP.route('/resetpassword/', methods=["POST"])
+def send_reset_email():
+    """Send Email"""
+    form = request.form
+    if get_user(email=form['email']) == None:
+        flash('Nie ma konta o takim emailu: {0}'.format(form['email']), 'warning')
+        return render_template('password_reset.html')
+    else:
+        send_password_reset_email(form['email'])
+        return render_template('login.html')
+
+
+def send_password_reset_email(email):
+
+    reset_key = ts.dumps(email, salt=APP.secret_key)
+    msg = Message('Pytatki - Zresetuj hasło', sender=APP.config.get('MAIL_USERNAME'),
+                  recipients=[email])
+    msg.html = render_template('reset_password_email.html', reset_key=reset_key)
+    MAIL.send(msg)
+
+
+@APP.route('/user/resetpassword/<email_to_reset>', methods = ['GET'])
+def reset_password_page(email_to_reset):
+    """Render page to reset password"""
+    if get_user(email=email_to_reset) == None:
+        return render_template('password_reset_page.html')
+
+
+@APP.route('/user/resetpassword/<email_to_reset>', methods = ['POST'])
+def reset_password_on_page(email_to_reset):
+
+    form = request.form
+    email = ts.loads(email_to_reset, salt=APP.secret_key, max_age=86400)
+    con, conn = connection()
+    password = sha256_crypt.encrypt((str(form['password'])))
+    con.execute("UPDATE user SET password = %s WHERE email = %s", (
+        escape_string(password), escape_string(str(email))))
+    conn.commit()
+    con.close()    
+    conn.close()
+    return render_template('login.html')
+
+
 @APP.route("/logout/")
 @login_required
 def logout():
