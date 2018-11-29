@@ -213,7 +213,11 @@ def send_reset_email():
 
 
 def send_password_reset_email(email):
-
+    """Sends an email that lets you reset your password
+        
+    Args:
+        email - recipent that gets an email       
+    """
     reset_key = ts.dumps(email, salt=APP.secret_key)
     msg = Message('Pytatki - Zresetuj hasło', sender=APP.config.get('MAIL_USERNAME'),
                   recipients=[email])
@@ -230,7 +234,7 @@ def reset_password_page(email_to_reset):
 
 @APP.route('/user/resetpassword/<email_to_reset>', methods = ['POST'])
 def reset_password_on_page(email_to_reset):
-
+    """Gets an email from url and resets password of user with this email"""
     form = request.form
     email = ts.loads(email_to_reset, salt=APP.secret_key, max_age=86400)
     con, conn = connection()
