@@ -1,8 +1,8 @@
-newIssueWelcomeComment: 
-  It's not a bug, it's a feature 
-  
-  ![img](https://i.gifer.com/ZLy7.gif) 
-  
+newIssueWelcomeComment:
+  It's not a bug, it's a feature
+
+  ![img](https://i.gifer.com/ZLy7.gif)
+
   Thanks for opening issue here ;)
 newPRWelcomeComment: >
   Wow, thanks for that PR! ![img](https://media.tenor.com/images/8609137e77ffdfbffde821ae03d2b2ef/tenor.gif)
