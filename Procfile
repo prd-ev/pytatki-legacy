@@ -1,0 +1,1 @@
+web: docker build . -t pytatki && docker run -p 80:80 --name pytatki
