@@ -15,7 +15,7 @@ from pytatki.dbconnect import (connection, create_note, has_access_to_note,
                                remove_notegroup, add_user_to_usergroup)
 from pytatki.main import APP, CONFIG
 from pytatki.models import get_user
-from pytatki.view_manager import login_manager, nocache
+from pytatki.view_manager import authentication_required, nocache
 from pytatki.security import ts
 import codecs
 
@@ -126,7 +126,7 @@ def about():
 
 
 @APP.route("/admin/")
-@login_manager
+@authentication_required
 def admin():
     """Admin"""
     if current_user.is_admin:
@@ -136,7 +136,7 @@ def admin():
 
 
 @APP.route('/admin/delete/user/<int:identifier>/', methods=["GET"])
-@login_manager
+@authentication_required
 def delete_user(identifier):
     """Delete user"""
     # TODO: delete user
@@ -159,7 +159,7 @@ def delete_notegroup(identifier):
 
 
 @APP.route('/admin/delete/note/<int:identifier>/', methods=["GET"])
-@login_manager
+@authentication_required
 def delete_note(identifier):
     """Delete note"""
     if current_user.is_admin:
@@ -178,7 +178,7 @@ def delete_note(identifier):
 
 
 @APP.route("/admin/user-list/")
-@login_manager
+@authentication_required
 def user_list():
     """wyswietla liste uzytkownikow"""
     if current_user.is_admin:
@@ -197,7 +197,7 @@ def user_list():
 
 
 @APP.route('/admin/give-admin/<int:identifier>/', methods=["GET"])
-@login_manager
+@authentication_required
 def give_admin(identifier):
     """Give admin"""
     con, conn = connection()
@@ -217,7 +217,7 @@ def give_admin(identifier):
 
 
 @APP.route('/admin/take-admin/<int:identifier>/', methods=["GET"])
-@login_manager
+@authentication_required
 def take_admin(identifier):
     """take admin"""
     if int(identifier) != int(CONFIG['identifiers']['admin_id']):
@@ -251,7 +251,7 @@ def allowed_file(filename):
 
 
 @APP.route('/add/', methods=["GET", "POST"])
-@login_manager
+@authentication_required
 def add():
     """Add new file"""
     if request.method == 'POST':
@@ -304,7 +304,7 @@ def add():
 
 
 @APP.route('/admin/add/', methods=["POST"])
-@login_manager
+@authentication_required
 def admin_add_post():
     """Admin add"""
     if current_user.is_admin:
@@ -344,7 +344,7 @@ def admin_add_post():
 
 
 @APP.route('/admin/add/', methods=["GET"])
-@login_manager
+@authentication_required
 def admin_add_get():
     """Admin add"""
     if current_user.is_admin:
@@ -363,7 +363,7 @@ def admin_add_get():
 
 
 @APP.route('/download/<identifier>/')
-@login_manager
+@authentication_required
 @nocache
 def download(identifier):
     """Download file"""
@@ -385,7 +385,7 @@ def download(identifier):
 
 
 @APP.route('/join/<group>')
-@login_manager
+@authentication_required
 def join_group(group):
     group = ts.loads(group, salt=APP.secret_key, max_age=86400)
     con, conn = connection()
