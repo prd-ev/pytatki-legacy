@@ -17,6 +17,7 @@ from pytatki.main import APP, CONFIG
 from pytatki.models import get_user
 from pytatki.view_manager import login_manager, nocache
 from pytatki.security import ts
+import codecs
 
 __author__ = 'Patryk Niedzwiedzinski'
 
@@ -481,7 +482,7 @@ def deaditor(idnote):
                 conn.close()
                 is_author = creator['creator_id']==current_user['iduser']
                 if note['note_type'] == "deadnote":
-                    with open('pytatki/files/' + note['value'], 'r') as file:
+                    with codecs.open('pytatki/files/' + note['value'], 'r', 'utf-8') as file:
                         data = json.load(file)
                     return render_template("deaditor.html", file=data, is_author=is_author)
                 return redirect("/download/" + idnote)
