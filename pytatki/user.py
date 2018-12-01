@@ -204,12 +204,11 @@ def reset_password():
 def send_reset_email():
     """Send Email"""
     form = request.form
-    if get_user(email=form['email']) == None:
+    if get_user(email=form['email']) is None:
         flash('Nie ma konta o takim emailu: {0}'.format(form['email']), 'warning')
         return render_template('password_reset.html')
-    else:
-        send_password_reset_email(form['email'])
-        return render_template('login.html')
+    send_password_reset_email(form['email'])
+    return render_template('login.html')
 
 
 def send_password_reset_email(email):
@@ -229,7 +228,7 @@ def send_password_reset_email(email):
 def reset_password_page(token):
     """Render page to reset password"""
     email = ts.loads(token, salt=APP.secret_key, max_age=86400)
-    if get_user(email=email) != None:
+    if get_user(email=email) is not None:
         return render_template('password_reset_page.html')
 
 
