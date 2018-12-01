@@ -213,7 +213,7 @@ def send_reset_email():
 
 
 def send_password_reset_email(email):
-    """Sends an email that lets you reset your password
+    """Sends an email that lets you reset your password.
         
     Args:
         email - recipent that gets an email       
@@ -225,18 +225,19 @@ def send_password_reset_email(email):
     MAIL.send(msg)
 
 
-@APP.route('/user/resetpassword/<email_to_reset>', methods = ['GET'])
-def reset_password_page(email_to_reset):
+@APP.route('/user/resetpassword/<token>', methods = ['GET'])
+def reset_password_page(token):
     """Render page to reset password"""
-    if get_user(email=email_to_reset) == None:
+    email = ts.loads(token, salt=APP.secret_key, max_age=86400)
+    if get_user(email=email) != None:
         return render_template('password_reset_page.html')
 
 
-@APP.route('/user/resetpassword/<email_to_reset>', methods = ['POST'])
-def reset_password_on_page(email_to_reset):
-    """Gets an email from url and resets password of user with this email"""
+@APP.route('/user/resetpassword/<token>', methods = ['POST'])
+def reset_password_on_page(token):
+    """Gets an email from url and resets password of user with this email."""
     form = request.form
-    email = ts.loads(email_to_reset, salt=APP.secret_key, max_age=86400)
+    email = ts.loads(token, salt=APP.secret_key, max_age=86400)
     con, conn = connection()
     password = sha256_crypt.encrypt((str(form['password'])))
     con.execute("UPDATE user SET password = %s WHERE email = %s", (
