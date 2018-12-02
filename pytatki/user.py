@@ -213,9 +213,9 @@ def send_reset_email():
 
 def send_password_reset_email(email):
     """Sends an email that lets you reset your password.
-        
+
     Args:
-        email - recipent that gets an email       
+        email - recipent that gets an email
     """
     reset_key = ts.dumps(email, salt=APP.secret_key)
     msg = Message('Pytatki - Zresetuj hasło', sender=APP.config.get('MAIL_USERNAME'),
@@ -242,7 +242,7 @@ def reset_password_on_page(token):
     con.execute("UPDATE user SET password = %s WHERE email = %s", (
         escape_string(password), escape_string(str(email))))
     conn.commit()
-    con.close()    
+    con.close()
     conn.close()
     return render_template('login.html')
 
