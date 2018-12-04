@@ -258,6 +258,8 @@ class Notatki extends React.Component {
           }
         }
         return content;
+      } else {
+        return <i className="ld ld-ring ld-cycle" />;
       }
     } else {
       return (
