@@ -1,45 +1,31 @@
-FROM debian:latest
+FROM pniedzwiedzinski/flask-react
 
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    apache2 \
-    apache2-dev \
-    libapache2-mod-wsgi-py3 \
-    build-essential \
-    python3 \
-    python3-dev\
-    python3-pip \
-    python3-setuptools \
-    python3-wheel \
-    gnupg
+COPY ./requirements/common.txt /home/
+COPY ./package.json /var/www/pytatki/
+RUN pip3 install -r /home/common.txt
+WORKDIR /var/www/pytatki
+RUN npm install
 
-RUN curl -sL https://deb.nodesource.com/setup_11.x | bash - \
-    && apt-get install -y --no-install-recommends \
-    nodejs \
-    vim \
-    && apt-get clean \
-    && apt-get autoremove \
-    && rm -rf /var/lib/apt/lists/*
+
+COPY ./examples/apache.conf /etc/apache2/sites-available/pytatki.conf
+RUN mkdir /etc/apache2/sites-enabled/ && \
+    ln -s /etc/apache2/sites-available/pytatki.conf /etc/apache2/sites-enabled/pytatki.conf
+
+RUN ln -sf /dev/stdout /var/log/apache2/access.log && \
+    ln -sf /dev/stderr /var/log/apache2/error.log
+
+#ln -s /etc/apache2/mods-available/headers.conf /etc/apache2/mods-enabled/headers.conf
+COPY ./examples/pytatki.wsgi /var/www/pytatki/pytatki.wsgi
+
+RUN ln -s  /var/run /run
 
 COPY . /var/www/pytatki
 
-WORKDIR /var/www/pytatki
-
-RUN pip3 install -r /var/www/pytatki/requirements/common.txt
-RUN npm install && npm run build
-
-COPY ./examples/apache.conf /etc/apache2/sites-available/pytatki.conf
-RUN a2ensite pytatki
-RUN a2enmod headers
-
-COPY ./examples/pytatki.wsgi /var/www/pytatki/pytatki.wsgi
-
-RUN a2dissite 000-default.conf
-RUN a2ensite pytatki.conf
+RUN  npm run build
 
 EXPOSE 80
 
 WORKDIR /var/www/pytatki
 
-CMD  /usr/sbin/apache2ctl -D FOREGROUND
+CMD  exec /usr/sbin/httpd -D FOREGROUND
