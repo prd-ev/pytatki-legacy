@@ -1,4 +1,4 @@
-# Looking for maintainers!!!
+# No longer in development!
 
 # pytatki
 
